@@ -1,0 +1,12 @@
+body{
+    background-color: #353535;
+    color: #fff;
+    -webkit-app-region: drag;
+    margin: 0;
+    cursor: default;
+}
+
+::-webkit-selection
+{
+    background-color: transparent;
+}

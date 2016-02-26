@@ -1,0 +1,9 @@
+{
+    "name": "Done",
+    "version": "0.0.1",
+    "main": "test.html",
+    "window":{
+        "toolbar":false,
+        "frame":false
+    }
+}
