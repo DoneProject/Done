@@ -1,0 +1,82 @@
+//MODULES
+var http = require("http");
+var dns = require("dns");
+var fs = require("fs");
+
+//CLASSES
+var c = require("./class/class.js");
+
+//LISTS
+var orderable = [];
+var tables = [];
+var extras = [];
+var pending = [];
+
+//CONST
+const port = 8080;
+const apikey = "api";
+
+//API Handlers
+var api_handlers = {
+  "tables":function()
+  {
+    return JSON.stringify(tables);
+  },
+  "orderable":function()
+  {
+    return JSON.stringify(orderable);
+  },
+  "extras":function()
+  {
+    return JSON.stringify(extras);
+  },
+  "queue":function(m)
+  {
+    if(m=="post")
+    {
+      
+    }
+    else return JSON.stringify(pending);
+  }
+};
+
+//Constructor
+function handleApiRequest(request,response)
+{
+  var r = request.url.replace(new RegExp("^\/?"+apikey+"\/?"),"");
+  var m = request.method.toLowerCase();
+  if(r in api_handlers)
+  {
+    var t = api_handlers[r](m,request);
+    response.end(t);
+  }
+};
+
+function handleRequest(request,response)
+{
+  
+  //console.log("HANDLE REQUEST: "+request.url);
+  console.log(request);
+  if(request.url.indexOf("/"+apikey)==0)
+  {
+    handleApiRequest(request,response);
+    return;
+  }
+  
+  if(request.url=="/" || request.url.length==0)request.url="index.html";
+  if(request.url[0]=="/")request.url=request.url.replace("/","");
+  
+  try{
+    var resp = fs.readFileSync(request.url);
+    response.end(resp);
+  }catch(e){
+    response.end("ERROR: location "+request.url);
+  }
+  
+};
+
+var hserver = http.createServer(handleRequest);
+hserver.listen(port,function(){
+  console.log("Server listening on: http://localhost:%s", port);
+});
+
