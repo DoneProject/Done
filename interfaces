@@ -9,3 +9,65 @@
   receive tables
   receive orderable things
   receive extras
+  
+[Table JSON]
+  {
+    "number":1,
+    "pending":[[Order JSON]]
+  }
+  
+[Order JSON]
+  {
+    "id":12,
+    "prod_id":12,
+    "name":"pizza capricciosa",
+    "type":"pizza",
+    "extra":[[Extra JSON]],
+    "price":8.8
+  }
+  
+[Extra JSON]
+  {
+    "id":8,
+    "name":"salami",
+    "action":"-", //Or "+"
+    "value":1.2
+  }
+
+
+[Example JSON]
+  {
+    "number":1,
+    "pending":[
+      {
+        "id":12,
+        "prod_id":12,
+        "name":"pizza capricciosa",
+        "type":"pizza",
+        "extra":[
+          {
+            "id":8,
+            "name":"salami",
+            "action":"-", //Or "+"
+            "value":1.2
+          }
+        ],
+        "price":8.8
+      },
+      {
+        "id":13,
+        "prod_id":12,
+        "name":"pizza capricciosa",
+        "type":"pizza",
+        "extra":[
+          {
+            "id":9,
+            "name":"gorgonzola",
+            "action":"+", //Or "-"
+            "value":1.2
+          }
+        ],
+        "price":8.8
+      }
+    ]
+  }
