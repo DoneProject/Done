@@ -1,0 +1,11 @@
+[manager]
+  send list of tables
+  send list of orderable things
+  send list of extras
+  receive incoming orders (with extras)
+
+[app]
+  send order (with extra)
+  receive tables
+  receive orderable things
+  receive extras
