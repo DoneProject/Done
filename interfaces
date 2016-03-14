@@ -1,11 +1,21 @@
 [manager]
-  send list of tables
-  send list of orderable things
-  send list of extras
-  receive incoming orders (with extras)
+  GET list of tables
+    /api/tables
+  GET list of orderable things
+    /api/orderable
+  GET list of extras
+    /api/extras
+  GET incoming orders (with extras)
+    /api/queue
+  POST incoming orders (with extras)
+    /api/queue
 
 [app]
-  send order (with extra)
+  POST order (with extra)
+    /api/queue
+  POST extra
+    /api/addextra
+    
   receive tables
   receive orderable things
   receive extras

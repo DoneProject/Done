@@ -1,3 +1,3 @@
 #!/bin/bash
 
-node app.js
+forever -w app.js

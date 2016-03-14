@@ -1,20 +1,63 @@
+//MODULES
 var http = require("http");
 var dns = require("dns");
 var fs = require("fs");
+
+//CLASSES
+var c = require("./class/class.js");
+
+//LISTS
+var orderable = [];
+var tables = [];
+var extras = [];
+var pending = [];
+
+//CONST
 const port = 8080;
+const apikey = "api";
 
+//API Handlers
+var api_handlers = {
+  "tables":function()
+  {
+    return JSON.stringify(tables);
+  },
+  "orderable":function()
+  {
+    return JSON.stringify(orderable);
+  },
+  "extras":function()
+  {
+    return JSON.stringify(extras);
+  },
+  "queue":function(m)
+  {
+    if(m=="post")
+    {
+      
+    }
+    else return JSON.stringify(pending);
+  }
+};
 
+//Constructor
 function handleApiRequest(request,response)
 {
-  response.end("API REQUEST!");
+  var r = request.url.replace(new RegExp("^\/?"+apikey+"\/?"),"");
+  var m = request.method.toLowerCase();
+  if(r in api_handlers)
+  {
+    var t = api_handlers[r](m,request);
+    response.end(t);
+  }
 };
 
 function handleRequest(request,response)
 {
   
-  console.log("HANDLE REQUEST: "+request.url);
-  
-  if(request.url.indexOf("/?")==0)
+  //console.log("HANDLE REQUEST: "+request.url);
+  console.log(request);
+  if(request.url.indexOf("/"+apikey)==0)
   {
     handleApiRequest(request,response);
     return;
