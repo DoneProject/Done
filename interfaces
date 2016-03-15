@@ -16,6 +16,24 @@
   POST extra
     /api/addextra
     
+[manager]
+    GET list of tables
+        {"get:"tables"}
+    GET list of orderable things
+        {"get:"orderable"}
+    GET list of extras
+        {"get":"extras"}
+    GET incoming orders (with extras)
+        {"get":"queue"}
+    POST incoming orders (with extras)
+        {"post:":"orders","data":[Order JSON]}
+    
+[app]
+    POST order (with extra)
+        {"post:"order","data":[Order JSON]}
+    POST extra
+        {"post:"addextra","data":[Extra JSON]}
+    
   receive tables
   receive orderable things
   receive extras

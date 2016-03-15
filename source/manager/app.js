@@ -1,7 +1,18 @@
 //MODULES
 var http = require("http");
+var hserver = http.createServer(handleRequest);
 var dns = require("dns");
 var fs = require("fs");
+var ws = require("ws");
+var WebSocketServer = require('ws').Server;
+var wss = new WebSocketServer({ port: 3000 });
+
+wss.on('connection', function connection(ws) {
+    ws.on('message', function incoming(message) {
+        console.log("");
+    });
+    ws.send('something');
+});
 
 //CLASSES
 var c = require("./class/class.js");
@@ -91,7 +102,7 @@ function handleRequest(request,response)
   
 };
 
-var hserver = http.createServer(handleRequest);
+
 hserver.listen(port,function(){
   console.log("Server listening on: http://localhost:%s", port);
 });

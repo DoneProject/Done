@@ -9,12 +9,25 @@
     <body>
         <div class="side">
             <h1>Impostazioni</h1>
-            <label><span>Tavoli</span><input type="number" name="numberOdTables"></label>
-            <div class="more"><span>Extra</span></div>
-            <div class="more"><span>Prodotti</span></div>
+            <label><span>Tavoli</span><input type="number" name="numberOdTables" placeholder="NR" min="0" step="1"></label>
+            <div class="more" data-action="extra"><span>Extra</span></div>
+            <div class="more" data-action="products"><span>Prodotti</span></div>
         </div>
         <div class="main">
-            
+            <div class="info">
+                Seleziona un menu per visualizzare le sue impostazioni.
+            </div>
         </div>
+        
+        <div class="hidden">
+            <div class="pops" data-action="extra">
+                <h3 class="title">Extras</h3>
+            </div>
+            <div class="pops" data-action="products">
+                <h3 class="title">Prodotti</h3>
+            </div>
+        </div>
+        
+        <script>init();</script>
     </body>
 </html>

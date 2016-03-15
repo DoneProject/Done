@@ -1,6 +1,12 @@
 html{background-color: #eee;}
 body{margin: 0;font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;}
 
+/*hidden*/
+.hidden
+{
+    display: none;
+}
+
 /*side*/
 div.side
 {
@@ -18,7 +24,21 @@ div.side label
     text-align: left;
     display: block;
     margin: 0 5px;
-    line-height: 25px;
+}
+div.side label:after
+{
+    content: "";
+    clear: both;
+    display: block;
+}
+div.side label input
+{
+    float: right;
+    width: 70px;
+    padding: 2px 5px;
+    border: 1px #ccc solid;
+    border-radius: 3px;
+    outline: none;
 }
 
 div.side div.more
@@ -28,6 +48,13 @@ div.side div.more
     margin: 0 5px;
     line-height: 25px;
     cursor: pointer;
+    -webkit-transition: all 0.4s ease;
+    -o-transition: all 0.4s ease;
+    transition: all 0.4s ease;
+}
+div.side div.more[data-active="true"]
+{
+    color: #0af;
 }
 div.side div.more:after
 {
@@ -42,6 +69,12 @@ div.side div.more:after
     transform: translate(0,-50%);
 }
 
+div.side .more, .side label
+{
+    line-height: 25px;
+}
+
+/*main*/
 div.main
 {
     position: fixed;
@@ -49,4 +82,22 @@ div.main
     right: 0;
     left: 300px;
     height: 100%;
+}
+
+div.info
+{
+    margin: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 3px;
+    border: 1px #ddd solid;
+    text-align: center;
+}
+
+h3.title
+{
+    padding: 10px;
+    margin: 0 10px;
+    font-size: 24px;
+    border-bottom: 1px #ddd solid;
 }
