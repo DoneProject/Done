@@ -30,11 +30,24 @@ var api_handlers = {
   {
     return JSON.stringify(extras);
   },
-  "queue":function(m)
+  "queue":function(m,req,res)
   {
     if(m=="post")
     {
-      
+      var data = "";
+      req.on("data",function(d){data+=d;})
+      req.on("end",function(){
+        try{
+          var json = JSON.parse(data);
+          pending.push(json);
+          res.end(JSON.stringify(pending));
+          return;
+        }catch(e){
+          res.end("{\"Error\":\"Invalid data format\"}");
+          return;
+        };
+        res.end("Somthing strange happened");
+      })
     }
     else return JSON.stringify(pending);
   }
@@ -47,16 +60,19 @@ function handleApiRequest(request,response)
   var m = request.method.toLowerCase();
   if(r in api_handlers)
   {
-    var t = api_handlers[r](m,request);
-    response.end(t);
+    var t = api_handlers[r](m,request,response);
+    if(t!==false)
+      response.end(t);
+  }
+  else
+  {
+    response.end("API not found.");
   }
 };
 
 function handleRequest(request,response)
 {
-  
-  //console.log("HANDLE REQUEST: "+request.url);
-  console.log(request);
+  console.log("REQUEST: "+new Date());
   if(request.url.indexOf("/"+apikey)==0)
   {
     handleApiRequest(request,response);
