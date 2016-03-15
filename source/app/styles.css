@@ -1,0 +1,64 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font: 13px sans-serif;
+  padding-bottom: 50px; /* .site-footer height */
+}
+
+/* ========== */
+/* = Header = */
+/* ========== */
+
+.site-header {
+  padding: 12px 12px;
+  background-color: #60C975;
+}
+
+.site-header h1 {
+  font: 15px sans-serif;
+  text-align: center;
+}
+
+/* ========= */
+/* = Views = */
+/* ========= */
+
+main {
+  padding: 12px;
+}
+
+/* ========== */
+/* = Footer = */
+/* ========== */
+
+.site-footer {
+  position: fixed;
+  width: 100%;
+  height: 50px;
+  background-color: #fff;
+  border-top: 1px solid #ccc;
+  bottom: 0;
+  left: 0;
+}
+
+.ios .site-footer {
+  background-color: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.site-footer ul {
+  display: flex;
+  height: 50px;
+  justify-content: center;
+  align-items: center;
+  list-style: none;
+}
+
+.site-footer li:not(:last-child) {
+  margin-right: 2em;
+}
