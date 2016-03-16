@@ -124,6 +124,13 @@ Element.prototype.aniprox = function(dur,easing,concat){
 
 var attele = {};
 
+var api={
+    "addextra":function(obj)
+    {
+        alert("ADD EXTRA");
+    }
+};
+
 function fadeInMain()
 {
     var m = document.querySelector(".main");
@@ -148,6 +155,39 @@ var menus={
     }
 };
 
+
+function extraInit()
+{
+    var root = document.querySelector(".pops[data-action=\"extra\"]");
+    
+    
+    var extralist = root.querySelector(".list");
+    
+    //AddList
+    var addlist = root.querySelector(".addlist");
+    var add_name = root.querySelector(".nome");
+    var reset_add_item=function(){
+        add_name.value=addlist.value="";
+    };
+    add_name.addEventListener("keydown",function(event){
+        if(event.keyCode==13)
+        {
+            event.preventDefault();
+            add_price.focus();
+        }
+    })
+    var add_price = root.querySelector(".prezzo");
+    add_price.addEventListener("click",function(){
+        if(event.keyCode==13)
+        {
+            event.preventDefault();
+            var gai = get_add_item();
+            api.addextra(gai);
+            reset_add_item();
+        }
+    });
+}
+
 function init()
 {
     var menuItems = document.querySelectorAll(".side div.more");
@@ -158,7 +198,6 @@ function init()
     {
         att=pops[i].getAttribute("data-action");
         attele[att]=pops[i];
-        
     }
     
     for(var i = menuItems.length; --i>=0;)
@@ -176,4 +215,6 @@ function init()
         e.setAttribute("data-active","true");
         });
     }
+    
+    extraInit();
 }

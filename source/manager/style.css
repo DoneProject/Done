@@ -2,9 +2,15 @@ html{background-color: #eee;}
 body{margin: 0;font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;}
 
 input{
-    height: 20px;
+    height: 25px;
     padding: 0 5px;
     border-radius: 3px;
+    outline:none;
+    border: 1px #ccc solid;
+    font-size: 14px;
+}
+input:focus{
+    border: 1px #0081d1 solid;
 }
 
 /*hidden*/
@@ -45,6 +51,8 @@ div.side label input
     border: 1px #ccc solid;
     border-radius: 3px;
     outline: none;
+    height: 20px;
+    font-size: 14px;
 }
 
 div.side div.more
@@ -64,7 +72,8 @@ div.side div.more[data-active="true"]
 }
 div.side div.more:after
 {
-    content: ">";
+    content: "‣";
+    font-size: 40px;
     position: absolute;
     right: 0;
     top: 50%;
@@ -149,10 +158,6 @@ ul.addlist li input
     -ms-flex: auto 1 0;
     -o-flex: auto 1 0;
     flex: auto 1 0;
-    border: 1px #ccc solid;
-    height: 20px;
-    padding: 0 5px;
-    border-radius: 3px;
 }
 
 ul.addlist li input.prezzo
