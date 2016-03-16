@@ -84,6 +84,7 @@ function handleApiRequest(request,response)
 function handleRequest(request,response)
 {
   console.log("REQUEST: "+new Date());
+    console.log(request.headers);
   if(request.url.indexOf("/"+apikey)==0)
   {
     handleApiRequest(request,response);

@@ -167,8 +167,13 @@ function init()
         {
             menuItems[j].setAttribute("data-active","false");
         }
-           menus[event.target.getAttribute("data-action")] (event);
-        event.target.setAttribute("data-active","true");
+        var e = event.target;
+        while(!e.hasAttribute("data-action"))
+        {
+            e=e.parentElement;
+        }
+           menus[e.getAttribute("data-action")] (event);
+        e.setAttribute("data-active","true");
         });
     }
 }

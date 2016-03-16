@@ -1,6 +1,12 @@
 html{background-color: #eee;}
 body{margin: 0;font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;}
 
+input{
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 3px;
+}
+
 /*hidden*/
 .hidden
 {
@@ -35,7 +41,7 @@ div.side label input
 {
     float: right;
     width: 70px;
-    padding: 2px 5px;
+    padding: 0 5px;
     border: 1px #ccc solid;
     border-radius: 3px;
     outline: none;
@@ -100,4 +106,60 @@ h3.title
     margin: 0 10px;
     font-size: 24px;
     border-bottom: 1px #ddd solid;
+}
+
+/*extra*/
+ul.list
+{
+    padding: 0;
+    margin: 10px 10px;
+    list-style-type: none;
+}
+
+ul.list li
+{
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    -moz-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    -o-flex-wrap: wrap;
+    flex-wrap: wrap;
+    position: relative;
+}
+
+ul.list li .name
+{
+    flex: auto 1 0;
+}
+ul.list li .price
+{
+    color: #555;
+    text-align: right;
+    flex: 100px 0 0;
+}
+
+ul.addlist li input
+{
+    -webkit-flex: auto 1 0;
+    -moz-flex: auto 1 0;
+    -ms-flex: auto 1 0;
+    -o-flex: auto 1 0;
+    flex: auto 1 0;
+    border: 1px #ccc solid;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 3px;
+}
+
+ul.addlist li input.prezzo
+{
+    -webkit-flex: auto 0 0;
+    -moz-flex: auto 0 0;
+    -ms-flex: auto 0 0;
+    -o-flex: auto 0 0;
+    flex: auto 0 0;
 }
