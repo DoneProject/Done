@@ -240,6 +240,82 @@ var api_handlers = {
             res.end("Somthing strange happened");
         });
         return false;
+    },
+    "addproduct":function(m,req,res)
+    {
+        postHandle(req,function(o){
+            console.log("RECIVED PRODUCT OMFG!!!! :O",o);
+            try{
+                var json = JSON.parse(o.data);
+                console.log(json);
+                var e = new Order(null,getOrderableId(),json.name,[],json.price);
+                orderable.push(e);
+                res.end(JSON.stringify({added:e}));
+                return;
+            }catch(e){
+                res.end("{\"error\":\""+e.message+"\"}");
+                return;
+            };
+            res.end("Somthing strange happened");
+        });
+        return false;
+    },
+    "editproduct":function(m,req,res)
+    {
+        postHandle(req,function(o){
+            try{
+                var json = JSON.parse(o.data);
+                var e = new Order(null,json.id,json.name,[],json.price);
+                var found = false;
+                for(var i = orderable.length; --i>=0;)
+                {
+                    if(orderable[i].prod_id==e.id)
+                    {
+                        orderable[i]=e;
+                        found=true;
+                        break;
+                    }
+                }
+                if(found)
+                    res.end(JSON.stringify({modified:e}));
+                else
+                    res.end(errorJSON("Extra not found"));
+                return;
+            }catch(e){
+                res.end("{\"error\":\"Invalid data format\"}");
+                return;
+            };
+            res.end("Somthing strange happened");
+        });
+        return false;
+    },
+    "delproduct":function(m,req,res)
+    {
+        postHandle(req,function(o){
+
+            try{
+                var deleted = false;
+                for(var i = extras.length; --i>=0;)
+                {
+                    if(extras[i].id==o.id)
+                    {
+                        extras.splice(i,1);
+                        deleted=true;
+                        break;
+                    }
+                }
+                if(deleted)
+                    res.end(JSON.stringify({deleted:o.id}));
+                else
+                    res.end(errorJSON("Extra not found"));
+                return;
+            }catch(e){
+                res.end("{\"error\":\"Invalid data format\"}");
+                return;
+            };
+            res.end("Somthing strange happened");
+        });
+        return false;
     }
 };
 
@@ -273,6 +349,14 @@ function handleRequest(request,response)
 
     try{
         var resp = fs.readFileSync(request.url);
+        console.log(request.url);
+        if(request.url.search(/\.svg$/i)!==-1)
+        {
+            response.writeHead(200,{
+                'Content-Length': resp.length,
+                'Content-Type': 'image/svg+xml'
+            })
+        }
         response.end(resp);
     }catch(e){
         response.end("ERROR: location "+request.url);

@@ -33,10 +33,17 @@
             </div>
             <div class="pops" data-action="products">
                 <h3 class="title">Prodotti</h3>
+                <ul class="list"></ul>
+                <ul class="list addlist">
+                    <li class="extra">
+                        <input type="text" pattern="[0-9A-Za-z]+" title="Solo valori alfanumerici" placeholder="Nome" class="nome">
+                        <input type="number" placeholder="prezzo" class="prezzo" min="0" step="0.5">
+                    </li>
+                </ul>
             </div>
         </div>
         
         <script>init();</script>
-        <script>menus.extra();</script>
+        <script>menus.products();</script>
     </body>
 </html>

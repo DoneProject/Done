@@ -262,6 +262,17 @@ var api={
             cb(json);
         },true);
     },
+    "addproduct":function(obj,cb){
+        if(obj == null)throw "Missing param";
+        cb = cb || function(){};
+        postrequest("/api/addproduct",{"data":JSON.stringify(obj)},function(json,error){
+            if(error)
+            {
+                na(""+json);
+            }
+            cb(json);
+        },true);
+    },
     "info":function(cb){
         cb = cb || function(){};
         request("/api/info",function(json,error){
@@ -276,6 +287,10 @@ var api={
     "editextra":function(obj,cb){
         cb = cb || function(){};
         postrequest("/api/editextra",{data:JSON.stringify(obj)},cb,true);
+    },
+    "editproduct":function(obj,cb){
+        cb = cb || function(){};
+        postrequest("/api/editproduct",{data:JSON.stringify(obj)},cb,true);
     }
 };
 
@@ -466,7 +481,171 @@ function extraInit()
     //DEV
     var gai = {name:"Test",price:2.7};
     var li = simulate_addextra(gai);
-    api.addextra(gai,function(data){
+}
+
+function productInit()
+{
+    var root = document.querySelector(".pops[data-action=\"products\"]");
+    addEventListener("product",function(){
+        
+    });
+
+    var action_edit = function(li)
+    {
+        var done=function(){//DONE
+            bCanc.remove();
+            bSend.remove();
+            name.innerHTML=vname;
+            priceEle.innerHTML=price(parseFloat(vprice.replace(",",".")))+"&euro;";
+            li.appendChild(act);
+        };
+        var save = function()
+        {
+            api.editproduct({
+                id:li.getAttribute("data-id"),
+                name:nname.value,
+                price:parseFloat(nprice.value)
+            },function(json,error){
+                if(error)
+                {
+                    na(json,true);
+                    return;
+                }
+                na("Salvato");
+                var m = json.modified;
+                vname=m.name;
+                vprice=price(m.price)+"&euro;";
+                done();
+            });
+        };
+        var name = li.querySelector(".name");
+        var vname = name.innerHTML;
+        var priceEle = li.querySelector(".price");
+        var vprice = priceEle.innerHTML.replace(/,/,".").replace(/[^0-9\.]+/g,"");
+        var act = li.querySelector(".actions");
+        li.removeChild(act);
+        name.innerHTML="<input type=\"text\">";
+        priceEle.innerHTML="<input type=\"number\" min=\"0\" step=\"0.5\">";
+        li.setAttribute("data-mode","editing");
+        var nname = name.querySelector("input");
+        var nprice = priceEle.querySelector("input");
+        nname.addEventListener("keydown",function(event){if(event.keyCode==13){save();}})
+        nprice.addEventListener("keydown",function(event){if(event.keyCode==13){save();}})
+        nname.value=vname;
+        nprice.value=vprice;
+        var bCanc = document.createElement("button");
+        bCanc.className="flexbutton";
+        bCanc.innerHTML="Annulla";
+        li.appendChild(bCanc);
+        bCanc.addEventListener("click",done);
+        var bSend = document.createElement("button");
+        bSend.className="flexbutton main";
+        bSend.innerHTML="Modifica";
+        li.appendChild(bSend);
+        bSend.addEventListener("click",save);
+        nname.focus();
+    };
+
+    var action_del = function(li)
+    {
+        var id = li.getAttribute("data-id");
+        if(id.length==0){
+            na("Questo elemento non è puro");
+            return;
+        }
+        var act = li.querySelector(".actions");
+        var nact = document.createElement("span");
+        nact.className="actions";
+        nact.innerHTML="<i class=\"icon loading rot\" style=\"color:#cb0b0b\"></i>";
+        li.removeChild(act);
+        li.appendChild(nact);
+
+        postrequest("/api/delproduct",{id:id},function(json,error){
+            if(!!error)
+            {
+                na(json,true);
+                li.removeChild(nact);
+                li.appendChild(act);
+                return;
+            }
+            li.parentNode.removeChild(li);
+            na("Eliminato");
+        },true);
+    };
+
+    var add_actions = function(li){
+        var act = li.querySelector(".actions");
+        var edit = act.querySelector(".edit");
+        var del = act.querySelector(".delete");
+        edit.addEventListener("click",function(){
+            action_edit(li);
+        });
+        del.addEventListener("click",function(){
+            action_del(li);
+        });
+    }
+    var productlist = root.querySelector(".list");
+
+    //AddList
+    var addlist = root.querySelector(".addlist");
+    var add_name = root.querySelector(".nome");
+    var reset_add_item=function(){
+        add_name.value=add_price.value="";
+    };
+    var get_add_item = function()
+    {
+        return {
+            name:add_name.value,
+            price:(parseFloat(add_price.value.replace(/,/,".")) || 0)
+        }
+    };
+    var simulate_addextra=function(dt)
+    {
+        var li = document.createElement("li");
+        li.className="extra";
+        li.innerHTML="<span class=\"name\">"+dt.name+"</span><span class=\"price\">"+price(dt.price)+"&euro;</span><span class=\"actions\"><i class=\"icon loading rot\"></i></span>";
+        productlist.appendChild(li);
+        return li;
+    };
+    add_name.addEventListener("keydown",function(event){
+        if(event.keyCode==13)
+        {
+            event.preventDefault();
+            add_price.focus();
+        }
+    });
+    var fix_entry = function(li,info)
+    {
+        li.setAttribute("data-id",info.id);
+        li.id="product"+info.id;
+        var eNm = li.querySelector(".name");
+        var ePc = li.querySelector(".price");
+        var eAc = li.querySelector(".actions");
+        eNm.innerHTML=info.name;
+        ePc.innerHTML=price(info.price)+"&euro;";
+        eAc.innerHTML="<i class=\"icon edit\"></i><i class=\"icon delete\"></i>";
+        add_actions(li);
+    };
+
+    var add_price = root.querySelector(".prezzo");
+    add_price.addEventListener("keydown",function(){
+        if(event.keyCode==13)
+        {
+            event.preventDefault();
+            var gai = get_add_item();
+            var li = simulate_addextra(gai);
+            api.addproduct(gai,function(data){
+                fix_entry(li,data.added);
+            });
+            reset_add_item();
+            add_name.focus();
+        }
+    });
+
+    //DEV
+    var gai = {name:"Test",price:2.7};
+    var li = simulate_addextra(gai);
+    api.addproduct(gai,function(data){
         fix_entry(li,data.added);
     });
 }
@@ -484,22 +663,24 @@ function init()
     }
     
     for(var i = menuItems.length; --i>=0;)
-    { menuItems[i].addEventListener("click",function(event){
-        for(var j = menuItems.length; --j>=0;)
-        {
-            menuItems[j].setAttribute("data-active","false");
-        }
-        var e = event.target;
-        while(!e.hasAttribute("data-action"))
-        {
-            e=e.parentElement;
-        }
-           menus[e.getAttribute("data-action")] (event);
-        e.setAttribute("data-active","true");
+    {
+        menuItems[i].addEventListener("click",function(event){
+            for(var j = menuItems.length; --j>=0;)
+            {
+                menuItems[j].setAttribute("data-active","false");
+            }
+            var e = event.target;
+            while(!e.hasAttribute("data-action"))
+            {
+                e=e.parentElement;
+            }
+            menus[e.getAttribute("data-action")] (event);
+            e.setAttribute("data-active","true");
         });
     }
     
     extraInit();
+    productInit();
     api.info(function(data){
         console.log(data);
     });
