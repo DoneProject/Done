@@ -10,10 +10,14 @@ var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({ port: 8181 });
 
 wss.on('connection', function connection(ws) {
-    ws.on('message', function incoming(message) {
-        console.log("");
+    ws_array.push(ws);
+    ws.on('message', function(message) {
+        messageRecived(ws,message);
+        console.log("RECIVED:"+message);
     });
-    ws.send('something');
+    ws.on("ready",function(){
+        ws.send(JSON.stringify(initInstance()));
+    });
 });
 
 //CLASSES
@@ -30,6 +34,8 @@ var orderable = [];
 var tables = [];
 var extras = [];
 var pending = [];
+
+var ws_array = [];
 
 //CONST
 const port = 8080;
@@ -85,6 +91,34 @@ function postHandle(req,cb)
         cb(o);
     });
 }
+
+function broadcast(msg)
+{
+    for(var i = ws_array.length; --i>=0;)
+    {
+        if(ws_array[i].readyState==ws_array[i].OPEN)
+        {
+            try{
+                ws_array[i].send(msg);
+            }catch(e){}
+        }
+    }
+}
+
+function messageRecived(ws,message)
+{
+    
+}
+
+function initInstance()
+{
+    return {
+        orderable:orderable,
+        tables: tables,
+        extras: extras,
+        queue: pending
+    };
+};
 
 //API Handlers
 var api_handlers = {
