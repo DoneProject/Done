@@ -10,7 +10,7 @@
     <body>
         <div class="side">
             <h1>Impostazioni</h1>
-            <label><span>Tavoli</span><input type="number" name="numberOdTables" placeholder="NR" min="0" step="1"></label>
+            <div class="more" data-action="general"><span>Generali</span></div>
             <div class="more" data-action="extra"><span>Extra</span></div>
             <div class="more" data-action="products"><span>Prodotti</span></div>
         </div>
@@ -21,6 +21,15 @@
         </div>
         
         <div class="hidden">
+
+            <div class="pops" data-action="general">
+                <h3 class="title">Generali</h3>
+                <ul class="setting list">
+                    <li><label><span class="name">Numero tavoli</span><span class="stretched tar"><input type="number" data-action="tablecount" placeholder="Numero" value="1" step="1"></span></label></li>
+                    <li><label><span class="name">Password</span><span class="stretched tar"><input type="text" data-action="password" placeholder="Parola segreta"></span></label></li>
+                </ul>
+            </div>
+            
             <div class="pops" data-action="extra">
                 <h3 class="title">Extras</h3>
                 <ul class="list"></ul>

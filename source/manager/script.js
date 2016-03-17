@@ -315,6 +315,13 @@ var menus={
         var main = document.querySelector(".main");
         main.innerHTML="";
         main.appendChild(attele["extra"]);
+    },
+    "general":function(event)
+    {
+        fadeInMain();
+        var main = document.querySelector(".main");
+        main.innerHTML="";
+        main.appendChild(attele["general"]);
     }
 };
 
@@ -616,8 +623,8 @@ function productInit()
     });
     var fix_entry = function(li,info)
     {
-        li.setAttribute("data-id",info.id);
-        li.id="product"+info.id;
+        li.setAttribute("data-id",info.prod_id);
+        li.id="product"+info.prod_id;
         var eNm = li.querySelector(".name");
         var ePc = li.querySelector(".price");
         var eAc = li.querySelector(".actions");

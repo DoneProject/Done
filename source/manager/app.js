@@ -6,6 +6,7 @@ var dns = require("dns");
 var fs = require("fs");
 var ws = require("ws");
 var os = require("os");
+var opener = require("opener");
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({ port: 8181 });
 
@@ -13,7 +14,6 @@ wss.on('connection', function connection(ws) {
     ws_array.push(ws);
     ws.on('message', function(message) {
         messageRecived(ws,message);
-        console.log("RECIVED:"+message);
     });
     ws.on("ready",function(){
         ws.send(JSON.stringify(initInstance()));
@@ -45,7 +45,7 @@ const apikey = "api";
 function getOrderableId(){orderable_id++;return orderable_id.toString(36);}
 function getTableId(){table_id++;return table_id.toString(36);}
 function getExtraId(){extra_id++;return extra_id.toString(36);}
-function getPensingd(){pending_id++;return pending_id.toString(36);}
+function getPendingId(){pending_id++;return pending_id.toString(36);}
 
 function errorJSON(st){return JSON.stringify({error:st});}
 
@@ -94,10 +94,12 @@ function postHandle(req,cb)
 
 function broadcast(msg)
 {
+    console.log("NUMBER OF CLIENTS: "+ws_array.length);
     for(var i = ws_array.length; --i>=0;)
     {
         if(ws_array[i].readyState==ws_array[i].OPEN)
         {
+            console.log("SEND TO CLIENT "+i);
             try{
                 ws_array[i].send(msg);
             }catch(e){}
@@ -105,9 +107,72 @@ function broadcast(msg)
     }
 }
 
+function sendEvent(eventName,eventAction,data)
+{
+    broadcast(JSON.stringify({
+        "act":"event",
+        "event":eventName,
+        "action":eventAction||null,
+        "data":data
+    }));
+}
+
 function messageRecived(ws,message)
 {
-    
+    var j = JSON.parse(message);
+    if("get" in j)
+    {
+        switch(j.get)
+        {
+            case "tables":
+                ws.send(JSON.stringify(tables));
+                break;
+            case "orderable":
+                ws.send(JSON.stringify(orderable));
+                break;
+            case "extras":
+                ws.send(JSON.stringify(extras));
+                break;
+            case "queue":
+                ws.send(JSON.stringify(pending));
+                break;
+            case "info":
+                serverInfo(function(o){
+                    ws.send(JSON.stringify(o));
+                });
+                break;
+            case "tables":
+                ws.send(JSON.stringify(tables));
+                break;
+            default:
+                ws.send(errorJSON("Wrong action"));
+                break;
+        }
+    }
+}
+
+function serverInfo(cb)
+{
+    cb = cb || function(){};
+    var o = {};
+    o.webPort = port;
+    o.socketPort = 8181;
+    o.apiPrefix = apikey;
+    o.hostname = os.hostname();
+    dns.lookup(o.hostname,function(err,address){
+        if(!!err)
+        {
+            o.address=false;
+            o.links=[];
+            cb(o);
+            return;
+        }
+        o.address=address;
+        dns.reverse(address,function(err,names){
+            o.links=names;
+            cb(o);
+        });
+    });
 }
 
 function initInstance()
@@ -134,30 +199,17 @@ var api_handlers = {
     {
         return JSON.stringify(extras);
     },
+    "orderid":function()
+    {
+        return JSON.stringify({"offer":getPendingId()})
+    },
     "info":function(m,req,res){
-        var o = {};
-        o.webPort = port;
-        o.socketPort = 8181;
-        o.apiPrefix = apikey;
-        o.hostname = os.hostname();
-        dns.lookup(o.hostname,function(err,address){
-            if(!!err)
-            {
-                o.address=false;
-                o.links=[];
-                res.end(JSON.stringify(o));
-                return;
-            }
-            o.address=address;
-            dns.reverse(address,function(err,names){
-                o.links=names;
-                res.end(JSON.stringify(o));
-            });
+        serverInfo(function(o){
+            res.end(JSON.stringify(o));
         });
         return false;
     },
-    "queue":function(m,req,res)
-    {
+    "queue":function(m,req,res){
         if(m=="post")
         {
             postHandle(req,function(o){
@@ -244,7 +296,6 @@ var api_handlers = {
     "addproduct":function(m,req,res)
     {
         postHandle(req,function(o){
-            console.log("RECIVED PRODUCT OMFG!!!! :O",o);
             try{
                 var json = JSON.parse(o.data);
                 console.log(json);
@@ -269,7 +320,7 @@ var api_handlers = {
                 var found = false;
                 for(var i = orderable.length; --i>=0;)
                 {
-                    if(orderable[i].prod_id==e.id)
+                    if(orderable[i].prod_id==e.prod_id)
                     {
                         orderable[i]=e;
                         found=true;
@@ -279,7 +330,7 @@ var api_handlers = {
                 if(found)
                     res.end(JSON.stringify({modified:e}));
                 else
-                    res.end(errorJSON("Extra not found"));
+                    res.end(errorJSON("Product not found"));
                 return;
             }catch(e){
                 res.end("{\"error\":\"Invalid data format\"}");
@@ -365,7 +416,38 @@ function handleRequest(request,response)
 };
 
 
-hserver.listen(port,function(){
-    console.log("Server listening on: http://localhost:%s", port);
-});
+function hinit()
+{
+    serverInfo(function(o){
+        if(o.links.length>0)
+        {
+            console.log("URL: "+("http://"+o.links[0]+":"+o.webPort));
+            opener("http://"+o.links[0]+":"+o.webPort);
+        }
+        else if(o.address.length>0)
+        {
+            console.log("URL: "+("http://"+o.address+":"+o.webPort));
+            opener("http://"+o.address+":"+o.webPort);
+        }
+        else
+        {
+            console.log("URL: "+("http://127.0.0.1:"+o.webPort));
+            opener("http://127.0.0.1:"+o.webPort);
+        }
+    });
+}
 
+try{
+hserver.listen(port,hinit).error(function(m){console.log("ERROR");});
+    hserver.on("error",function(){console.log("Connection Error");});
+}catch(e)
+{
+    while(true)
+    {
+        port++;
+        try{
+            hserver.listen(port,hinit);
+            break;
+        }catch(e){continue;}
+    }
+}

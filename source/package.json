@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "main": "test.html",
   "dependencies": {
+    "opener": "^1.4.1",
     "ws": "^1.0.1"
   }
 }
