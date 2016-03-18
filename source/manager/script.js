@@ -322,6 +322,13 @@ var menus={
         var main = document.querySelector(".main");
         main.innerHTML="";
         main.appendChild(attele["general"]);
+    },
+    "run":function(event)
+    {
+        fadeInMain();
+        var main = document.querySelector(".main");
+        main.innerHTML="";
+        main.appendChild(attele["run"]);
     }
 };
 

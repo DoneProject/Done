@@ -159,6 +159,8 @@ function serverInfo(cb)
     o.socketPort = 8181;
     o.apiPrefix = apikey;
     o.hostname = os.hostname();
+    o.links=[];
+    o.address="127.0.0.1";
     dns.lookup(o.hostname,function(err,address){
         if(!!err)
         {
@@ -167,9 +169,10 @@ function serverInfo(cb)
             cb(o);
             return;
         }
-        o.address=address;
+        o.address=address; 
         dns.reverse(address,function(err,names){
-            o.links=names;
+            if(!err)
+                o.links=names;
             cb(o);
         });
     });
@@ -400,7 +403,6 @@ function handleRequest(request,response)
 
     try{
         var resp = fs.readFileSync(request.url);
-        console.log(request.url);
         if(request.url.search(/\.svg$/i)!==-1)
         {
             response.writeHead(200,{
@@ -419,6 +421,7 @@ function handleRequest(request,response)
 function hinit()
 {
     serverInfo(function(o){
+        console.log(o);
         if(o.links.length>0)
         {
             console.log("URL: "+("http://"+o.links[0]+":"+o.webPort));
