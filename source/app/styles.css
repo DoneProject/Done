@@ -5,7 +5,8 @@
 }
 
 body {
-  font: 13px sans-serif;
+  font: 13px -apple-system, sans-serif;
+  padding-top: 40px; /* .site-header height */
   padding-bottom: 50px; /* .site-footer height */
 }
 
@@ -13,14 +14,26 @@ body {
 /* = Header = */
 /* ========== */
 
-.site-header {
-  padding: 12px 12px;
-  background-color: #60C975;
+.app-header {
+  position: fixed;
+  width: 100%;
+  height: 40px;
+  background-color: #fafafa;
+  border-bottom: 1px solid #ccc;
+  top: 0;
+  left: 0;
 }
 
-.site-header h1 {
+.ios .app-header {
+  background-color: rgba(250, 250, 250, 0.7);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.app-header h1 {
   font: 15px sans-serif;
   text-align: center;
+  margin-top: 11px;
 }
 
 /* ========= */
@@ -32,33 +45,95 @@ main {
 }
 
 /* ========== */
+/* = Tables = */
+/* ========== */
+
+#view-tables {
+  display: table;
+}
+
+.table {
+  width: 64px;
+  height: 64px;
+  background-color: #ddd;
+}
+
+/* ========== */
 /* = Footer = */
 /* ========== */
 
-.site-footer {
+.app-footer {
   position: fixed;
+  font-size: 0.85em;
   width: 100%;
   height: 50px;
-  background-color: #fff;
+  background-color: #fafafa;
   border-top: 1px solid #ccc;
   bottom: 0;
   left: 0;
 }
 
-.ios .site-footer {
-  background-color: rgba(255, 255, 255, 0.7);
+.ios .app-footer {
+  background-color: rgba(250, 250, 250, 0.7);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
 
-.site-footer ul {
+.app-footer ul {
   display: flex;
   height: 50px;
   justify-content: center;
   align-items: center;
   list-style: none;
+  touch-action: none;
 }
 
-.site-footer li:not(:last-child) {
+.app-footer li {
+  min-width: 42px;
+}
+
+.app-footer li:not(:last-child) {
   margin-right: 2em;
+}
+
+.app-footer a {
+  display: block;
+  color: #444;
+  text-decoration: none;
+}
+
+.app-footer a svg {
+  display: block;
+  width: 32px;
+  height: 32px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.app-footer a svg.small {
+  width: 26px;
+  height: 26px;
+  margin: 2px auto;
+}
+
+.app-footer svg * {
+  fill: #555;
+  stroke: #555;
+}
+
+.app-footer a span {
+  display: block;
+  text-align: center;
+  margin-right: auto;
+  margin-bottom: 3px;
+  margin-left: auto;
+}
+
+.app-footer .active svg * {
+  fill: #0A60FE;
+  stroke: #0A60FE;
+}
+
+.app-footer .active a {
+  color: #0A60FE;
 }
