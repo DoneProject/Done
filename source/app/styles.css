@@ -6,8 +6,8 @@
 
 body {
   font: 13px -apple-system, sans-serif;
-  padding-top: 40px; /* .site-header height */
-  padding-bottom: 50px; /* .site-footer height */
+  padding-top: 40px; /* .app-header height */
+  padding-bottom: 50px; /* .app-footer height */
 }
 
 /* ========== */
