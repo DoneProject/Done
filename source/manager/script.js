@@ -1,3 +1,6 @@
+serverInfo={};
+password="";
+
 function aniprox(dur, fx) {
     if(!("requestAnimationFrame" in window)){
         requestAnimationFrame = mozAnimationFrame || oRequestAnimationFrame || webkitRequestAnimationFrame || msRequestAnimationFrame || function(fx){setTimeout(fx,16);}
@@ -308,6 +311,8 @@ var menus={
         var main = document.querySelector(".main");
         main.innerHTML="";
         main.appendChild(attele["products"]);
+        var side = document.querySelector(".side");
+        side.setAttribute("data-status","in");
     },
     "extra":function(event)
     {
@@ -315,6 +320,8 @@ var menus={
         var main = document.querySelector(".main");
         main.innerHTML="";
         main.appendChild(attele["extra"]);
+        var side = document.querySelector(".side");
+        side.setAttribute("data-status","in");
     },
     "general":function(event)
     {
@@ -322,6 +329,8 @@ var menus={
         var main = document.querySelector(".main");
         main.innerHTML="";
         main.appendChild(attele["general"]);
+        var side = document.querySelector(".side");
+        side.setAttribute("data-status","in");
     },
     "run":function(event)
     {
@@ -329,9 +338,49 @@ var menus={
         var main = document.querySelector(".main");
         main.innerHTML="";
         main.appendChild(attele["run"]);
+        var side = document.querySelector(".side");
+        side.setAttribute("data-status","out");
+        loadModule();
     }
 };
 
+function loadModule()
+{
+    var root = document.querySelector(".pops[data-action=\"run\"]");
+    var eles={
+        address:root.querySelector("[data-bind=\"address\"]"),
+        ip:root.querySelector("[data-bind=\"ip\"]"),
+        password:root.querySelector("[data-bind=\"password\"]"),
+        stopbutton:root.querySelector("[data-bind=\"stopbutton\"]"),
+        productsnumber:root.querySelector("[data-bind=\"productsnumber\"]"),
+        tablenumber:root.querySelector("[data-bind=\"tablenumber\"]"),
+        extranumber:root.querySelector("[data-bind=\"extranumber\"]"),
+        orders:root.querySelector("[data-bind=\"orders\"]"),
+        tables:root.querySelector("[data-bind=\"tables\"]"),
+        incoming:root.querySelector("[data-bind=\"incoming\"]"),
+        orders:root.querySelector("[data-bind=\"orders\"]"),
+        pending:root.querySelector("[data-bind=\"pending\"]")
+    }
+    
+    eles.ip.innerHTML=(serverInfo.address && serverInfo.webPort && "http://"+serverInfo.address+":"+serverInfo.webPort) || "no addr";
+    eles.address.innerHTML=(serverInfo.links[0] &&  serverInfo.webPort && "http://"+serverInfo.links[0]+":"+serverInfo.webPort) || (serverInfo.hostname && serverInfo.webPort && "http://"+serverInfo.hostname+":"+serverInfo.webPort) || "no link";
+    eles.password.innerHTML=password;
+    eles.stopbutton.innerHTML="<button>Ferma</button>";
+    eles.stopbutton.querySelector("button").addEventListener("click",function(event){
+        event.preventDefault();
+        event.stopPropagation();
+        event.cancelBubble=true;
+        if(confirm("Se fermi l'esecuzione, alcuni dati potrebbero venire persi"))
+        {
+            menus.general();
+        }
+    });
+    
+    ele.productsnumber.innerHTML="Prodotti: 0";
+    ele.extranumber.innerHTML="Extra: 0";
+    ele.tablenumber.innerHTML="Tavoli: 0";
+    ele.orders.innerHTML="Ordini: 0";
+};
 
 function extraInit()
 {
@@ -664,6 +713,19 @@ function productInit()
     });
 }
 
+function welcomeInit()
+{
+    var general = document.querySelector(".pops[data-action=\"general\"]");
+    var passinput = general.querySelector("[data-action=\"password\"]");
+    var uPass=function()
+    {
+        password=passinput.value;
+    };
+    passinput.addEventListener("keyup",uPass);
+    passinput.addEventListener("change",uPass);
+    passinput.addEventListener("input",uPass);
+}
+
 function init()
 {
     var menuItems = document.querySelectorAll(".side div.more");
@@ -693,9 +755,10 @@ function init()
         });
     }
     
+    welcomeInit();
     extraInit();
     productInit();
     api.info(function(data){
-        console.log(data);
+        console.log(serverInfo=data);
     });
 }
