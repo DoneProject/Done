@@ -24,7 +24,13 @@
   
   self.selectTabEvents.push({ tabName: 'order', action: function () {
     // Load self.activeTable
+    var title = document.getElementById('view-order--title')
     
+    if (self.activeTable !== null) {
+      title.innerHTML = 'Table '+self.activeTable.id
+    } else {
+      title.innerHTML = 'No Orders to Show'
+    }
   }})
   
   // ========

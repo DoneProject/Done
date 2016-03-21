@@ -45,6 +45,10 @@ main {
   margin-bottom: 50px; /* .app-footer height */
 }
 
+h2 {
+  text-align: center;
+}
+
 /* ========== */
 /* = Tables = */
 /* ========== */
