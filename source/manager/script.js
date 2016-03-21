@@ -358,7 +358,6 @@ function loadModule()
         orders:root.querySelector("[data-bind=\"orders\"]"),
         tables:root.querySelector("[data-bind=\"tables\"]"),
         incoming:root.querySelector("[data-bind=\"incoming\"]"),
-        orders:root.querySelector("[data-bind=\"orders\"]"),
         pending:root.querySelector("[data-bind=\"pending\"]")
     }
     
@@ -376,10 +375,13 @@ function loadModule()
         }
     });
     
-    ele.productsnumber.innerHTML="Prodotti: 0";
-    ele.extranumber.innerHTML="Extra: 0";
-    ele.tablenumber.innerHTML="Tavoli: 0";
-    ele.orders.innerHTML="Ordini: 0";
+    eles.productsnumber.innerHTML="Prodotti: 0";
+    eles.extranumber.innerHTML="Extra: 0";
+    eles.tablenumber.innerHTML="Tavoli: 0";
+    eles.orders.innerHTML="Ordini totali: 0";
+    
+    eles.tables.innerHTML="Guadagno: ~0€";
+    eles.pending.innerHTML="Ordini attivi: 0";
 };
 
 function extraInit()
