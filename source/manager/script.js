@@ -1,5 +1,18 @@
 serverInfo={};
 password="";
+ws = null;
+
+function sendEvent(name,element)
+{
+    try{
+        var e = document.createEvent("Event");
+        e.initEvent(name,true,true);
+        element.dispatchEvent(e);
+    }catch(err){
+        var e = new Event(name);
+        element.dispatchEvent(e);
+    }
+}
 
 function aniprox(dur, fx) {
     if(!("requestAnimationFrame" in window)){
@@ -294,6 +307,23 @@ var api={
     "editproduct":function(obj,cb){
         cb = cb || function(){};
         postrequest("/api/editproduct",{data:JSON.stringify(obj)},cb,true);
+    },
+    "sendTableNumber":function(nr,cb)
+    {
+        cb = cb || function(){};
+        postrequest("/api/settablecount",{number:nr},cb,true);
+    },
+    "startExec":function(){
+        if(ws!==null)try{ws.close();}catch(e){}
+        postrequest("/api/startexecution",{action:"start",password:password},function(json,error){
+            if(!!error)
+            {
+                na("Errore durante l'esecuzione",true);
+                return;
+            }
+            console.log("STARTED",json);
+        },true);
+        
     }
 };
 
@@ -341,6 +371,7 @@ var menus={
         var side = document.querySelector(".side");
         side.setAttribute("data-status","out");
         loadModule();
+        api.startExec();
     }
 };
 
@@ -393,7 +424,7 @@ function loadModule()
     }
     eles.tables.innerHTML=t;
     
-    eles.incoming.innerHTML="Guadagno: ~0€";
+    eles.incoming.innerHTML="Guadagnio: ~0€";
     eles.pending.innerHTML="Ordini attivi: 0";
     rz.trigger();
 };
@@ -763,6 +794,7 @@ function welcomeInit()
 {
     var general = document.querySelector(".pops[data-action=\"general\"]");
     var passinput = general.querySelector("[data-action=\"password\"]");
+    var tableinput = general.querySelector("[data-action=\"tablecount\"]");
     var uPass=function()
     {
         password=passinput.value;
@@ -770,6 +802,20 @@ function welcomeInit()
     passinput.addEventListener("keyup",uPass);
     passinput.addEventListener("change",uPass);
     passinput.addEventListener("input",uPass);
+
+    var uTable = function()
+    {
+        api.sendTableNumber(parseInt(tableinput.value));
+    }
+    tableinput.addEventListener("blur",uTable);
+    tableinput.addEventListener("keydown",function(event){
+        if(event.keyCode==13)
+        {
+            event.preventDefault();
+            tableinput.blur();
+            passinput.focus();
+        }
+    });
 }
 
 function init()

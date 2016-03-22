@@ -653,7 +653,7 @@ ul.list.setting li .tar
     -o-flex: 300px 1 0;
     flex: 300px 1 0;
     border-bottom: 1px #ddd solid;
-    overflow: hidden;
+    overflow: auto;
 }
 
 .pops[data-action="run"] .tables .table
@@ -712,4 +712,10 @@ ul.list.setting li .tar
 .pops[data-action="run"] .tables .table.leaving:after
 {
     background-color: #1f90e3;
+}
+
+.pops[data-action="run"] .tables
+{
+    background:url(./images/lineneut.svg) local top repeat-x,url(./images/lineneut.svg) local bottom repeat-x,url(./images/linedark.svg) scroll top repeat-x,url(./images/linedark.svg) scroll bottom repeat-x;
+    background-size:10px;
 }
