@@ -399,7 +399,7 @@ function loadModule()
 };
 
 rz={};
-rz.dash_tab = function(root)
+rz.dash_tab = function(root,or)
 {
     var w = root.offsetWidth;
     var min_margin = 10;
@@ -409,12 +409,18 @@ rz.dash_tab = function(root)
     ot = tables[0].offsetTop;
     ow = tables[0].offsetWidth;
     var epl = Math.floor(w/ow);
+    if(typeof or !== undefined)epl--;
     var md = (w-(epl*ow));
-    console.log(epl,md,w);
+    if(md < min_margin)
+    {
+        rz.dash_tab(root,-1);
+        return;
+    }
     for(var i = tables.length; --i>=0;)
     {
-        tables[i].style.margin=(md/(epl/2))+"px";
+        tables[i].style.margin=((md*0.5)/(epl))+"px";
     }
+    
     
 };
 rz.trigger=function(){
