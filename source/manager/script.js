@@ -363,7 +363,7 @@ function loadModule()
     
     eles.ip.innerHTML=(serverInfo.address && serverInfo.webPort && "http://"+serverInfo.address+":"+serverInfo.webPort) || "no addr";
     eles.address.innerHTML=(serverInfo.links[0] &&  serverInfo.webPort && "http://"+serverInfo.links[0]+":"+serverInfo.webPort) || (serverInfo.hostname && serverInfo.webPort && "http://"+serverInfo.hostname+":"+serverInfo.webPort) || "no link";
-    eles.password.innerHTML=password;
+    eles.password.innerHTML=password.length==0 ? "nessuna password" : password;
     eles.stopbutton.innerHTML="<button>Ferma</button>";
     eles.stopbutton.querySelector("button").addEventListener("click",function(event){
         event.preventDefault();
@@ -371,6 +371,11 @@ function loadModule()
         event.cancelBubble=true;
         if(confirm("Se fermi l'esecuzione, alcuni dati potrebbero venire persi"))
         {
+            var side_ac = document.querySelectorAll(".side .more[data-active=\"true\"]");
+            for(var i = side_ac.length; --i>=0;)
+            {
+                side_ac[i].setAttribute("data-active","false");
+            }
             menus.general();
         }
     });
@@ -380,8 +385,41 @@ function loadModule()
     eles.tablenumber.innerHTML="Tavoli: 0";
     eles.orders.innerHTML="Ordini totali: 0";
     
-    eles.tables.innerHTML="Guadagno: ~0€";
+    var t = "";
+    var classes = ["occupied","free","leaving"];
+    for(var i = 10; i--;)
+    {
+        t+="<div class=\"table "+classes[Math.floor(Math.random()*classes.length)]+"\"><span class=\"label\">Tavolo "+i+"</span></div>";
+    }
+    eles.tables.innerHTML=t;
+    
+    eles.incoming.innerHTML="Guadagno: ~0€";
     eles.pending.innerHTML="Ordini attivi: 0";
+    rz.trigger();
+};
+
+rz={};
+rz.dash_tab = function(root)
+{
+    var w = root.offsetWidth;
+    var min_margin = 10;
+    var ot = 0, tot, sw = 0, ow;
+    var tables = root.querySelectorAll(".table");
+    if(tables.length==0)return;
+    ot = tables[0].offsetTop;
+    ow = tables[0].offsetWidth;
+    var epl = Math.floor(w/ow);
+    var md = (w-(epl*ow));
+    console.log(epl,md,w);
+    for(var i = tables.length; --i>=0;)
+    {
+        tables[i].style.margin=(md/(epl/2))+"px";
+    }
+    
+};
+rz.trigger=function(){
+    var dash_tab = document.querySelector(".pops[data-action=\"run\"] .tables");
+    !!dash_tab && rz.dash_tab(dash_tab);
 };
 
 function extraInit()
@@ -763,4 +801,5 @@ function init()
     api.info(function(data){
         console.log(serverInfo=data);
     });
+    addEventListener("resize",rz.trigger);
 }
