@@ -14,7 +14,6 @@
   var triggerSelectTabEvents = function (tabId) {
     tabName = tabId.slice(5)
     
-    
     self.selectTabEvents.filter(function (x) {
       return x.tabName === tabName
     }).forEach(function (x) {
@@ -27,7 +26,7 @@
     var title = document.getElementById('view-order--title')
     
     if (self.activeTable !== null) {
-      title.innerHTML = 'Table '+self.activeTable.id
+      title.innerHTML = `Table ${self.activeTable.id}`
     } else {
       title.innerHTML = 'No Orders to Show'
     }
