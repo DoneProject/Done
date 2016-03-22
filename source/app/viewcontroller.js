@@ -2,6 +2,7 @@
   
   var self = this
   
+  self.view = document.getElementById('view-tables')
   self.views = []
   self.activeView = null
   self.activeTable = null
@@ -26,7 +27,7 @@
     var title = document.getElementById('view-order--title')
     
     if (self.activeTable !== null) {
-      title.innerHTML = `Table ${self.activeTable.id}`
+      title.innerHTML = `Table ${self.activeTable.number}`
     } else {
       title.innerHTML = 'No Orders to Show'
     }
@@ -52,14 +53,47 @@
     }
   })
   
+  // =========
+  // = Logic =
+  // =========
+  
+  var is = (function(from, to) {
+    var range = []
+    for (var i = from; i <= to; i += 1) {
+      range.push(i)
+    }
+    return range
+  }(1, 14))
+  
+  is.forEach(function (x) {
+    var element  = document.createElement('div')
+    var contents = document.createElement('div')
+    
+    element.id = `table-${x}`
+    element.dataset.id = x
+    element.classList.add('table')
+    contents.classList.add('table-contents')
+    
+    contents.innerHTML = `T${x}`
+    
+    element.addEventListener('click', function () {
+      self.activeTable = {
+        number: parseInt(this.dataset.id, 10),
+        pending: []
+      }
+      
+      openTabById('view-order')
+    })
+    
+    element.appendChild(contents)
+    self.view.appendChild(element)
+  })
+  
   // ==========
   // = Events =
   // ==========
   
-  window.addEventListener('hashchange', function () {
-    var hash = location.hash
-    
-    var id = hash.slice(1)
+  function openTabById(id) {
     var oldView = self.activeView
     var newView = document.getElementById(id)
     
@@ -74,6 +108,10 @@
     self.activeView = newView
     
     history.pushState('', document.title, location.pathname)
+  }
+  
+  window.addEventListener('hashchange', function () {
+    openTabById(location.hash.slice(1))
   })
   
 }())
