@@ -50,7 +50,7 @@
     "prod_id":12,
     "name":"pizza capricciosa",
     "type":"pizza",
-    "extra":[[Extra JSON]],
+    "extras":[[Extra JSON]],
     "price":8.8
   }
   
