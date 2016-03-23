@@ -1,5 +1,18 @@
 serverInfo={};
 password="";
+ws = null;
+
+function sendEvent(name,element)
+{
+    try{
+        var e = document.createEvent("Event");
+        e.initEvent(name,true,true);
+        element.dispatchEvent(e);
+    }catch(err){
+        var e = new Event(name);
+        element.dispatchEvent(e);
+    }
+}
 
 function aniprox(dur, fx) {
     if(!("requestAnimationFrame" in window)){
@@ -294,6 +307,23 @@ var api={
     "editproduct":function(obj,cb){
         cb = cb || function(){};
         postrequest("/api/editproduct",{data:JSON.stringify(obj)},cb,true);
+    },
+    "sendTableNumber":function(nr,cb)
+    {
+        cb = cb || function(){};
+        postrequest("/api/settablecount",{number:nr},cb,true);
+    },
+    "startExec":function(){
+        if(ws!==null)try{ws.close();}catch(e){}
+        postrequest("/api/startexecution",{action:"start",password:password},function(json,error){
+            if(!!error)
+            {
+                na("Errore durante l'esecuzione",true);
+                return;
+            }
+            console.log("STARTED",json);
+        },true);
+        
     }
 };
 
@@ -341,6 +371,7 @@ var menus={
         var side = document.querySelector(".side");
         side.setAttribute("data-status","out");
         loadModule();
+        api.startExec();
     }
 };
 
@@ -363,7 +394,7 @@ function loadModule()
     
     eles.ip.innerHTML=(serverInfo.address && serverInfo.webPort && "http://"+serverInfo.address+":"+serverInfo.webPort) || "no addr";
     eles.address.innerHTML=(serverInfo.links[0] &&  serverInfo.webPort && "http://"+serverInfo.links[0]+":"+serverInfo.webPort) || (serverInfo.hostname && serverInfo.webPort && "http://"+serverInfo.hostname+":"+serverInfo.webPort) || "no link";
-    eles.password.innerHTML=password;
+    eles.password.innerHTML=password.length==0 ? "nessuna password" : password;
     eles.stopbutton.innerHTML="<button>Ferma</button>";
     eles.stopbutton.querySelector("button").addEventListener("click",function(event){
         event.preventDefault();
@@ -371,6 +402,11 @@ function loadModule()
         event.cancelBubble=true;
         if(confirm("Se fermi l'esecuzione, alcuni dati potrebbero venire persi"))
         {
+            var side_ac = document.querySelectorAll(".side .more[data-active=\"true\"]");
+            for(var i = side_ac.length; --i>=0;)
+            {
+                side_ac[i].setAttribute("data-active","false");
+            }
             menus.general();
         }
     });
@@ -380,8 +416,47 @@ function loadModule()
     eles.tablenumber.innerHTML="Tavoli: 0";
     eles.orders.innerHTML="Ordini totali: 0";
     
-    eles.tables.innerHTML="Guadagno: ~0€";
+    var t = "";
+    var classes = ["occupied","free","leaving"];
+    for(var i = 10; i--;)
+    {
+        t+="<div class=\"table "+classes[Math.floor(Math.random()*classes.length)]+"\"><span class=\"label\">Tavolo "+i+"</span></div>";
+    }
+    eles.tables.innerHTML=t;
+    
+    eles.incoming.innerHTML="Guadagnio: ~0€";
     eles.pending.innerHTML="Ordini attivi: 0";
+    rz.trigger();
+};
+
+rz={};
+rz.dash_tab = function(root,or)
+{
+    var w = root.offsetWidth;
+    var min_margin = 10;
+    var ot = 0, tot, sw = 0, ow;
+    var tables = root.querySelectorAll(".table");
+    if(tables.length==0)return;
+    ot = tables[0].offsetTop;
+    ow = tables[0].offsetWidth;
+    var epl = Math.floor(w/ow);
+    if(typeof or !== undefined)epl--;
+    var md = (w-(epl*ow));
+    if(md < min_margin)
+    {
+        rz.dash_tab(root,-1);
+        return;
+    }
+    for(var i = tables.length; --i>=0;)
+    {
+        tables[i].style.margin=((md*0.5)/(epl))+"px";
+    }
+    
+    
+};
+rz.trigger=function(){
+    var dash_tab = document.querySelector(".pops[data-action=\"run\"] .tables");
+    !!dash_tab && rz.dash_tab(dash_tab);
 };
 
 function extraInit()
@@ -719,6 +794,7 @@ function welcomeInit()
 {
     var general = document.querySelector(".pops[data-action=\"general\"]");
     var passinput = general.querySelector("[data-action=\"password\"]");
+    var tableinput = general.querySelector("[data-action=\"tablecount\"]");
     var uPass=function()
     {
         password=passinput.value;
@@ -726,6 +802,20 @@ function welcomeInit()
     passinput.addEventListener("keyup",uPass);
     passinput.addEventListener("change",uPass);
     passinput.addEventListener("input",uPass);
+
+    var uTable = function()
+    {
+        api.sendTableNumber(parseInt(tableinput.value));
+    }
+    tableinput.addEventListener("blur",uTable);
+    tableinput.addEventListener("keydown",function(event){
+        if(event.keyCode==13)
+        {
+            event.preventDefault();
+            tableinput.blur();
+            passinput.focus();
+        }
+    });
 }
 
 function init()
@@ -763,4 +853,5 @@ function init()
     api.info(function(data){
         console.log(serverInfo=data);
     });
+    addEventListener("resize",rz.trigger);
 }

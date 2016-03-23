@@ -578,3 +578,144 @@ ul.list.setting li .tar
 {
     text-align:right;
 }
+
+/*RUN*/
+.pops[data-action="run"]
+{
+    min-height: 100vh;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+}
+
+.pops[data-action="run"] .top, .pops[data-action="run"] .bottom
+{
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+    -webkit-flex: auto 0 0;
+    -moz-flex: auto 0 0;
+    -ms-flex: auto 0 0;
+    -o-flex: auto 0 0;
+    flex: auto 0 0;
+}
+.pops[data-action="run"] .top .f, .pops[data-action="run"] .bottom .f
+{
+    -webkit-flex: auto 1 0;
+    -moz-flex: auto 1 0;
+    -ms-flex: auto 1 0;
+    -o-flex: auto 1 0;
+    flex: auto 1 0;
+    border: 1px #ddd solid;
+    border-top: none;
+    border-right: none;
+    padding: 5px 10px;
+}
+.pops[data-action="run"] .top .f:first-child, .pops[data-action="run"] .bottom .f:first-child
+{
+    border-left: none;
+}
+
+.pops[data-action="run"] .title
+{
+    background-color: #fff;
+    border-bottom: 1px #ddd solid;
+    position: relative;
+}
+
+.pops[data-action="run"] .title h2
+{
+    padding: 0;
+    margin: 10px;
+}
+
+.pops[data-action="run"] .title .sbtn
+{
+    position: absolute;
+    top: 12px;
+    right: 10px;
+}
+
+.pops[data-action="run"] .tables
+{
+    -webkit-flex: 300px 1 0;
+    -moz-flex: 300px 1 0;
+    -ms-flex: 300px 1 0;
+    -o-flex: 300px 1 0;
+    flex: 300px 1 0;
+    border-bottom: 1px #ddd solid;
+    overflow: auto;
+}
+
+.pops[data-action="run"] .tables .table
+{
+    display: inline-block;
+    margin: 10px;
+    width: 100px;
+    height: 100px;
+    position: relative;
+    border-radius: 5px;
+    background-color: #fff;
+    border: 1px #ddd solid;
+}
+
+.pops[data-action="run"] .tables .table:after
+{
+    content: "";
+    position: absolute;
+    display: block;
+    height: 16px;
+    width: 16px;
+    border: 1px #ddd solid;
+    background-color: #000;
+    top: -8px;
+    right: -8px;
+    border-radius: 100%;
+}
+
+.pops[data-action="run"] .tables .table .label
+{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    line-height: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    -ms-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    text-align: center;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+.pops[data-action="run"] .tables .table.free:after
+{
+    background-color: #1fe31f;
+}
+.pops[data-action="run"] .tables .table.occupied:after
+{
+    background-color: #e31f4c;
+}
+.pops[data-action="run"] .tables .table.leaving:after
+{
+    background-color: #1f90e3;
+}
+
+.pops[data-action="run"] .tables
+{
+    background:url(./images/lineneut.svg) local top repeat-x,url(./images/lineneut.svg) local bottom repeat-x,url(./images/linedark.svg) scroll top repeat-x,url(./images/linedark.svg) scroll bottom repeat-x;
+    background-size:10px;
+}

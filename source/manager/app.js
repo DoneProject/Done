@@ -9,7 +9,6 @@ var os = require("os");
 var opener = require("opener");
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({ port: 8181 });
-
 wss.on('connection', function connection(ws) {
     ws_array.push(ws);
     ws.on('message', function(message) {
@@ -29,6 +28,9 @@ var table_id = 0;
 var extra_id = 0;
 var pending_id = 0;
 
+var running = false;
+var password = "";
+
 //LISTS
 var orderable = [];
 var tables = [];
@@ -46,6 +48,13 @@ function getOrderableId(){orderable_id++;return orderable_id.toString(36);}
 function getTableId(){table_id++;return table_id.toString(36);}
 function getExtraId(){extra_id++;return extra_id.toString(36);}
 function getPendingId(){pending_id++;return pending_id.toString(36);}
+function wsBroadcast(st)
+{
+    for(var i = ws_array.length; --i>=0;)
+    {
+        ws_array[i].send(st);
+    }
+}
 
 function errorJSON(st){return JSON.stringify({error:st});}
 
@@ -301,7 +310,6 @@ var api_handlers = {
         postHandle(req,function(o){
             try{
                 var json = JSON.parse(o.data);
-                console.log(json);
                 var e = new Order(null,getOrderableId(),json.name,[],json.price);
                 orderable.push(e);
                 res.end(JSON.stringify({added:e}));
@@ -368,6 +376,53 @@ var api_handlers = {
                 return;
             };
             res.end("Somthing strange happened");
+        });
+        return false;
+    },
+    "settablecount":function(m,req,res){
+        postHandle(req,function(o){
+            try{
+                var c = parseInt(json.number);
+                if(isNaN(c))res.end("{\"error\":\"Param is not a number\"}");
+                
+                if(!!tables)
+                {
+                    if(c < tables.length)
+                    {
+                        tables.splice(c);
+                    }
+                    else if(c > tables.length)
+                    {
+                        var dif = tables.length-c;
+                        for(var i = dif; --i>=0;)
+                        {
+                            tables.push(new Table(getTableId()));
+                        }
+                    }
+                    res.end(JSON.stringify({action:"settables",tables:tables}));
+                }
+                return;
+            }catch(e){
+                res.end("{\"error\":\"Invalid data format\"}");
+                return;
+            };
+            res.end("Somthing strange happened");
+        });
+        return false;
+    },
+    "startexecution":function(m,req,res)
+    {
+        postHandle(req,function(o){
+            if(o.password.length<=1 || o.password==undefined)
+            {
+                password=false;
+            }
+            else
+            {
+                password=o.password;
+            }
+            
+            running=true;
         });
         return false;
     }
