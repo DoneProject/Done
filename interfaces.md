@@ -7,12 +7,12 @@ Index
 - [OBJECTS](#objects)
   - [ServerInfo](#serverinfo)
   - [URLResolvable](#urlresolvable)
- - [IPResolvable](#ipresolvable)
- - [IDResolvable](#idresolvable)
- - [PasswordResolvable](#passwordresolvable)
- - [ExtraObject](#extraobject)
- - [ProductObject](#productobject)
- - [HTTP](#http)
+  - [IPResolvable](#ipresolvable)
+  - [IDResolvable](#idresolvable)
+  - [PasswordResolvable](#passwordresolvable)
+  - [ExtraObject](#extraobject)
+  - [ProductObject](#productobject)
+- [HTTP](#http)
 
 OBJECTS
 ----
