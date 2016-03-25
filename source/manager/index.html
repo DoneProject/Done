@@ -1,81 +1,82 @@
 <!doctype html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Done</title>
-        <link rel="stylesheet" href="style.css">
-        <script src="script.js"></script>
-        <script src="scrolls.js"></script>
-    </head>
-    <body>
-        <div class="side">
-            <h1>Impostazioni</h1>
-            <div class="more" data-action="general"><span>Generali</span></div>
-            <div class="more" data-action="extra"><span>Extra</span></div>
-            <div class="more" data-action="products"><span>Prodotti</span></div>
-            <div class="more" data-action="run"><span>Avvia</span></div>
-        </div>
-        <div class="main">
-            <div class="info">
-                Seleziona un menu per visualizzare le sue impostazioni.
-            </div>
-        </div>
-        
-        <div class="hidden">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1.0, shrink-to-fit=no">
+    <title>Done</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+    <script src="scrolls.js"></script>
+  </head>
+  <body>
+    <div class="side">
+      <h1>Impostazioni</h1>
+      <div class="more" data-action="general"><span>Generali</span></div>
+      <div class="more" data-action="extra"><span>Extra</span></div>
+      <div class="more" data-action="products"><span>Prodotti</span></div>
+      <div class="more" data-action="run"><span>Avvia</span></div>
+    </div>
+    <div class="main">
+      <div class="info">
+        Seleziona un menu per visualizzare le sue impostazioni.
+      </div>
+    </div>
 
-            <div class="pops" data-action="general">
-                <h3 class="title">Generali</h3>
-                <ul class="setting list">
-                    <li><label><span class="name">Numero tavoli</span><span class="stretched tar"><input type="number" data-action="tablecount" placeholder="Numero" value="1" step="1"></span></label></li>
-                    <li><label><span class="name">Password</span><span class="stretched tar"><input type="text" data-action="password" placeholder="Parola segreta"></span></label></li>
-                </ul>
-            </div>
-            
-            <div class="pops" data-action="extra">
-                <h3 class="title">Extras</h3>
-                <ul class="list"></ul>
-                <ul class="list addlist">
-                    <li class="extra">
-                        <input type="text" pattern="[0-9A-Za-z]+" title="Solo valori alfanumerici" placeholder="Nome" class="nome">
-                        <input type="number" placeholder="prezzo" class="prezzo" min="0" step="0.5">
-                    </li>
-                </ul>
-            </div>
-            <div class="pops" data-action="products">
-                <h3 class="title">Prodotti</h3>
-                <ul class="list"></ul>
-                <ul class="list addlist">
-                    <li class="extra">
-                        <input type="text" pattern="[0-9A-Za-z]+" title="Solo valori alfanumerici" placeholder="Nome" class="nome">
-                        <input type="number" placeholder="prezzo" class="prezzo" min="0" step="0.5">
-                    </li>
-                </ul>
-            </div>
-            <div class="pops" data-action="run">
-               <div class="title">
-                   <h2>Dashboard</h2>
-                   <div class="sbtn" data-bind="stopbutton"></div>
-               </div>
-                <div class="top">
-                    <div class="f" data-bind="address"></div>
-                    <div class="f" data-bind="ip"></div>
-                    <div class="f" data-bind="password"></div>
-                </div>
-                <div class="top">
-                    <div class="f" data-bind="productsnumber"></div>
-                    <div class="f" data-bind="extranumber"></div>
-                    <div class="f" data-bind="tablenumber"></div>
-                </div>
-                <div class="tables" data-bind="tables"></div> 
-                <div class="top bottom">
-                    <div class="f" data-bind="incoming"></div>
-                    <div class="f" data-bind="orders"></div>
-                    <div class="f" data-bind="pending"></div>
-                </div>
-            </div>
+    <div class="hidden">
+
+      <div class="pops" data-action="general">
+        <h3 class="title">Generali</h3>
+        <ul class="setting list">
+          <li><label><span class="name">Numero tavoli</span><span class="stretched tar"><input type="number" data-action="tablecount" placeholder="Numero" value="1" step="1"></span></label></li>
+          <li><label><span class="name">Password</span><span class="stretched tar"><input type="text" data-action="password" placeholder="Parola segreta"></span></label></li>
+        </ul>
+      </div>
+
+      <div class="pops" data-action="extra">
+        <h3 class="title">Extras</h3>
+        <ul class="list"></ul>
+        <ul class="list addlist">
+          <li class="extra">
+            <input type="text" pattern="[0-9A-Za-z]+" title="Solo valori alfanumerici" placeholder="Nome" class="nome">
+            <input type="number" placeholder="prezzo" class="prezzo" min="0" step="0.5">
+          </li>
+        </ul>
+      </div>
+      <div class="pops" data-action="products">
+        <h3 class="title">Prodotti</h3>
+        <ul class="list"></ul>
+        <ul class="list addlist">
+          <li class="extra">
+            <input type="text" pattern="[0-9A-Za-z]+" title="Solo valori alfanumerici" placeholder="Nome" class="nome">
+            <input type="number" placeholder="prezzo" class="prezzo" min="0" step="0.5">
+          </li>
+        </ul>
+      </div>
+      <div class="pops" data-action="run">
+        <div class="title">
+          <h2>Dashboard</h2>
+          <div class="sbtn" data-bind="stopbutton"></div>
         </div>
-        
-        <script>init();</script>
-        <script>menus.products();</script>
-    </body>
+        <div class="top">
+          <div class="f" data-bind="address"></div>
+          <div class="f" data-bind="ip"></div>
+          <div class="f" data-bind="password"></div>
+        </div>
+        <div class="top">
+          <div class="f" data-bind="productsnumber"></div>
+          <div class="f" data-bind="extranumber"></div>
+          <div class="f" data-bind="tablenumber"></div>
+        </div>
+        <div class="tables" data-bind="tables"></div> 
+        <div class="top bottom">
+          <div class="f" data-bind="incoming"></div>
+          <div class="f" data-bind="orders"></div>
+          <div class="f" data-bind="pending"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>init();</script>
+    <script>menus.products();</script>
+  </body>
 </html>
