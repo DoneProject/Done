@@ -4,15 +4,15 @@ INTERFACES
 
 Index
 ----
-- [OBJECTS](#OBJECTS)
-- [ServerInfo](#ServerInfo)
- - [URLResolvable](#URLResolvable)
- - [IPResolvable](#IPResolvable)
- - [IDResolvable](#IDResolvable)
- - [PasswordResolvable](#PasswordResolvable)
- - [ExtraObject](#ExtraObject)
- - [ExtraObject](#ExtraObject)
- - [HTTP](#HTTP)
+- [OBJECTS](#objects)
+  - [ServerInfo](#serverinfo)
+  - [URLResolvable](#urlresolvable)
+ - [IPResolvable](#ipresolvable)
+ - [IDResolvable](#idresolvable)
+ - [PasswordResolvable](#passwordresolvable)
+ - [ExtraObject](#extraobject)
+ - [ProductObject](#productobject)
+ - [HTTP](#http)
 
 OBJECTS
 ----
