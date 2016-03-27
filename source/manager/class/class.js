@@ -5,11 +5,10 @@ global.OrderList = function(id)
   this.orders=[];
 }
 
-global.Order = function Order(id,prod_id,name,extra,price)
+global.Order = function Order(id,name,extra,price)
 {
   var self = this;
-  this.id=prod_id;
-  this.prod_id=prod_id;
+  this.id=id;
   this.name=name;
   this.extra=extra;
   this.price=price;

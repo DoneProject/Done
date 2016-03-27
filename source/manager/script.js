@@ -5,6 +5,35 @@ ws = null;
 //PH
 updateStatusView = function(){}
 
+//EventHandlers
+var ehandlers={
+  addProduct:function(){
+    console.log("addProduct not implemented");
+  },
+  addExtra:function(){
+    console.log("addExtra not implemented");
+  },
+  editProduct:function(){
+    console.log("editProduct not implemented");
+  },
+  editExtra:function(){
+    console.log("editExtra not implemented");
+  },
+  delProduct:function(){
+    console.log("delProduct not implemented");
+  },
+  delExtra:function(){
+    console.log("delExtra not implemented");
+  },
+  updateTablecount:function(){
+    console.log("updateTablecount not implemented");
+  },
+  updateTablecount2:function(){},
+  statsUpdate:function(){
+    console.log("statsUpdate not implemented");
+  }
+};
+
 
 function sendEvent(name,element)
 {
@@ -18,7 +47,6 @@ function sendEvent(name,element)
     element.dispatchEvent(e);
   }
 }
-
 
 function aniprox(dur, fx) {
   if(!("requestAnimationFrame" in window)){
@@ -270,16 +298,8 @@ function request(url,cb,asjson)
   };
 }
 
-eventHandler = {
-  statsUpdate:function(data)
-  {
-    updateStatusView(data);
-  }
-}
-
 function handleWSMessage(event)
 {
-  console.log("MESSAGE FROM WEBSOCKET: ",event.data);
   var d = event.data;
   try{d=JSON.parse(d)}catch(e){}
   console.log(d);
@@ -290,9 +310,9 @@ function handleWSMessage(event)
       case "event":
         if("event" in d)
         {
-          if(d.event in eventHandler)
+          if(d.event in ehandlers)
           {
-            eventHandler[d.event](d.data);
+            ehandlers[d.event](d.data);
           }
           else
           {
@@ -458,28 +478,14 @@ function loadModule()
   eles.tablenumber.innerHTML="Tavoli: 0";
   eles.orders.innerHTML="Ordini totali: 0";
 
-  var t = "";
-  var classes = ["occupied","free","leaving"];
-  for(var i = 10; i--;)
-  {
-    t+="<div class=\"table "+classes[Math.floor(Math.random()*classes.length)]+"\"><span class=\"label\">Tavolo "+i+"</span></div>";
-  }
+  var t = "<div class=\"info\"><i class=\"icon rot loading\"></i> In attesa di dati</div>";
   eles.tables.innerHTML=t;
 
   eles.incoming.innerHTML="Guadagnio: ~0€";
   eles.pending.innerHTML="Ordini attivi: 0";
   rz.trigger();
-
-  //    ws=new WebSocket("ws://"+serverInfo.address+":"+serverInfo.socketPort);
-  ws=new WebSocket("ws://localhost:8181");
-  ws.onmessage=handleWSMessage;
-  ws.onopen=function()
-  {
-    ws.send('{"get":"stats"}');
-  }
   
-  updateStatusView=function(data){
-    console.log("DATA FOR UPDATE",data);
+  ehandlers.statsUpdate=function(data){
     eles.password.innerHTML=(data.password===false || data.password.length==0) ? "nessuna password" : data.password;
 
     eles.productsnumber.innerHTML="Prodotti: "+data.products;
@@ -491,7 +497,35 @@ function loadModule()
     eles.incoming.innerHTML="Guadagnio: ~"+data.earned+"€";
     eles.pending.innerHTML="Ordini attivi: "+data.orders.active;
     rz.trigger();
+    
+    var pwi = document.querySelector(".setting.list input[data-action=\"password\"]");
+    if(!!pwi)
+    {
+      if(data.password=="false")
+      {
+        pwi.value="";
+        return;
+      }
+      pwi.value=data.password;
+    }
   };
+  
+  ehandlers.updateTablecount2=function(aObj)
+  {
+    var ts = aObj.tables, t="";
+    if(ts.length==0)
+    {
+      eles.tables.innerHTML="<div class=\"info\">Non ci sono tavoli da servire</div>";
+    }
+    for(var i = 0; i < ts.length; i++)
+    {
+      t+="<div class=\"table "+(ts[i].pending.length > 0 ? "occupied" : "free")+"\"><span class=\"label\">"+ts[i].name+"</span></div>";
+    }
+    eles.tables.innerHTML=t;
+  }
+  
+  ws.send('{"get":"stats"}');
+  ws.send('{"get":"tables"}');
 };
 
 rz={};
@@ -527,9 +561,6 @@ rz.trigger=function(){
 function extraInit()
 {
   var root = document.querySelector(".pops[data-action=\"extra\"]");
-  addEventListener("extra",function(){
-
-  });
 
   var action_edit = function(li)
   {
@@ -609,8 +640,10 @@ function extraInit()
         li.appendChild(act);
         return;
       }
+      try{
       li.parentNode.removeChild(li);
       na("Eliminato");
+      }catch(e){}
     },true);
   };
 
@@ -676,6 +709,15 @@ function extraInit()
       var gai = get_add_item();
       var li = simulate_addextra(gai);
       api.addextra(gai,function(data){
+
+        var id = data.added.id;
+        var ele = root.querySelector("#extra"+id);
+        if(!!ele)
+        {
+          li.remove();
+          return;
+        }
+        
         fix_entry(li,data.added);
       });
       reset_add_item();
@@ -683,17 +725,33 @@ function extraInit()
     }
   });
 
-  //DEV
-  var gai = {name:"Test",price:2.7};
-  var li = simulate_addextra(gai);
+  ehandlers.addExtra=function(p)
+  {
+    var id = p.id;
+    var ele = root.querySelector("#extra"+id);
+    if(!!ele)return;
+    var li = simulate_addextra(p);
+    fix_entry(li,p);
+  }
+  ehandlers.editExtra=function(p)
+  {
+    var id = p.id;
+    var ele = root.querySelector("#extra"+id);
+    if(!ele)return;
+    ele.querySelector(".name").innerHTML=p.name;
+    ele.querySelector(".price").innerHTML=price(p.price)+"&euro;";
+  }
+  ehandlers.delExtra=function(p)
+  {
+    var ele = root.querySelector("#extra"+p);
+    if(!ele)return;
+    ele.remove();
+  }
 }
 
 function productInit()
 {
   var root = document.querySelector(".pops[data-action=\"products\"]");
-  addEventListener("product",function(){
-
-  });
 
   var action_edit = function(li)
   {
@@ -773,8 +831,10 @@ function productInit()
         li.appendChild(act);
         return;
       }
-      li.parentNode.removeChild(li);
-      na("Eliminato");
+      try{
+        li.parentNode.removeChild(li);
+        na("Eliminato");
+      }catch(e){}
     },true);
   };
 
@@ -821,8 +881,8 @@ function productInit()
   });
   var fix_entry = function(li,info)
   {
-    li.setAttribute("data-id",info.prod_id);
-    li.id="product"+info.prod_id;
+    li.setAttribute("data-id",info.id);
+    li.id="product"+info.id;
     var eNm = li.querySelector(".name");
     var ePc = li.querySelector(".price");
     var eAc = li.querySelector(".actions");
@@ -840,6 +900,13 @@ function productInit()
       var gai = get_add_item();
       var li = simulate_addextra(gai);
       api.addproduct(gai,function(data){
+        var id = data.added.id;
+        var ele = root.querySelector("#product"+id);
+        if(!!ele)
+        {
+          li.remove();
+          return;
+        }
         fix_entry(li,data.added);
       });
       reset_add_item();
@@ -847,12 +914,29 @@ function productInit()
     }
   });
 
-  //DEV
-  var gai = {name:"Test",price:2.7};
-  var li = simulate_addextra(gai);
-  api.addproduct(gai,function(data){
-    fix_entry(li,data.added);
-  });
+  
+  ehandlers.addProduct=function(p)
+  {
+    var id = p.id;
+    var ele = root.querySelector("#product"+id);
+    if(!!ele)return;
+    var li = simulate_addextra(p);
+    fix_entry(li,p);
+  }
+  ehandlers.editProduct=function(p)
+  {
+    var id = p.id;
+    var ele = root.querySelector("#product"+id);
+    if(!ele)return;
+    ele.querySelector(".name").innerHTML=p.name;
+    ele.querySelector(".price").innerHTML=price(p.price)+"&euro;";
+  }
+  ehandlers.delProduct=function(p)
+  {
+    var ele = root.querySelector("#product"+p);
+    if(!ele)return;
+    ele.remove();
+  }
 }
 
 function welcomeInit()
@@ -881,6 +965,38 @@ function welcomeInit()
       passinput.focus();
     }
   });
+  
+  ehandlers.updateTablecount=function(aObj)
+  {
+    tableinput.value=aObj.count;
+    console.log("TABLE OBJ",aObj);
+    ehandlers.updateTablecount2(aObj);
+  }
+}
+
+var open_attempt=0;
+var c_lost = false;
+function connect(con_problem)
+{
+  if((open_attempt>10 && !con_problem)){
+    c_lost=true;
+    connect(true);
+    na("Connessione persa",true);
+    return;
+  }
+  ws=new WebSocket("ws://localhost:8181");
+  ws.onmessage=handleWSMessage;
+  ws.onopen=function()
+  {
+    if(con_problem)na("Connessione ripristinata");
+    open_attempt=0;
+  };
+  ws.onclose=function()
+  {
+    open_attempt++;
+    setTimeout(connect,con_problem?3000:500);
+  };
+//  ws.onerror=function(){console.log("ERROR");open_attempt++;}
 }
 
 function init()
@@ -916,9 +1032,10 @@ function init()
   extraInit();
   productInit();
   api.info(function(data){
-    console.log(serverInfo=data);
+    (serverInfo=data);
   });
   addEventListener("resize",rz.trigger);
+  connect();
 }
 
 //DEBUGGING

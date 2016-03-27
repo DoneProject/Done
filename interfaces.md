@@ -168,7 +168,15 @@ WebSocket
 - **Request:** `{"get":"stats"}`
  - **Response:** `(Event<"statsUpdate",StatsObject>)`
  - **Notice:** The response is broadcasted
+- **Request:** `{"get":"tables"}`
+ - **Response:** `(Event<"updateTablecount",AddTableActionObject>)`
 
 ###Events
 - **StatsUpdate:** `(Event<"statsUpdate",StatsObject>)`
-- **AddStatus:** 
+- **DeleteExtra:** `(Event<"delExtra",IDResolvable>)`
+- **EditExtra:** `(Event<"editExtra",ExtraObject>)`
+- **AddExtra:** `(Event<"addExtra",ExtraObject>)`
+- **DeleteProduct:** `(Event<"delProduct",IDResolvable>)`
+- **EditProduct:** `(Event<"editProduct",ProductObject>)`
+- **AddProduct:** `(Event<"addProduct",ProductObject>)`
+- **updateTablecount:** `(Event<"updateTablecount",AddTableActionObject>)`

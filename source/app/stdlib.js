@@ -3,9 +3,8 @@ function OrderList(id) {
   this.orders = []
 }
 
-function Order(id, productId, name, extras, price) {
-  this.id = id || -1
-  this.prod_id = productId
+function Order(id, name, extras, price) {
+  this.id = id
   this.name = name
   this.extras = extras
   this.price = price

@@ -53,6 +53,26 @@ var wsaction = {
   "statsUpdate":function()
   {
     sendEvent("statsUpdate",getStats());
+  },
+  "delextra":function(id)
+  {
+    sendEvent("delExtra",id);
+  },
+  "addextra":function(e){
+    sendEvent("addExtra",e);
+  },
+  "editextra":function(e){
+    sendEvent("editExtra",e);
+  },
+  "delproduct":function(id)
+  {
+    sendEvent("delProduct",id);
+  },
+  "addproduct":function(e){
+    sendEvent("addProduct",e);
+  },
+  "editproduct":function(e){
+    sendEvent("editProduct",e);
   }
 }
 
@@ -130,7 +150,7 @@ function getStats()
     earned:earned,
     orders:{
       active:pending.length,
-      total:orders.length
+      total:orders
     }
   }
 }
@@ -159,6 +179,14 @@ function sendEvent(eventName,data)
   }));
 }
 
+function sendEventTo(ws,eventName,data){
+  ws.send(JSON.stringify({
+    action:"event",
+    "event":eventName,
+    "data":data
+  }))
+}
+
 function messageRecived(ws,message)
 {
   var j = JSON.parse(message);
@@ -167,7 +195,11 @@ function messageRecived(ws,message)
     switch(j.get)
     {
       case "tables":
-        ws.send(JSON.stringify(tables));
+        sendEventTo(ws,"updateTablecount",{
+          action:"settables",
+          tables:tables,
+          count:tables.length
+        });
         break;
       case "orderable":
         ws.send(JSON.stringify(orderable));
@@ -185,9 +217,6 @@ function messageRecived(ws,message)
         break;
       case "stats":
         wsaction.statsUpdate();
-        break;
-      case "tables":
-        ws.send(JSON.stringify(tables));
         break;
       default:
         ws.send(errorJSON("Wrong action"));
@@ -275,10 +304,7 @@ var api_handlers = {
         var e = new Extra(getExtraId(),json.name,json.price);
         extras.push(e);
         res.end(JSON.stringify({added:e}));
-        wsBroadcastObject({
-          action:"addExtra",
-          element:e
-        });
+        wsaction.addextra(e);
         wsaction.statsUpdate();
         return;
       }catch(e){
@@ -307,10 +333,7 @@ var api_handlers = {
         }
         if(found)
         {
-          wsBroadcastObject({
-            action:"editExtra",
-            element:e
-          });
+          wsaction.editextra(e);
           res.end(JSON.stringify({modified:e}));
         }
         else
@@ -341,10 +364,7 @@ var api_handlers = {
         }
         if(deleted)
         {
-          wsBroadcastObject({
-            action:"delExtra",
-            id:o.id
-          });
+          wsaction.delextra(o.id);
           wsaction.statsUpdate();
           res.end(JSON.stringify({deleted:o.id}));
         }
@@ -364,12 +384,9 @@ var api_handlers = {
     postHandle(req,function(o){
       try{
         var json = JSON.parse(o.data);
-        var e = new Order(null,getOrderableId(),json.name,[],json.price);
+        var e = new Order(getOrderableId(),json.name,[],json.price);
         orderable.push(e);
-        wsBroadcastObject({
-          action:"addProduct",
-          element:e
-        });
+        wsaction.addproduct(e);
         wsaction.statsUpdate();
         res.end(JSON.stringify({added:e}));
         return;
@@ -386,7 +403,7 @@ var api_handlers = {
     postHandle(req,function(o){
       try{
         var json = JSON.parse(o.data);
-        var e = new Order(null,json.id,json.name,[],json.price);
+        var e = new Order(json.id,json.name,[],json.price);
         var found = false;
         for(var i = orderable.length; --i>=0;)
         {
@@ -399,10 +416,7 @@ var api_handlers = {
         }
         if(found)
         {
-          wsBroadcastObject({
-            action:"editProduct",
-            element:e
-          });
+          wsaction.editproduct(e);
           res.end(JSON.stringify({modified:e}));
         }
         else
@@ -422,26 +436,23 @@ var api_handlers = {
 
       try{
         var deleted = false;
-        for(var i = extras.length; --i>=0;)
+        for(var i = orderable.length; --i>=0;)
         {
-          if(extras[i].id==o.id)
+          if(orderable[i].id==o.id)
           {
-            extras.splice(i,1);
+            orderable.splice(i,1);
             deleted=true;
             break;
           }
         }
         if(deleted)
         {
-          wsBroadcastObject({
-            action:"delProduct",
-            id:o.id
-          });
+          wsaction.delproduct(o.id);
           wsaction.statsUpdate();
           res.end(JSON.stringify({deleted:o.id}));
         }
         else
-          res.end(errorJSON("Extra not found"));
+          res.end(errorJSON("Product not found"));
         return;
       }catch(e){
         res.end("{\"error\":\"Invalid data format\"}");
@@ -461,12 +472,10 @@ var api_handlers = {
         {
           if(c < tables.length)
           {
-            console.log("C IS LOWER THEN TABLES (deleting)");
             tables.splice(c);
           }
           else if(c > tables.length)
           {
-            console.log("C IS GREATER THEN TABLES (adding)");
             var dif = c-tables.length;
             console.log("DIF: "+dif);
             for(var i = dif; --i>=0;)
@@ -474,7 +483,7 @@ var api_handlers = {
               tables.push(new Table(getTableId()));
             }
           }
-          var t = {action:"settables",tables:tables,"num":c,count:tables.length};
+          var t = {action:"settables",tables:tables,count:tables.length};
           sendEvent("updateTablecount",t);
           wsaction.statsUpdate();
           res.end(JSON.stringify(t));
