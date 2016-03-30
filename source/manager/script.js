@@ -978,25 +978,34 @@ var open_attempt=0;
 var c_lost = false;
 function connect(con_problem)
 {
+  var connected = function()
+  {
+    var side = document.querySelector(".side");
+    if(!!side){side.setAttribute("data-status","in")}
+    var info = document.querySelector(".info");
+    if(!!info){
+      info.innerHTML="Seleziona un menu per visualizzare le impostazioni.";
+    }
+  }
   if((open_attempt>10 && !con_problem)){
     c_lost=true;
     connect(true);
     na("Connessione persa",true);
     return;
   }
-  ws=new WebSocket("ws://localhost:8181");
+  ws=new WebSocket("ws://"+serverInfo.address+":"+serverInfo.socketPort);
   ws.onmessage=handleWSMessage;
   ws.onopen=function()
   {
     if(con_problem)na("Connessione ripristinata");
     open_attempt=0;
+    connected();
   };
   ws.onclose=function()
   {
     open_attempt++;
     setTimeout(connect,con_problem?3000:500);
   };
-//  ws.onerror=function(){console.log("ERROR");open_attempt++;}
 }
 
 function init()
@@ -1033,9 +1042,9 @@ function init()
   productInit();
   api.info(function(data){
     (serverInfo=data);
+    connect();
   });
   addEventListener("resize",rz.trigger);
-  connect();
 }
 
 //DEBUGGING
