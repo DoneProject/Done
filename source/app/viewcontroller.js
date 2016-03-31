@@ -4,6 +4,7 @@
   
   self.view = document.getElementById('view-tables')
   self.views = []
+  self.title = document.getElementById('view-title')
   self.activeView = null
   self.activeTable = null
   self.selectTabEvents = []
@@ -23,13 +24,10 @@
   }
   
   self.selectTabEvents.push({ tabName: 'order', action: function () {
-    // Load self.activeTable
-    var title = document.getElementById('view-order--title')
-    
     if (self.activeTable !== null) {
-      title.innerHTML = `Table ${self.activeTable.number}`
+      self.title.innerHTML = self.activeTable.name
     } else {
-      title.innerHTML = 'No Orders to Show'
+      self.title.innerHTML = 'Order'
     }
   }})
   
@@ -77,12 +75,9 @@
     contents.innerHTML = `T${x}`
     
     element.addEventListener('click', function () {
-      self.activeTable = {
-        number: parseInt(this.dataset.id, 10),
-        pending: []
-      }
+      self.activeTable = new Table(parseInt(this.dataset.id, 10))
       
-      openTabById('view-order')
+      openTabById('view-order', true)
     })
     
     element.appendChild(contents)
@@ -93,15 +88,29 @@
   // = Events =
   // ==========
   
-  function openTabById(id) {
+  function openTabById(id, animate) {
+    animate = animate === true
+    
     var oldView = self.activeView
     var newView = document.getElementById(id)
     
-    oldView.setAttribute('hidden', 'hidden')
+    newView.classList.remove('inactive')
+    
+    if (animate) {
+      Velocity(oldView, 'slideUp',   { duration: 300, easing: 'ease-out' })
+      oldView.classList.add('inactive')
+    } else {
+      oldView.setAttribute('hidden', 'hidden')
+      oldView.style.display = 'none'
+    }
+    
     newView.removeAttribute('hidden')
+    newView.style.display = 'block'
     
     document.getElementById('nav-'+oldView.id).classList.remove('active')
     document.getElementById('nav-'+newView.id).classList.add('active')
+    
+    self.title = 'Done'
     
     triggerSelectTabEvents(newView.id)
     

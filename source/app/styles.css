@@ -52,6 +52,9 @@ main {
 
 h2 {
   text-align: center;
+.inactive {
+  background-color: #ddd;
+  transition: background-color 300ms ease-out;
 }
 
 /* ========== */
