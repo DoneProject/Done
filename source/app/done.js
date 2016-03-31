@@ -32,31 +32,64 @@ var Done = (function(baseSocketURL) {
       self.accessToken = accessToken
     }
     
+    // ==========
+    // = Listen =
+    // ==========
+    
+    self.listener = {}
+    
+    self.send = function (object, type, callback) {
+      if (type && callback) {
+        if (!self.listener.hasOwnProperty(type)) {
+          self.listener[type] = []
+        }
+        
+        self.listener[type].push(callback)
+      }
+      
+      self.connection.send(JSON.stringify(object))
+    }
+    
+    self.connection.onmessage = function (event) {
+      var rawEvent = JSON.parse(event.data)
+      var action = rawEvent.action
+      var type = rawEvent.event
+      var data = rawEvent.data
+      
+      console.log('Incoming Message', data)
+      
+      if (self.listener.hasOwnProperty(type)) {
+        self.listener[type].forEach(function (f) {
+          f(action, type, data)
+        })
+      }
+    }
+    
     // ========
     // = POST =
     // ========
     
-    self.post = function (message, data) {
-      return self.connection.send(JSON.stringify({ post: message, data: data }))
+    self.post = function (message, data, type, callback) {
+      return self.send({ post: message, data: data }, type, callback)
     }
     
-    self.postTables    = function (data, callback) { return self.post('tables', data, callback) }
-    self.postOrderable = function (data, callback) { return self.post('orderable', data, callback) }
-    self.postExtras    = function (data, callback) { return self.post('extras', data, callback) }
-    self.postQueue     = function (data, callback) { return self.post('queue', data, callback) }
+    self.postTables    = function (data, type, callback) { return self.post('tables', data, type, callback) }
+    self.postOrderable = function (data, type, callback) { return self.post('orderable', data, type, callback) }
+    self.postExtras    = function (data, type, callback) { return self.post('extras', data, type, callback) }
+    self.postQueue     = function (data, type, callback) { return self.post('queue', data, type, callback) }
     
     // =======
     // = GET =
     // =======
     
-    self.get = function (message, callback) {
-      self.connection.send(JSON.stringify({ get: message }))
+    self.get = function (message, type, callback) {
+      self.send({ get: message }, type, callback)
     }
     
-    self.getTables    = function (callback) { return self.get('tables', callback) }
-    self.getOrderable = function (callback) { return self.get('orderable', callback) }
-    self.getExtras    = function (callback) { return self.get('extras', callback) }
-    self.getQueue     = function (callback) { return self.get('queue', callback) }
+    self.getTables    = function (type, callback) { return self.get('tables', type, callback) }
+    self.getOrderable = function (type, callback) { return self.get('orderable', type, callback) }
+    self.getExtras    = function (type, callback) { return self.get('extras', type, callback) }
+    self.getQueue     = function (type, callback) { return self.get('queue', type, callback) }
     
     // ==================
     // = Event Listener =
