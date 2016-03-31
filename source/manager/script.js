@@ -301,6 +301,7 @@ function request(url,cb,asjson)
 function handleWSMessage(event)
 {
   var d = event.data;
+  console.log(event);
   try{d=JSON.parse(d)}catch(e){}
   console.log(d);
   if("action" in d)
@@ -501,7 +502,7 @@ function loadModule()
     var pwi = document.querySelector(".setting.list input[data-action=\"password\"]");
     if(!!pwi)
     {
-      if(data.password=="false")
+      if(data.password=="false" || data.password==false || data.password.indexOf("false")==0)
       {
         pwi.value="";
         return;
@@ -996,7 +997,7 @@ function connect(con_problem)
   ws=new WebSocket("ws://"+serverInfo.address+":"+serverInfo.socketPort);
   ws.onmessage=handleWSMessage;
   ws.onopen=function()
-  {
+  { 
     if(con_problem)na("Connessione ripristinata");
     open_attempt=0;
     connected();
@@ -1004,7 +1005,7 @@ function connect(con_problem)
   ws.onclose=function()
   {
     open_attempt++;
-    setTimeout(connect,con_problem?3000:500);
+    setTimeout(connect,con_problem?5000:500);
   };
 }
 
@@ -1050,7 +1051,7 @@ function init()
 //DEBUGGING
 function debugme()
 {
-  gws = new WebSocket("ws://192.168.1.10:8181");
+  gws = new WebSocket("ws://mbp.local:8181");
   gws.onmessage=function(event){
     console.log("RECIVED: "+event.data);
   }

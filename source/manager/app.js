@@ -13,7 +13,7 @@ wss.on('connection', function connection(ws) {
   console.log("OPENING CONNECTION");
   ws_array.push(ws);
   ws.on('message', function(message) {
-    console.log("RECIVED");
+    console.log("RECIVED:"+message);
     messageRecived(ws,message);
   });
   ws.on("ready",function(){
@@ -73,6 +73,12 @@ var wsaction = {
   },
   "editproduct":function(e){
     sendEvent("editProduct",e);
+  },
+  "sendorderlist":function(e){
+    sendEvent("orderListUpdate",e);
+  },
+  "orderable":function(e){
+    sendEvent("orderableUpdate",e);
   }
 }
 
@@ -202,10 +208,10 @@ function messageRecived(ws,message)
         });
         break;
       case "orderable":
-        ws.send(JSON.stringify(orderable));
+        sendEventTo(ws,"orderableUpdate",orderable);
         break;
       case "extras":
-        ws.send(JSON.stringify(extras));
+        sendEventTo(ws,"extras",extras);
         break;
       case "queue":
         ws.send(JSON.stringify(pending));
@@ -221,6 +227,13 @@ function messageRecived(ws,message)
       default:
         ws.send(errorJSON("Wrong action"));
         break;
+    }
+  }
+  else if("post" in j)
+  {
+    switch(j.post)
+    {
+        
     }
   }
 }
