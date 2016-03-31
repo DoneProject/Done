@@ -1,6 +1,6 @@
 (function() {
   
-  var self = this
+  var self = {}
   
   self.view = document.getElementById('view-tables')
   self.views = []
@@ -110,7 +110,7 @@
     document.getElementById('nav-'+oldView.id).classList.remove('active')
     document.getElementById('nav-'+newView.id).classList.add('active')
     
-    self.title = 'Done'
+    self.title.innerHTML = 'Done'
     
     triggerSelectTabEvents(newView.id)
     
