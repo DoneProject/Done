@@ -6,6 +6,7 @@
 
 html,
 body {
+  width: 100%;
   overflow-x: hidden;
 }
 
@@ -45,13 +46,15 @@ body {
 /* ========= */
 
 main {
-  padding: 12px;
   margin-top: 40px; /* .app-header height */
   margin-bottom: 50px; /* .app-footer height */
+  overflow-y: scroll;
 }
 
-h2 {
-  text-align: center;
+.view {
+  padding: 12px;
+}
+
 .inactive {
   background-color: #ddd;
   transition: background-color 300ms ease-out;
