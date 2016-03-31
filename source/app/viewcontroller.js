@@ -97,7 +97,7 @@
     newView.classList.remove('inactive')
     
     if (animate) {
-      Velocity(oldView, 'slideUp',   { duration: 300, easing: 'ease-out' })
+      Velocity(oldView, 'slideUp', { duration: 300, easing: 'ease-out' })
       oldView.classList.add('inactive')
     } else {
       oldView.setAttribute('hidden', 'hidden')
