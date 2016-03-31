@@ -1,7 +1,7 @@
 global.OrderList = function(id)
 {
   this.id=id || -1;
-  this.state="pensing"; //to serve, to pay, payed
+  this.state="pending"; //to serve, to pay, done
   this.orders=[];
 }
 

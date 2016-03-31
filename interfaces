@@ -26,7 +26,7 @@
     GET incoming orders (with extras)
         {"get":"queue"}
     POST incoming orders (with extras)
-        {"post:":"orders","data":[Order JSON]}
+        {"post:":"orders","data":[OrderList]}
     
 [app]
     POST order (with extra)

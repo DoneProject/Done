@@ -73,6 +73,20 @@ Object rappresenting an Product
 }
 ```
 
+###OrderListObject
+A list that holds orders and an ID
+- *Id:* the id of the orderlist
+- *Orders:* the list of the order
+- *State:* the status of the order (to serve, to pay, pending, done)
+
+```
+{
+"id":(IDResolvable),
+"orders":[ProductObject, ProductObject, ...],
+"state":"done"
+}
+```
+
 ###AddTableActionObject
 ```
 {
@@ -170,6 +184,23 @@ WebSocket
  - **Notice:** The response is broadcasted
 - **Request:** `{"get":"tables"}`
  - **Response:** `(Event<"updateTablecount",AddTableActionObject>)`
+- **Request:** `{"get":"orders"}`
+ - **Response:** `(Event<"orderListUpdate",OrderList>)`
+- **Request:** `{"get":"orderable"}`
+ - **Response:** `(Event<"orderableUpdate",[ProductObject, ProductObject, ...]>)`
+- **Request:** `{"get":"extras"}`
+  - **Response:** `(Event<"extrasUpdate",[ExtraObject, ExtraObject, ...]>)`
+- **Request:** `{"get":"queue"}`
+  - **Response:** `(Event<"queueUpdate",[OrderListObject, OrderListObject, ...]>)`
+
+####Posts
+- **Post** `{"post":"orderlist","data":[OrderListObject, OrderListObject, ...]}`
+ - **Event** `Event<"orderListAdded",OrderListObject>`
+- **Post** `{"post":"extra","data":ExtraObject}`
+ - **Event** `Event<"addExtra",ExtraObject>`
+ - **Event** `Event<"editExtra",ExtraObject>`
+ - **Notice** If id exists it will be modified
+
 
 ###Events
 - **StatsUpdate:** `(Event<"statsUpdate",StatsObject>)`
