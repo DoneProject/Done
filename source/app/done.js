@@ -13,6 +13,17 @@ var Done = (function(baseSocketURL) {
     self.connection = new WebSocket(self.baseSocketURL)
     self.callback = function (event, success) { }
     
+    var errorHandler = function () {
+      try {
+        self.connection = new WebSocket(self.baseSocketURL)
+        self.connection.onclose = errorHandler
+      } catch (error) {
+        errorHandler()
+      }
+    }
+    
+    self.connection.onclose = errorHandler
+    
     // ========
     // = Auth =
     // ========
