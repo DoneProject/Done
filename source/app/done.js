@@ -38,6 +38,14 @@ var Done = (function(baseSocketURL) {
     
     self.listener = {}
     
+    var trySend = function (string) {
+      try {
+        self.connection.send(string)
+      } catch (variable) {
+        setTimeout(function () { trySend(string) }, 100)
+      }
+    }
+    
     self.send = function (object, type, callback) {
       if (type && callback) {
         if (!self.listener.hasOwnProperty(type)) {
@@ -47,7 +55,7 @@ var Done = (function(baseSocketURL) {
         self.listener[type].push(callback)
       }
       
-      self.connection.send(JSON.stringify(object))
+      trySend(JSON.stringify(object))
     }
     
     self.connection.onmessage = function (event) {
@@ -55,8 +63,6 @@ var Done = (function(baseSocketURL) {
       var action = rawEvent.action
       var type = rawEvent.event
       var data = rawEvent.data
-      
-      console.log('Incoming Message', data)
       
       if (self.listener.hasOwnProperty(type)) {
         self.listener[type].forEach(function (f) {
