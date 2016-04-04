@@ -8,6 +8,9 @@
   self.activeView = null
   self.activeTable = null
   self.selectTabEvents = []
+  self.buttons = {
+    addOrder: document.getElementById('add-order-button')
+  }
   
   // ===============
   // = Select View =
