@@ -55,33 +55,33 @@
   // = Logic =
   // =========
   
-  var is = (function(from, to) {
-    var range = []
-    for (var i = from; i <= to; i += 1) {
-      range.push(i)
-    }
-    return range
-  }(1, 14))
-  
-  is.forEach(function (x) {
-    var element  = document.createElement('div')
-    var contents = document.createElement('div')
+  Done.getTables('updateTablecount', function (action, type, data) {
+    self.view.innerHTML = ''
     
-    element.id = `table-${x}`
-    element.dataset.id = x
-    element.classList.add('table')
-    contents.classList.add('table-contents')
-    
-    contents.innerHTML = `T${x}`
-    
-    element.addEventListener('click', function () {
-      self.activeTable = new Table(parseInt(this.dataset.id, 10))
+    data.tables.forEach(function (x) {
+      var element  = document.createElement('div')
+      var contents = document.createElement('div')
       
-      openTabById('view-order', true)
+      element.id = `table-${x.id}`
+      element.dataset.id = x.id
+      element.classList.add('table')
+      contents.classList.add('table-contents')
+      
+      contents.innerHTML = x.name
+      
+      element.addEventListener('click', function () {
+        self.activeTable = new Table(parseInt(x.id, 36), x.name)
+        
+        openTabById('view-table', true)
+      })
+      
+      element.appendChild(contents)
+      self.view.appendChild(element)
     })
-    
-    element.appendChild(contents)
-    self.view.appendChild(element)
+  })
+  
+  self.buttons.addOrder.addEventListener('click', function () {
+    openTabById('view-add-order', true)
   })
   
   // ==========
