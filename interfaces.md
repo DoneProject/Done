@@ -8,10 +8,12 @@ Index
   - [URLResolvable](#urlresolvable)
   - [IPResolvable](#ipresolvable)
   - [IDResolvable](#idresolvable)
+  - [IDResolvable](#orderlistobject)
   - [PasswordResolvable](#passwordresolvable)
   - [ExtraObject](#extraobject)
   - [ProductObject](#productobject)
-- [HTTP](#http)
+- [HTTP / REST](#http)
+- [WebSockets](#websocket)
 
 OBJECTS
 ----
@@ -82,6 +84,17 @@ A list that holds orders and an ID
 ```
 {
 "id":(IDResolvable),
+"orders":[ProductObject, ProductObject, ...],
+"state":"done"
+}
+```
+
+###OrderListObject_withTableID
+Is equal to the OrderListObject, but extended by a tableId attribute
+```
+{
+"id":(IDResolvable),
+"tableId":(IDResolvable),
 "orders":[ProductObject, ProductObject, ...],
 "state":"done"
 }
@@ -194,12 +207,12 @@ WebSocket
   - **Response:** `(Event<"queueUpdate",[OrderListObject, OrderListObject, ...]>)`
 
 ####Posts
-- **Post** `{"post":"orderlist","data":[OrderListObject, OrderListObject, ...]}`
+- **Post** `{"post":"orderlist","data":[OrderListObject_withTableID, OrderListObject_withTableID, ...]}`
  - **Event** `Event<"orderListAdded",OrderListObject>`
 - **Post** `{"post":"extra","data":ExtraObject}`
  - **Event** `Event<"addExtra",ExtraObject>`
  - **Event** `Event<"editExtra",ExtraObject>`
- - **Notice** If id exists it will be modified
+ - **Notice** If ID exists it will be modified
 
 
 ###Events
@@ -211,3 +224,5 @@ WebSocket
 - **EditProduct:** `(Event<"editProduct",ProductObject>)`
 - **AddProduct:** `(Event<"addProduct",ProductObject>)`
 - **updateTablecount:** `(Event<"updateTablecount",AddTableActionObject>)`
+- **updateOrderlist:** `(Event<"updateOrderlist",[OrderListObject,OrderListObject,...]>)`
+- **addOrderlist:** `(Event<"addOrderlist",[OrderListObject,OrderListObject,...]>)`

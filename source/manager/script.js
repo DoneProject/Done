@@ -226,6 +226,17 @@ function na(st,flash)
   },50);
 };
 
+function highlight(nr)
+{
+  var opt = document.querySelectorAll(".side .more");
+  for(var i = opt.length; --i>=0;)
+  {
+    opt[i].setAttribute("data-active","false");
+  }
+  if(nr >= 0 && nr < opt.length)
+    opt[nr].setAttribute("data-active","true");
+}
+
 function postrequest(url,data,cb,asjson)
 {
   cb = cb || function(){};
@@ -387,6 +398,12 @@ var api={
       console.log("STARTED",json);
     },true);
 
+  },
+  "updateOneOrderlist":function(o){
+    sendEvent("updateOneOrderlist",o);
+  },
+  "addorderlist":function(o){
+    sendEvent("updateOrderlist",o);
   }
 };
 
@@ -406,6 +423,8 @@ var menus={
     main.appendChild(attele["products"]);
     var side = document.querySelector(".side");
     side.setAttribute("data-status","in");
+    var inp = attele["products"].querySelector("input");
+    !!inp && inp.focus();
   },
   "extra":function(event)
   {
@@ -415,6 +434,8 @@ var menus={
     main.appendChild(attele["extra"]);
     var side = document.querySelector(".side");
     side.setAttribute("data-status","in");
+    var inp = attele["extra"].querySelector("input");
+    !!inp && inp.focus();
   },
   "general":function(event)
   {
@@ -424,6 +445,8 @@ var menus={
     main.appendChild(attele["general"]);
     var side = document.querySelector(".side");
     side.setAttribute("data-status","in");
+    var inp = attele["general"].querySelector("input");
+    !!inp && inp.focus();
   },
   "run":function(event)
   {
@@ -471,6 +494,7 @@ function loadModule()
         side_ac[i].setAttribute("data-active","false");
       }
       menus.general();
+      highlight(0);
     }
   });
 
@@ -522,6 +546,9 @@ function loadModule()
       t+="<div class=\"table "+(ts[i].pending.length > 0 ? "occupied" : "free")+"\"><span class=\"label\">"+ts[i].name+"</span></div>";
     }
     eles.tables.innerHTML=t;
+    try{
+      Translation.applyTo(eles.tables);
+    }catch(e){}
   }
   
   ws.send('{"get":"stats"}');
@@ -562,6 +589,12 @@ function extraInit()
 {
   var root = document.querySelector(".pops[data-action=\"extra\"]");
 
+  var sto = root.querySelector(".stepon button");
+  if(!!sto)sto.addEventListener("click",function(){
+    menus.products();
+    highlight(2);
+  })
+  
   var action_edit = function(li)
   {
     var done=function(){//DONE
@@ -706,7 +739,15 @@ function extraInit()
     if(event.keyCode==13)
     {
       event.preventDefault();
+      
       var gai = get_add_item();
+      if(gai.name.length==0 || add_price.value.length==0)
+      {
+        menus.products();
+        highlight(2);
+        return;
+      }
+      
       var li = simulate_addextra(gai);
       api.addextra(gai,function(data){
 
@@ -752,6 +793,11 @@ function extraInit()
 function productInit()
 {
   var root = document.querySelector(".pops[data-action=\"products\"]");
+  var so = root.querySelector(".stepon button");
+  if(!!so)so.addEventListener("click",function(){
+    menus.run();
+    highlight(3);
+  })
 
   var action_edit = function(li)
   {
@@ -899,6 +945,13 @@ function productInit()
     {
       event.preventDefault();
       var gai = get_add_item();
+      if(gai.name.length==0 || add_price.value.length==0)
+      {
+        menus.run();
+        highlight(3);
+        return;
+      }
+      
       var li = simulate_addextra(gai);
       api.addproduct(gai,function(data){
         var id = data.added.id;
@@ -952,6 +1005,14 @@ function welcomeInit()
   passinput.addEventListener("keyup",uPass);
   passinput.addEventListener("change",uPass);
   passinput.addEventListener("input",uPass);
+  passinput.addEventListener("keydown",function(event){
+    if(event.keyCode==13){
+      event.stopPropagation();
+      event.preventDefault();
+      menus.extra();
+      highlight(1);
+    }
+  });
 
   var uTable = function()
   {
@@ -972,6 +1033,14 @@ function welcomeInit()
     tableinput.value=aObj.count;
     console.log("TABLE OBJ",aObj);
     ehandlers.updateTablecount2(aObj);
+  }
+  var btn = general.querySelector(".stepon button");
+  if(!!btn)
+  {
+    btn.addEventListener("click",function(){
+      menus.extra();
+      highlight(1);
+    })
   }
 }
 
@@ -1042,6 +1111,17 @@ function connect(con_problem)
   };
 }
 
+function getProductsAndExtras()
+{
+  if(ws.readyState==ws.OPEN)
+  {
+//    ws.send("{'get':'extras'}");
+//    ws.send("{'get':'ordarable'}");
+    return;
+  }
+  setTimeout(getProductsAndExtras,100);
+}
+
 function init()
 {
   var menuItems = document.querySelectorAll(".side div.more");
@@ -1077,9 +1157,26 @@ function init()
   api.info(function(data){
     (serverInfo=data);
     connect();
+    getProductsAndExtras();
+  });
+  addEventListener("keydown",function(event){
+    if(event.keyCode==13)
+    {
+      var s = document.querySelector(".side [data-active=\"true\"]");
+      if(!s){
+        menus.general();
+        highlight(0);
+      }
+    }
+    else if(event.keyCode==27)
+    {
+      var s = document.querySelector(".side [data-active=\"true\"]");
+      var b = document.querySelector(".sbtn[data-bind=\"stopbutton\"] button");
+      if(!!b && !!s){event.preventDefault();b.click();}
+    }
   });
   addEventListener("resize",rz.trigger);
-  activeLanguage.applyTo();
+  Translation.applyTo();
 }
 
 //DEBUGGING

@@ -41,6 +41,7 @@ var orderable = [];
 var tables = [];
 var extras = [];
 var pending = [];
+var concluded = [];
 
 var ws_array = [];
 
@@ -75,7 +76,10 @@ var wsaction = {
     sendEvent("editProduct",e);
   },
   "sendorderlist":function(e){
-    sendEvent("orderListUpdate",e);
+    sendEvent("updateOrderlist",e);
+  },
+  "addorderlist":function(e){
+    sendEvent("addOrderlist",e)
   },
   "orderable":function(e){
     sendEvent("orderableUpdate",e);
@@ -193,6 +197,18 @@ function sendEventTo(ws,eventName,data){
   }))
 }
 
+function updateOrderList(o)
+{
+  for(var i = pending.length; --i>=0;)
+  {
+    if(o.id==pending[i].id)
+    { 
+      pending[i].orders=o.orders;
+      api.updateOneOrderlist(pending[i]);
+    }
+  }
+}
+
 function messageRecived(ws,message)
 {
   var j = JSON.parse(message);
@@ -224,16 +240,61 @@ function messageRecived(ws,message)
       case "stats":
         wsaction.statsUpdate();
         break;
+      case "orderlist":
+        sendEventTo(ws,"updateOrderlist",orders)
+        break;
       default:
         ws.send(errorJSON("Wrong action"));
         break;
     }
   }
-  else if("post" in j)
+  else if("post" in j && "data" in j)
   {
+    var d = j.data, mask;
     switch(j.post)
     {
+      case "orderlist":
+        for(var i = d.length; --i>=0;)
+        {
+          if(!("tableId") in d[i])continue;
+          if(mask=OrderList.valid(d[i]) > 0)
+          {
+            switch(mask)
+            {
+              case OrderList.VALID:
+                updateOrderList(d[i])
+                break;
+              default:
+                var o = new OrderList(getPendingId());
+                o.state="pending";
+                o.orders=d[i].orders;
+                pending.push(o);
+                api.addorderlist(o);
+                break;
+            }
+          }
+        }
+        break;
+      case "extra":
+        if((mask = Extra.valid(d)) > 0)
+        {
+          switch(mask){
+            case Extra.VALID:
+              updateExtra(d);
+              break;
+            default:
+              var e = new Extra(getExtraId());
+              e.name=d.name;
+              e.price=d.price;
+              extras.push(e);
+              api.addextra(e);
+              break;
+          }
+        }
+        break;
+      case "done":
         
+        break;
     }
   }
 }
@@ -274,6 +335,16 @@ function initInstance()
     queue: pending
   };
 };
+
+function enumTables()
+{
+  var t = [];
+  for(var i = 0; i < tables.length;i++)
+  {
+    t.push(tables[i].setNR(i+1)); 
+  }
+  return t;
+}
 
 //API Handlers
 var api_handlers = {
@@ -477,6 +548,7 @@ var api_handlers = {
   },
   "settablecount":function(m,req,res){
     postHandle(req,function(o){
+      console.log(o);
       try{
         var c = parseInt(o.number);
         if(isNaN(c))res.end("{\"error\":\"Param is not a number\"}");
@@ -490,12 +562,14 @@ var api_handlers = {
           else if(c > tables.length)
           {
             var dif = c-tables.length;
-            console.log("DIF: "+dif);
             for(var i = dif; --i>=0;)
             {
+              console.log("TABLE COUNT:"+i);
               tables.push(new Table(getTableId()));
             }
+            console.log("END");
           }
+          var table = enumTables();
           var t = {action:"settables",tables:tables,count:tables.length};
           sendEvent("updateTablecount",t);
           wsaction.statsUpdate();
@@ -504,6 +578,7 @@ var api_handlers = {
         return;
       }catch(e){
         res.end("{\"error\":\"Invalid data format\"}");
+        console.log("ERROR:",e.message);
         return;
       };
       res.end("Somthing strange happened");
@@ -573,6 +648,17 @@ function handleRequest(request,response)
 
 };
 
+function save()
+{
+  var t = os.tmpdir();
+  fs.writeFile(t+"/table.json",JSON.stringify(tables),"utf8");
+  fs.writeFile(t+"/products.json",JSON.stringify(orderable),"utf8");
+  fs.writeFile(t+"/extras.json",JSON.stringify(extras),"utf8");
+  fs.writeFile(t+"/status.json",JSON.stringify(getStats()),"utf8");
+  fs.writeFile(t+"/pending.json",JSON.stringify(pending),"utf8");
+  fs.writeFile(t+"/concluded.json",JSON.stringify(concluded),"utf8");
+  console.log("TEMP DIR: "+t);
+}
 
 function hinit()
 {
@@ -610,3 +696,5 @@ try{
     }catch(e){continue;}
   }
 }
+
+console.log("TEMP DIR: "+os.tmpdir())

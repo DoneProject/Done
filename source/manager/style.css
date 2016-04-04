@@ -35,7 +35,7 @@ button
 }
 button:active
 {
-  background-color: #0094ff;
+  background-color: #0a60fe;
   color: #ffffff;
   text-shadow: 0 1px rgba(0,0,0,0.1);
   border-color: #999;
@@ -667,6 +667,7 @@ ul.list.setting li .tar
   border-radius: 5px;
   background-color: #fff;
   border: 1px #ddd solid;
+  cursor: pointer;
 }
 
 .pops[data-action="run"] .tables .table:after
@@ -766,5 +767,59 @@ div.alertDiv i
   div.alertDiv{
     background-color: rgba(255, 255, 255, 0.3);
     -webkit-backdrop-filter:blur(10px);
+    -webkit-animation: pulse 2s cubic-bezier(0.445,0.05,0.55,0.95) infinite alternate;
+    -o-animation: pulse 2s cubic-bezier(0.445,0.05,0.55,0.95) infinite alternate;
+    animation: pulse 2s cubic-bezier(0.445,0.05,0.55,0.95) infinite alternate;
   }
+  @-webkit-keyframes pulse{
+    0%{
+      -webkit-backdrop-filter:blur(10px);
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+    100%{
+      -webkit-backdrop-filter:blur(3px);
+      background-color: rgba(255, 255, 255, 0.7);
+    }
+  }
+}
+
+/*stepon*/
+.stepon{
+  display:block;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flex;
+  display: -o-flex;
+  display: flex;
+  text-align:right;
+  -webkit-justify-content: flex-end;
+  -moz-justify-content: flex-end;
+  -ms-justify-content: flex-end;
+  -o-justify-content: flex-end;
+  justify-content: flex-end;
+  margin:10px;
+}
+
+.stepon .spacer
+{
+  -webkit-flex: 50% 1 1;
+  -moz-flex: 50% 1 1;
+  -ms-flex: 50% 1 1;
+  -o-flex: 50% 1 1;
+  flex: 50% 1 1;
+}
+
+.stepon button
+{
+  background-color:#0a60fe;
+  color:white;
+  border:none;
+  height:30px;
+  min-width:60px;
+  padding:0 5px;
+  -webkit-flex: auto 1 1;
+  -moz-flex: auto 1 1;
+  -ms-flex: auto 1 1;
+  -o-flex: auto 1 1;
+  flex: auto 1 1;
 }
