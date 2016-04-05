@@ -226,6 +226,17 @@ function na(st,flash)
   },50);
 };
 
+function highlight(nr)
+{
+  var opt = document.querySelectorAll(".side .more");
+  for(var i = opt.length; --i>=0;)
+  {
+    opt[i].setAttribute("data-active","false");
+  }
+  if(nr >= 0 && nr < opt.length)
+    opt[nr].setAttribute("data-active","true");
+}
+
 function postrequest(url,data,cb,asjson)
 {
   cb = cb || function(){};
@@ -387,6 +398,12 @@ var api={
       console.log("STARTED",json);
     },true);
 
+  },
+  "updateOneOrderlist":function(o){
+    sendEvent("updateOneOrderlist",o);
+  },
+  "addorderlist":function(o){
+    sendEvent("updateOrderlist",o);
   }
 };
 
@@ -406,6 +423,8 @@ var menus={
     main.appendChild(attele["products"]);
     var side = document.querySelector(".side");
     side.setAttribute("data-status","in");
+    var inp = attele["products"].querySelector("input");
+    !!inp && inp.focus();
   },
   "extra":function(event)
   {
@@ -415,6 +434,8 @@ var menus={
     main.appendChild(attele["extra"]);
     var side = document.querySelector(".side");
     side.setAttribute("data-status","in");
+    var inp = attele["extra"].querySelector("input");
+    !!inp && inp.focus();
   },
   "general":function(event)
   {
@@ -424,6 +445,8 @@ var menus={
     main.appendChild(attele["general"]);
     var side = document.querySelector(".side");
     side.setAttribute("data-status","in");
+    var inp = attele["general"].querySelector("input");
+    !!inp && inp.focus();
   },
   "run":function(event)
   {
@@ -457,13 +480,13 @@ function loadModule()
 
   eles.ip.innerHTML=(serverInfo.address && serverInfo.webPort && "http://"+serverInfo.address+":"+serverInfo.webPort) || "no addr";
   eles.address.innerHTML=(serverInfo.links[0] &&  serverInfo.webPort && "http://"+serverInfo.links[0]+":"+serverInfo.webPort) || (serverInfo.hostname && serverInfo.webPort && "http://"+serverInfo.hostname+":"+serverInfo.webPort) || "no link";
-  eles.password.innerHTML=password.length==0 ? "nessuna password" : password;
-  eles.stopbutton.innerHTML="<button>Ferma</button>";
+  eles.password.innerHTML=password.length==0 ? (activeLanguage.noPassword || "nessuna password") : password;
+  eles.stopbutton.innerHTML="<button>"+(activeLanguage.stop)+"</button>";
   eles.stopbutton.querySelector("button").addEventListener("click",function(event){
     event.preventDefault();
     event.stopPropagation();
     event.cancelBubble=true;
-    if(confirm("Se fermi l'esecuzione, alcuni dati potrebbero venire persi"))
+    if(confirm(activeLanguage.stopInfo || "Se fermi l'esecuzione, alcuni dati potrebbero venire persi"))
     {
       var side_ac = document.querySelectorAll(".side .more[data-active=\"true\"]");
       for(var i = side_ac.length; --i>=0;)
@@ -471,32 +494,32 @@ function loadModule()
         side_ac[i].setAttribute("data-active","false");
       }
       menus.general();
+      highlight(0);
     }
   });
 
-  eles.productsnumber.innerHTML="Prodotti: 0";
-  eles.extranumber.innerHTML="Extra: 0";
-  eles.tablenumber.innerHTML="Tavoli: 0";
-  eles.orders.innerHTML="Ordini totali: 0";
-
-  var t = "<div class=\"info\"><i class=\"icon rot loading\"></i> In attesa di dati</div>";
+  eles.productsnumber.innerHTML=(activeLanguage.products || "Prodotti")+": 0";
+  eles.extranumber.innerHTML=(activeLanguage.extra || "Extra")+": 0";
+  eles.tablenumber.innerHTML=(activeLanguage.tables || "Tavoli")+": 0";
+  eles.orders.innerHTML=(activeLanguage.orderTot || "Ordini totali")+": 0";
+  var t = "<div class=\"info\"><i class=\"icon rot loading\"></i> "+(activeLanguage.waitForData)+"</div>";
   eles.tables.innerHTML=t;
 
-  eles.incoming.innerHTML="Guadagnio: ~0€";
-  eles.pending.innerHTML="Ordini attivi: 0";
+  eles.incoming.innerHTML=(activeLanguage.earned || "Guadagno")+": ~0€";
+  eles.pending.innerHTML=(activeLanguage.orderPending || "Ordini attivi")+": 0";
   rz.trigger();
   
   ehandlers.statsUpdate=function(data){
-    eles.password.innerHTML=(data.password===false || data.password.length==0) ? "nessuna password" : data.password;
+    eles.password.innerHTML=(data.password===false || data.password.length==0) ? (activeLanguage.noPassword || "nessuna password") : data.password;
 
-    eles.productsnumber.innerHTML="Prodotti: "+data.products;
-    eles.extranumber.innerHTML="Extra: "+data.extras;
-    eles.tablenumber.innerHTML="Tavoli: "+data.tables;
-    eles.orders.innerHTML="Ordini totali: "+data.orders.total;
+    eles.productsnumber.innerHTML=(activeLanguage.products || "Prodotti")+": "+data.products;
+    eles.extranumber.innerHTML=(activeLanguage.extra || "Extra")+": "+data.extras;
+    eles.tablenumber.innerHTML=(activeLanguage.tables || "Tavoli")+": "+data.tables;
+    eles.orders.innerHTML=(activeLanguage.orderTot || "Ordini totali")+": "+data.orders.total;
 
 
-    eles.incoming.innerHTML="Guadagnio: ~"+data.earned+"€";
-    eles.pending.innerHTML="Ordini attivi: "+data.orders.active;
+    eles.incoming.innerHTML=(activeLanguage.earned || "Guadagno")+": ~"+data.earned+"€";
+    eles.pending.innerHTML=(activeLanguage.orderPending || "Ordini attivi")+": "+data.orders.active;
     rz.trigger();
     
     var pwi = document.querySelector(".setting.list input[data-action=\"password\"]");
@@ -523,6 +546,9 @@ function loadModule()
       t+="<div class=\"table "+(ts[i].pending.length > 0 ? "occupied" : "free")+"\"><span class=\"label\">"+ts[i].name+"</span></div>";
     }
     eles.tables.innerHTML=t;
+    try{
+      Translation.applyTo(eles.tables);
+    }catch(e){}
   }
   
   ws.send('{"get":"stats"}');
@@ -563,6 +589,12 @@ function extraInit()
 {
   var root = document.querySelector(".pops[data-action=\"extra\"]");
 
+  var sto = root.querySelector(".stepon button");
+  if(!!sto)sto.addEventListener("click",function(){
+    menus.products();
+    highlight(2);
+  })
+  
   var action_edit = function(li)
   {
     var done=function(){//DONE
@@ -608,12 +640,12 @@ function extraInit()
     nprice.value=vprice;
     var bCanc = document.createElement("button");
     bCanc.className="flexbutton";
-    bCanc.innerHTML="Annulla";
+    bCanc.innerHTML=activeLanguage.cancel || "Annulla";
     li.appendChild(bCanc);
     bCanc.addEventListener("click",done);
     var bSend = document.createElement("button");
     bSend.className="flexbutton main";
-    bSend.innerHTML="Modifica";
+    bSend.innerHTML=activeLanguage.modify || "Modifica";
     li.appendChild(bSend);
     bSend.addEventListener("click",save);
     nname.focus();
@@ -707,7 +739,15 @@ function extraInit()
     if(event.keyCode==13)
     {
       event.preventDefault();
+      
       var gai = get_add_item();
+      if(gai.name.length==0 || add_price.value.length==0)
+      {
+        menus.products();
+        highlight(2);
+        return;
+      }
+      
       var li = simulate_addextra(gai);
       api.addextra(gai,function(data){
 
@@ -753,6 +793,11 @@ function extraInit()
 function productInit()
 {
   var root = document.querySelector(".pops[data-action=\"products\"]");
+  var so = root.querySelector(".stepon button");
+  if(!!so)so.addEventListener("click",function(){
+    menus.run();
+    highlight(3);
+  })
 
   var action_edit = function(li)
   {
@@ -799,12 +844,13 @@ function productInit()
     nprice.value=vprice;
     var bCanc = document.createElement("button");
     bCanc.className="flexbutton";
-    bCanc.innerHTML="Annulla";
+    bCanc.innerHTML=activeLanguage.cancel || "Annulla";
     li.appendChild(bCanc);
     bCanc.addEventListener("click",done);
     var bSend = document.createElement("button");
     bSend.className="flexbutton main";
-    bSend.innerHTML="Modifica";
+    bSend.innerHTML=activeLanguage.modify || "Modifica";
+    li.appendChild(bSend);
     li.appendChild(bSend);
     bSend.addEventListener("click",save);
     nname.focus();
@@ -899,6 +945,13 @@ function productInit()
     {
       event.preventDefault();
       var gai = get_add_item();
+      if(gai.name.length==0 || add_price.value.length==0)
+      {
+        menus.run();
+        highlight(3);
+        return;
+      }
+      
       var li = simulate_addextra(gai);
       api.addproduct(gai,function(data){
         var id = data.added.id;
@@ -952,6 +1005,14 @@ function welcomeInit()
   passinput.addEventListener("keyup",uPass);
   passinput.addEventListener("change",uPass);
   passinput.addEventListener("input",uPass);
+  passinput.addEventListener("keydown",function(event){
+    if(event.keyCode==13){
+      event.stopPropagation();
+      event.preventDefault();
+      menus.extra();
+      highlight(1);
+    }
+  });
 
   var uTable = function()
   {
@@ -973,40 +1034,92 @@ function welcomeInit()
     console.log("TABLE OBJ",aObj);
     ehandlers.updateTablecount2(aObj);
   }
+  var btn = general.querySelector(".stepon button");
+  if(!!btn)
+  {
+    btn.addEventListener("click",function(){
+      menus.extra();
+      highlight(1);
+    })
+  }
 }
 
 var open_attempt=0;
 var c_lost = false;
+
+function handleConnectionLost()
+{
+  var alertDiv = document.querySelector(".alertDiv");
+  if(!alertDiv)
+  {
+    alertDiv=document.createElement("div");
+    alertDiv.innerHTML="<i class=\"icon rot loading\"></i>"+(activeLanguage.conLost || "Connessione persa");
+    alertDiv.className="alertDiv";
+    alertDiv.setAttribute("data-hidden","true");
+    document.body.appendChild(alertDiv);
+    setTimeout(function(){
+      alertDiv.setAttribute("data-hidden","false");
+    });
+  }
+}
+
+function handleConnectionEstablished()
+{
+  var side = document.querySelector(".side");
+  if(!!side && !(side.querySelector("[data-action=\"run\"][data-active=\"true\"]")))
+  {
+    side.setAttribute("data-status","in")
+  }
+  var info = document.querySelector(".info");
+  if(!!info){
+    info.innerHTML=activeLanguage.useInfo || "Seleziona un menu per visualizzare le impostazioni.";
+  }
+  var alertDiv = document.querySelector(".alertDiv");
+  if(!!alertDiv)
+  {
+    alertDiv.setAttribute("data-hidden","true");
+    setTimeout(function(){
+      alertDiv.remove();
+    },400);
+  }
+}
+
 function connect(con_problem)
 {
-  var connected = function()
-  {
-    var side = document.querySelector(".side");
-    if(!!side){side.setAttribute("data-status","in")}
-    var info = document.querySelector(".info");
-    if(!!info){
-      info.innerHTML="Seleziona un menu per visualizzare le impostazioni.";
-    }
-  }
   if((open_attempt>10 && !con_problem)){
     c_lost=true;
     connect(true);
-    na("Connessione persa",true);
+    handleConnectionLost();
     return;
   }
   ws=new WebSocket("ws://"+serverInfo.address+":"+serverInfo.socketPort);
   ws.onmessage=handleWSMessage;
   ws.onopen=function()
   { 
-    if(con_problem)na("Connessione ripristinata");
+    if(con_problem)
+    {
+      na(activeLanguage.reCon || "Connessione ripristinata");
+      handleConnectionEstablished();
+    }
     open_attempt=0;
-    connected();
+    handleConnectionEstablished();
   };
   ws.onclose=function()
   {
     open_attempt++;
     setTimeout(connect,con_problem?5000:500);
   };
+}
+
+function getProductsAndExtras()
+{
+  if(ws.readyState==ws.OPEN)
+  {
+//    ws.send("{'get':'extras'}");
+//    ws.send("{'get':'ordarable'}");
+    return;
+  }
+  setTimeout(getProductsAndExtras,100);
 }
 
 function init()
@@ -1044,8 +1157,26 @@ function init()
   api.info(function(data){
     (serverInfo=data);
     connect();
+    getProductsAndExtras();
+  });
+  addEventListener("keydown",function(event){
+    if(event.keyCode==13)
+    {
+      var s = document.querySelector(".side [data-active=\"true\"]");
+      if(!s){
+        menus.general();
+        highlight(0);
+      }
+    }
+    else if(event.keyCode==27)
+    {
+      var s = document.querySelector(".side [data-active=\"true\"]");
+      var b = document.querySelector(".sbtn[data-bind=\"stopbutton\"] button");
+      if(!!b && !!s){event.preventDefault();b.click();}
+    }
   });
   addEventListener("resize",rz.trigger);
+  Translation.applyTo();
 }
 
 //DEBUGGING
