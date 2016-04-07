@@ -60,6 +60,48 @@ main {
   transition: background-color 300ms ease-out;
 }
 
+/* View Footer */
+
+.view.has-footer {
+  margin-bottom: 35px;
+}
+
+.view-footer {
+  position: fixed;
+  display: flex;
+  width: 100vw;
+  padding: 8px;
+  background: linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+  bottom: 50px; /* .app-footer height */
+  left: 0;
+}
+
+/* ====== */
+/* = UI = */
+/* ====== */
+
+.button {
+  -webkit-appearance: none;
+  display: block;
+  flex: auto 1 1;
+  font-size: 13px;
+  color: #fff;
+  padding: 8px;
+  background-color: #0A60FE;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+label {
+  display: block;
+}
+
+input[type=search] {
+  -webkit-appearance: none;
+  border: 1px solid #ccc;
+}
+
 /* ========== */
 /* = Tables = */
 /* ========== */
