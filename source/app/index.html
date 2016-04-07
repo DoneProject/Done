@@ -16,17 +16,28 @@
         
       </section>
       
-      <section id="view-table" class="has-footer view">
+      <section id="view-table" class="has-footer view" hidden>
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         <footer class="view-footer">
-          <button id="add-order-button" data-translation="Add Order">Add Order</button>
+          <button id="add-order-button" class="button" data-translation="Add Order">Add Order</button>
         </footer>
       </section>
       
-      <section id="view-add-order" class="view">
-        Add Order.
+      <section id="view-add-order" class="view" hidden>
+        <form>
+          <label for="order" data-translation="Order">Order</label>
+          <input type="search" id="order">
+          <div class="suggestions-list"><ul id="order-suggestions"></ul></div>
+          
+          <label for="extras" data-translation="Order">Extras</label>
+          <input type="search" id="extras">
+          <div class="suggestions-list"><ul id="extras-suggestions"></ul></div>
+        </form>
       </section>
       
-      <section id="view-settings" class="view">
+      <section id="view-settings" class="view" hidden>
         Settings.
       </section>
     </main>
