@@ -1,6 +1,6 @@
 function Translation(arr)
 {
-  var prop=["settings","general","extra","products","start","useInfo","noTable","noTableLabel","password","passwordLabel","nameLabel","priceLabel","cancel","modify","noPassword","tables","waitForData","earned","orderTot","orderPending","stop","stopInfo","conLost","reCon","tryCon","loading","tableName","continue"];
+  var prop=["settings","general","extra","products","start","useInfo","noTable","noTableLabel","password","passwordLabel","nameLabel","priceLabel","cancel","modify","noPassword","tables","waitForData","earned","orderTot","orderPending","stop","stopInfo","conLost","reCon","tryCon","loading","tableName","continue","users","logs","close"];
   
   this.langKey="en";
   this.settings="Settings";
@@ -31,6 +31,9 @@ function Translation(arr)
   this.loading="loading";
   this.tableName="Table";
   this.continue="Next";
+  this.users="Users";
+  this.logs="Logs";
+  this.close="Close";
   
   if(!!arr)
   {
@@ -63,8 +66,8 @@ Translation.applyTo=function(root)
 activeLanguage = null;
 
 var lang_arr = {
-  it:["Impostazioni","Generali","Extra","Prodotti","Avvia","Seleziona un menu per visualizzare le impostazioni.","Numero tavoli","Numero","Password","Parola segreta","Nome","Prezzo","Cancella","Modifica","Nessuna password","Tavoli","In attesa di dati","Guadagno","Ordini totali","Ordini attivi","Ferma","Se fermi l'esecuzione, alcuni dati potrebbero andare persi","Connessione persa","Connessione ristabilita","La connessione è stata persa, tutto riprenderà appena possibile.","Caricamento","Tavolo","Avanti"],
-  de:["Einstellungen","Allgemein","Extra","Produkte","Starten","Wählen sie ein Menu um die Einstellungen zu verändern.","Anzahl der Tische","Nummer","Password","Geheimwort","Name","Preis","Abbrechen","Speichern","Kein Password","Tische","Warte auf Daten","Verdienst","Anz. Bestellungen","Aktive Bestellungen","Stoppen","Wenn sie das Programm stoppen, können Daten verloren gehen","Verbindung verloren","Verbunden","Verbindung verloren, es wird nach einer neue Verbindung gesucht.","Beim Laden","Tisch","Weiter"]
+  it:["Impostazioni","Generali","Extra","Prodotti","Avvia","Seleziona un menu per visualizzare le impostazioni.","Numero tavoli","Numero","Password","Parola segreta","Nome","Prezzo","Cancella","Modifica","Nessuna password","Tavoli","In attesa di dati","Guadagno","Ordini totali","Ordini attivi","Ferma","Se fermi l'esecuzione, alcuni dati potrebbero andare persi","Connessione persa","Connessione ristabilita","La connessione è stata persa, tutto riprenderà appena possibile.","Caricamento","Tavolo","Avanti","Utenti","Cronologia","Chiudi"],
+  de:["Einstellungen","Allgemein","Extra","Produkte","Starten","Wählen sie ein Menu um die Einstellungen zu verändern.","Anzahl der Tische","Nummer","Password","Geheimwort","Name","Preis","Abbrechen","Speichern","Kein Password","Tische","Warte auf Daten","Verdienst","Anz. Bestellungen","Aktive Bestellungen","Stoppen","Wenn sie das Programm stoppen, können Daten verloren gehen","Verbindung verloren","Verbunden","Verbindung verloren, es wird nach einer neue Verbindung gesucht.","Beim Laden","Tisch","Weiter","Benutzer","Verlauf","Schließen"]
 };
  
 if("language" in navigator)

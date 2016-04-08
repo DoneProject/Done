@@ -9,15 +9,13 @@ var os = require("os");
 var opener = require("opener");
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({ port: 8181 });
-wss.on('connection', function connection(ws) {
-  console.log("OPENING CONNECTION");
+wss.on('connection', function connection(ws)
+       {
   ws_array.push(ws);
   ws.on('message', function(message) {
-    console.log("RECIVED:"+message);
     messageRecived(ws,message);
   });
   ws.on("ready",function(){
-    console.log("READY");
     ws.send(JSON.stringify(initInstance()));
   });
 });
@@ -227,7 +225,7 @@ function messageRecived(ws,message)
         sendEventTo(ws,"orderableUpdate",orderable);
         break;
       case "extras":
-        sendEventTo(ws,"extras",extras);
+        sendEventTo(ws,"extrasUpdate",extras);
         break;
       case "queue":
         ws.send(JSON.stringify(pending));

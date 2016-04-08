@@ -70,6 +70,9 @@ global.Table = function Table(id,name)
   this.nr=parseInt(id,36);
   this.name=name||"<span data-translation=\"tableName\">Tavolo</span> "+self.nr;
   this.id=id;
+  this.isFree=true;
+  this.isPayed=false;
+  this.isWaiting=false;
   this.pending=[];
   this.setNR=function(nr){
     self.nr=nr;
