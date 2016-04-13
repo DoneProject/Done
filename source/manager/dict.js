@@ -1,6 +1,6 @@
 function Translation(arr)
 {
-  var prop=["settings","general","extra","products","start","useInfo","noTable","noTableLabel","password","passwordLabel","nameLabel","priceLabel","cancel","modify","noPassword","tables","waitForData","earned","orderTot","orderPending","stop","stopInfo","conLost","reCon","tryCon","loading","tableName","continue","users","logs","close"];
+  var prop=["settings","general","extra","products","start","useInfo","noTable","noTableLabel","password","passwordLabel","nameLabel","priceLabel","cancel","modify","noPassword","tables","waitForData","earned","orderTot","orderPending","stop","stopInfo","conLost","reCon","tryCon","loading","tableName","continue","users","logs","close","cook","waiter","helpUser"];
   
   this.langKey="en";
   this.settings="Settings";
@@ -34,6 +34,9 @@ function Translation(arr)
   this.users="Users";
   this.logs="Logs";
   this.close="Close";
+  this.cook="Cook";
+  this.waiter="Waiter";
+  this.helpUser="Press on the <i class=\"icon add\"></i> icon, to add a user.<br><div class=\"desc\"><h4>Roles</h4><strong>Waiter:</strong> Can access the mobile app.<br><strong>Cook:</strong> Can access to the overview.</div>";
   
   if(!!arr)
   {
@@ -66,8 +69,8 @@ Translation.applyTo=function(root)
 activeLanguage = null;
 
 var lang_arr = {
-  it:["Impostazioni","Generali","Extra","Prodotti","Avvia","Seleziona un menu per visualizzare le impostazioni.","Numero tavoli","Numero","Password","Parola segreta","Nome","Prezzo","Cancella","Modifica","Nessuna password","Tavoli","In attesa di dati","Guadagno","Ordini totali","Ordini attivi","Ferma","Se fermi l'esecuzione, alcuni dati potrebbero andare persi","Connessione persa","Connessione ristabilita","La connessione è stata persa, tutto riprenderà appena possibile.","Caricamento","Tavolo","Avanti","Utenti","Cronologia","Chiudi"],
-  de:["Einstellungen","Allgemein","Extra","Produkte","Starten","Wählen sie ein Menu um die Einstellungen zu verändern.","Anzahl der Tische","Nummer","Password","Geheimwort","Name","Preis","Abbrechen","Speichern","Kein Password","Tische","Warte auf Daten","Verdienst","Anz. Bestellungen","Aktive Bestellungen","Stoppen","Wenn sie das Programm stoppen, können Daten verloren gehen","Verbindung verloren","Verbunden","Verbindung verloren, es wird nach einer neue Verbindung gesucht.","Beim Laden","Tisch","Weiter","Benutzer","Verlauf","Schließen"]
+  it:["Impostazioni","Generali","Extra","Prodotti","Avvia","Seleziona un menu per visualizzare le impostazioni.","Numero tavoli","Numero","Password","Parola segreta","Nome","Prezzo","Annulla","Modifica","Nessuna password","Tavoli","In attesa di dati","Guadagno","Ordini totali","Ordini attivi","Ferma","Se fermi l'esecuzione, alcuni dati potrebbero andare persi","Connessione persa","Connessione ristabilita","La connessione è stata persa, tutto riprenderà appena possibile.","Caricamento","Tavolo","Avanti","Utenti","Cronologia","Chiudi","Cuoco","Cameriere","Premi sul tasto <i class=\"icon add\"></i> per aggiungere un'utente.<br><div class=\"desc\"><h4>Ruoli</h4><strong>Cameriere:</strong> Può accedere all'ìapplicazione.<br><strong>Cuoco:</strong> Può accedere alla overview.</div>"],
+  de:["Einstellungen","Allgemein","Extra","Produkte","Starten","Wählen sie ein Menu um die Einstellungen zu verändern.","Anzahl der Tische","Nummer","Password","Geheimwort","Name","Preis","Abbrechen","Speichern","Kein Password","Tische","Warte auf Daten","Gewinn","Anz. Bestellungen","Aktive Bestellungen","Stoppen","Wenn sie das Programm stoppen, können Daten verloren gehen","Verbindung verloren","Verbunden","Verbindung verloren, es wird nach einer neue Verbindung gesucht.","Beim Laden","Tisch","Weiter","Benutzer","Verlauf","Schließen","Koch","Kellner","Drücken Sie auf das <i class=\"icon add\"></i> Icon, um ein Benutzer hinzuzufügen.<br><div class=\"desc\"><h4>Rollen</h4><strong>Kellner:</strong> Kann aufs app zugreifen.<br><strong>Koch:</strong> Kann auf der Overview zugreifen.</div>"]
 };
  
 if("language" in navigator)

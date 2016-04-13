@@ -413,6 +413,26 @@ var api={
   },
   "addorderlist":function(o){
     sendEvent("updateOrderlist",o);
+  },
+  "editUser":function(o,cb){
+    postrequest("/api/edituser",o,function(json,error){
+      if(!!error)
+      {
+        na(error,true);
+        return;
+      }
+      !!cb && cb(json);
+    },true);
+  },
+  "delUser":function(id,cb){
+    postrequest("/api/deluser",{id:id},function(json,error){
+      if(!!error)
+      {
+        na(error,true);
+        return;
+      }
+      !!cb && cb(json);
+    },true);
   }
 };
 
@@ -1152,6 +1172,7 @@ function getProductsAndExtras()
   setTimeout(getProductsAndExtras,100);
 }
 
+//NOTE popup manager
 function createPopup(title,element)
 {
   var visible = false;
@@ -1241,6 +1262,145 @@ function createPopup(title,element)
   return o;
 }
 
+//NOTE User init
+function userInit()
+{
+  var addUser;
+  var root = document.querySelector(".hidden .popups[data-action=\"users\"]");
+  var list = root.querySelector("#userlist");
+  
+  var createUserElement = function()
+  {
+    var li = document.createElement("li");
+    li.className="user";
+    li.innerHTML="<div class=\"name\">Username</div><div class=\"role\">Cook</div><div class=\"actions\"><i class=\"icon rot loading\"></i></div>";
+    return li;
+  };
+  
+  var loadDataIn=function(li,data){
+    if("username" in data)
+    {
+      li.querySelector(".name").innerHTML=data.username;
+    }
+    if("role" in data)
+    {
+      li.querySelector(".role").innerHTML=data.role.html;
+    }
+    var actions = li.querySelector(".actions");
+    actions.innerHTML="<i class=\"icon edit\"></i><i class=\"icon delete\"></i>";
+    actions.querySelector(".icon.edit").addEventListener("click",function(){editUser(li);});
+    actions.querySelector(".icon.delete").addEventListener("click",function(){removeUser(li);});
+    
+    Translation.applyTo(li);
+  };
+  
+  var removeRemovable=function()
+  {
+    var rable = root.querySelectorAll("[data-canremove=\"true\"]");
+    Array.from(rable).forEach(function(a){a.remove();})
+  }
+  
+  var removeUser = function(ele)
+  {
+    if(ele.hasAttribute("data-id"))
+    {
+      api.delUser(ele.getAttribute("data-id"));
+    }
+    ele.remove();
+  }
+  
+  var editUser = function(ele)
+  {
+    var name = ele.querySelector(".name");
+    var role = ele.querySelector(".role");
+    var actions = ele.querySelector(".actions");
+
+    var vName = name.innerHTML;
+    var vRole = role.innerHTML;
+    
+    var bCancel = document.createElement("button");
+    bCancel.innerHTML=activeLanguage.cancel || "cancella";
+    var bSubmit = document.createElement("button");
+    bSubmit.innerHTML=activeLanguage.modify || "modifica";
+    bSubmit.className="main";
+    
+    name.innerHTML="<input type=\"text\" placeholder=\"name\" value=\""+vName+"\" data-id=\"name\" autofocus>";
+    role.innerHTML="<select class=\"styleselect\" data-name=\"role\"><option value=\"0\">"+(activeLanguage.waiter||"Cameriere")+"</option><option value=\"1\">"+(activeLanguage.cook||"Cuoco")+"</option></select>";
+    ele.appendChild(bCancel);
+    ele.appendChild(bSubmit);
+    name.querySelector("input").addEventListener("keydown",function(event){
+      if(event.keyCode==13){
+        event.stopPropagation();
+        event.preventDefault();
+        submit();
+        return;
+      }
+    });
+    
+    var cancel = function()
+    {
+      name.innerHTML=vName;
+      role.innerHTML=vRole;
+      bCancel.remove();
+      bSubmit.remove();
+      ele.appendChild(actions);
+    };
+    
+    var submit = function()
+    {
+      var nvName = name.querySelector("input").value;
+      var nvRole = role.querySelector("select");
+      var nrOption = nvRole.options[nvRole.selectedIndex].innerHTML;
+      nvRole=nvRole.value;
+      name.innerHTML=nvName;
+      role.innerHTML=nrOption;
+      cancel();
+      var o = {
+        username:nvName,
+        role:nvRole
+      };
+      var hasID = ele.hasAttribute("data-id");
+      if(hasID)
+      {
+        o.id=ele.getAttribute("data-id");
+      }
+      api.editUser(o,function(json){
+        var le = list.querySelector(".user[data-id=\""+json.id+"\"]");
+        if(!!le)ele.remove();
+        else loadDataIn(ele,json);    
+      });
+    };
+    
+    bCancel.addEventListener("click",cancel);
+    bSubmit.addEventListener("click",submit);
+    
+    actions.remove();
+    var i = name.querySelector("input");
+    i.focus();try{i.select();}catch(e){}
+    delete i;
+    
+    Translation.applyTo(ele);
+  }
+
+  var addUser=function()
+  {
+    removeRemovable();
+    var li = createUserElement();
+    list.appendChild(li);
+    editUser(li);
+  };
+  
+  //CONSTRUCTOR
+  var addbtns = Array.from(root.querySelectorAll("[data-action=\"add\"]"));
+  addbtns.forEach(function(b){
+    b.addEventListener("click",addUser);
+  });
+  
+  
+}
+
+
+//NOTE initializer
 function init()
 {
   var menuItems = document.querySelectorAll(".side div.more");
@@ -1278,6 +1438,7 @@ function init()
   welcomeInit();
   extraInit();
   productInit();
+  userInit();
   api.info(function(data){
     (serverInfo=data);
     connect();

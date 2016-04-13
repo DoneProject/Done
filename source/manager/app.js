@@ -28,6 +28,7 @@ var orderable_id = 0;
 var table_id = 0;
 var extra_id = 0;
 var pending_id = 0;
+var user_id=0;
 
 var running = false;
 var password = "";
@@ -40,6 +41,7 @@ var tables = [];
 var extras = [];
 var pending = [];
 var concluded = [];
+var users = [];
 
 var ws_array = [];
 
@@ -81,6 +83,15 @@ var wsaction = {
   },
   "orderable":function(e){
     sendEvent("orderableUpdate",e);
+  },
+  "editUser":function(e){
+    sendEvent("editUser",e);
+  },
+  "addUser":function(e){
+    sendEvent("addUser",e);
+  },
+  "delUser":function(id){
+    sendEvent("delUser",id);
   }
 }
 
@@ -89,6 +100,7 @@ function getOrderableId(){orderable_id++;return orderable_id.toString(36);}
 function getTableId(){table_id++;return table_id.toString(36);}
 function getExtraId(){extra_id++;return extra_id.toString(36);}
 function getPendingId(){pending_id++;return pending_id.toString(36);}
+function getUserId(){user_id++;return user_id.toString(36);}
 function wsBroadcast(st)
 {
   for(var i = ws_array.length; --i>=0;)
@@ -599,6 +611,55 @@ var api_handlers = {
       running=true;
     });
     return false;
+  },
+  "edituser":function(m,req,res)
+  {
+    postHandle(req,function(o){
+      if(!("username" in o)){
+        res.end(errorJSON("No username defined"));
+        return;
+      }
+      var hasID = ("id" in o);
+      if(hasID)
+      {
+        for(var i = users.length;--i>=0;){
+          if(users[i].id==o.id)
+          {
+            users[i].username=o.username;
+            users[i].setRole(o.role);
+            wsaction.editUser(users[i]);
+            res.end(JSON.stringify(users[i]))
+            return;
+          }
+        }
+      }
+      var u = new User(getUserId(),o.username);
+      u.setRole(o.role);
+      users.push(u);
+      wsaction.addUser(u);
+      res.end(JSON.stringify(u));
+    });
+    return false;
+  },
+  "deluser":function(m,req,res){
+    postHandle(req,function(id){
+      if(!("id" in id)){
+        res.end(errorJSON("No id specidifed"));
+        return;
+      }
+      id=id.id;
+      for(var i = users.length; --i>=0;)
+      {
+        if(users[i].id==id)
+        {
+          users.splice(i,1);
+          res.end('{"deleted":"'+id+'"}');
+          return;
+        }
+      }
+      res.end(errorJSON("Did not find ID"));
+    });
+    return false;
   }
 };
 
@@ -655,6 +716,7 @@ function save()
   fs.writeFile(t+"/status.json",JSON.stringify(getStats()),"utf8");
   fs.writeFile(t+"/pending.json",JSON.stringify(pending),"utf8");
   fs.writeFile(t+"/concluded.json",JSON.stringify(concluded),"utf8");
+  fs.writeFile(t+"/users.json",JSON.stringify(users),"utf8");
   console.log("TEMP DIR: "+t);
 }
 
