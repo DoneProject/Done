@@ -53,35 +53,45 @@ const apikey = "api";
 var wsaction = {
   "statsUpdate":function()
   {
+    wsaction.log("updating Status");
     sendEvent("statsUpdate",getStats());
   },
   "delextra":function(id)
   {
+    wsaction.log("Deleting extra "+id);
     sendEvent("delExtra",id);
   },
   "addextra":function(e){
+    wsaction.log("Added extra "+JSON.stringify(e));
     sendEvent("addExtra",e);
   },
   "editextra":function(e){
+    wsaction.log("Edited extra "+JSON.stringify(e));
     sendEvent("editExtra",e);
   },
   "delproduct":function(id)
   {
+    wsaction.log("Deleted extra "+JSON.stringify(e));
     sendEvent("delProduct",id);
   },
   "addproduct":function(e){
+    wsaction.log("Added product "+JSON.stringify(e));
     sendEvent("addProduct",e);
   },
   "editproduct":function(e){
+    wsaction.log("Edited product "+JSON.stringify(e));
     sendEvent("editProduct",e);
   },
   "sendorderlist":function(e){
+    wsaction.log("Orderlist broadcasted");
     sendEvent("updateOrderlist",e);
   },
   "addorderlist":function(e){
+    wsaction.log("new order added "+JSON.stringify(e));
     sendEvent("addOrderlist",e)
   },
   "orderable":function(e){
+    wsaction.log("List of products broadcasted");
     sendEvent("orderableUpdate",e);
   },
   "editUser":function(e){
@@ -92,6 +102,12 @@ var wsaction = {
   },
   "delUser":function(id){
     sendEvent("delUser",id);
+  },
+  "log":function(msg){
+    sendEvent("addLog",{
+      time:new Date(),
+      message:msg
+    });
   }
 }
 
@@ -212,7 +228,7 @@ function updateOrderList(o)
   for(var i = pending.length; --i>=0;)
   {
     if(o.id==pending[i].id)
-    { 
+    {
       pending[i].orders=o.orders;
       api.updateOneOrderlist(pending[i]);
     }
@@ -252,6 +268,9 @@ function messageRecived(ws,message)
         break;
       case "orderlist":
         sendEventTo(ws,"updateOrderlist",orders)
+        break;
+      case "users":
+        sendEventTo(ws,"usersUpdate",users);
         break;
       default:
         ws.send(errorJSON("Wrong action"));
@@ -303,7 +322,7 @@ function messageRecived(ws,message)
         }
         break;
       case "done":
-        
+
         break;
     }
   }
@@ -327,7 +346,7 @@ function serverInfo(cb)
       cb(o);
       return;
     }
-    o.address=address; 
+    o.address=address;
     dns.reverse(address,function(err,names){
       if(!err)
         o.links=names;
@@ -351,7 +370,7 @@ function enumTables()
   var t = [];
   for(var i = 0; i < tables.length;i++)
   {
-    t.push(tables[i].setNR(i+1)); 
+    t.push(tables[i].setNR(i+1));
   }
   return t;
 }
@@ -444,7 +463,6 @@ var api_handlers = {
   "delextra":function(m,req,res)
   {
     postHandle(req,function(o){
-
       try{
         var deleted = false;
         for(var i = extras.length; --i>=0;)
@@ -652,7 +670,9 @@ var api_handlers = {
       {
         if(users[i].id==id)
         {
+          console.log("USER FOUND");
           users.splice(i,1);
+          wsaction.delUser(id);
           res.end('{"deleted":"'+id+'"}');
           return;
         }
@@ -739,6 +759,7 @@ function hinit()
       console.log("URL: "+("http://127.0.0.1:"+o.webPort));
       opener("http://127.0.0.1:"+o.webPort);
     }
+    wsaction.log("Server is ready");
   });
 }
 

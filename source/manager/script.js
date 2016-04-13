@@ -40,6 +40,12 @@ var ehandlers={
   extrasUpdate:function()
   {
     console.log("extrasUpdate not implemented");
+  },
+  usersUpdate:function(){
+    console.log("usersUpdate not implemented");
+  },
+  addLog:function(){
+    console.log("addLog not implemented");
   }
 };
 
@@ -541,7 +547,7 @@ function loadModule()
   eles.incoming.innerHTML=(activeLanguage.earned || "Guadagno")+": ~0€";
   eles.pending.innerHTML=(activeLanguage.orderPending || "Ordini attivi")+": 0";
   rz.trigger();
-  
+
   ehandlers.statsUpdate=function(data){
     eles.password.innerHTML=(data.password===false || data.password.length==0) ? (activeLanguage.noPassword || "nessuna password") : data.password;
 
@@ -554,7 +560,7 @@ function loadModule()
     eles.incoming.innerHTML=(activeLanguage.earned || "Guadagno")+": ~"+data.earned+"€";
     eles.pending.innerHTML=(activeLanguage.orderPending || "Ordini attivi")+": "+data.orders.active;
     rz.trigger();
-    
+
     var pwi = document.querySelector(".setting.list input[data-action=\"password\"]");
     if(!!pwi)
     {
@@ -566,7 +572,7 @@ function loadModule()
       pwi.value=data.password;
     }
   };
-  
+
   ehandlers.updateTablecount2=function(aObj)
   {
     var ts = aObj.tables, t="";
@@ -583,7 +589,7 @@ function loadModule()
       Translation.applyTo(eles.tables);
     }catch(e){}
   }
-  
+
   ws.send('{"get":"stats"}');
   ws.send('{"get":"tables"}');
 };
@@ -627,7 +633,7 @@ function extraInit()
     menus.products();
     highlight(2);
   })
-  
+
   var action_edit = function(li)
   {
     var done=function(){//DONE
@@ -772,7 +778,7 @@ function extraInit()
     if(event.keyCode==13)
     {
       event.preventDefault();
-      
+
       var gai = get_add_item();
       if(gai.name.length==0 || add_price.value.length==0)
       {
@@ -780,7 +786,7 @@ function extraInit()
         highlight(2);
         return;
       }
-      
+
       var li = simulate_addextra(gai);
       api.addextra(gai,function(data){
 
@@ -791,7 +797,7 @@ function extraInit()
           li.remove();
           return;
         }
-        
+
         fix_entry(li,data.added);
       });
       reset_add_item();
@@ -926,6 +932,7 @@ function productInit()
     },true);
   };
 
+//TODO add action please
   var add_actions = function(li){
     var act = li.querySelector(".actions");
     var edit = act.querySelector(".edit");
@@ -992,7 +999,7 @@ function productInit()
         highlight(3);
         return;
       }
-      
+
       var li = simulate_addextra(gai);
       api.addproduct(gai,function(data){
         var id = data.added.id;
@@ -1009,7 +1016,7 @@ function productInit()
     }
   });
 
-  
+
   ehandlers.addProduct=function(p)
   {
     var id = p.id;
@@ -1076,7 +1083,7 @@ function welcomeInit()
       passinput.focus();
     }
   });
-  
+
   ehandlers.updateTablecount=function(aObj)
   {
     tableinput.value=aObj.count;
@@ -1144,7 +1151,7 @@ function connect(con_problem)
   ws=new WebSocket("ws://"+serverInfo.address+":"+serverInfo.socketPort);
   ws.onmessage=handleWSMessage;
   ws.onopen=function()
-  { 
+  {
     if(con_problem)
     {
       na(activeLanguage.reCon || "Connessione ripristinata");
@@ -1167,6 +1174,7 @@ function getProductsAndExtras()
     ws.send('{"get":"extras"}');
     ws.send('{"get":"orderable"}');
     ws.send('{"get":"tables"}');
+    ws.send('{"get":"users"}');
     return;
   }
   setTimeout(getProductsAndExtras,100);
@@ -1180,24 +1188,24 @@ function createPopup(title,element)
   var handler = function(){}
   d.className="popup_backdrop";
   d.setAttribute("data-status","out");
-  
+
   var c = document.createElement("div");
   c.className="popup_content";
-  
+
   c.innerHTML="<div class=\"popup_title\">"+title+"</div><div class=\"popup_main\"></div>";
   var cp = c.querySelector(".popup_main");
   if(!!element && !!cp)cp.appendChild(element);
-  
+
   d.appendChild(c);
   document.body.appendChild(d);
-  
+
   var closebuttons = document.querySelectorAll("[data-action=\"close\"]");
   Array.from(closebuttons).forEach(function(btn){
     btn.addEventListener("click",function(){
       o.visible=false;
     });
   });
-  
+
   var lShow = function()
   {
     d.setAttribute("data-status","in");
@@ -1212,7 +1220,7 @@ function createPopup(title,element)
       document.body.removeChild(d);
     },800);
   }
-  
+
   var o={
     set title(value){
       title=value;
@@ -1268,7 +1276,7 @@ function userInit()
   var addUser;
   var root = document.querySelector(".hidden .popups[data-action=\"users\"]");
   var list = root.querySelector("#userlist");
-  
+
   var createUserElement = function()
   {
     var li = document.createElement("li");
@@ -1276,7 +1284,7 @@ function userInit()
     li.innerHTML="<div class=\"name\">Username</div><div class=\"role\">Cook</div><div class=\"actions\"><i class=\"icon rot loading\"></i></div>";
     return li;
   };
-  
+
   var loadDataIn=function(li,data){
     if("username" in data)
     {
@@ -1290,16 +1298,27 @@ function userInit()
     actions.innerHTML="<i class=\"icon edit\"></i><i class=\"icon delete\"></i>";
     actions.querySelector(".icon.edit").addEventListener("click",function(){editUser(li);});
     actions.querySelector(".icon.delete").addEventListener("click",function(){removeUser(li);});
-    
+
+    if ("id" in data)
+    {
+      li.setAttribute("data-id",data.id);
+    }
+
     Translation.applyTo(li);
   };
-  
+
   var removeRemovable=function()
   {
     var rable = root.querySelectorAll("[data-canremove=\"true\"]");
     Array.from(rable).forEach(function(a){a.remove();})
   }
-  
+
+  var checkIfEmpty=function(){
+    if(list.children.length==0){
+      list.insertAdjacentHTML("afterBegin","<div data-canremove=\"true\" data-translation=\"helpUser\" class=\"placeholder\">Drücken Sie auf das <i class=\"icon add\"></i> Icon, um ein Benutzer hinzuzufügen.<br><div class=\"desc\"><h4>Rollen</h4><strong>Kellner:</strong> Kann aufs app zugreifen.<br><strong>Koch:</strong> Kann auf der Overview zugreifen.</div></div>");
+    }
+  };
+
   var removeUser = function(ele)
   {
     if(ele.hasAttribute("data-id"))
@@ -1307,8 +1326,9 @@ function userInit()
       api.delUser(ele.getAttribute("data-id"));
     }
     ele.remove();
+    checkIfEmpty();
   }
-  
+
   var editUser = function(ele)
   {
     var name = ele.querySelector(".name");
@@ -1317,13 +1337,13 @@ function userInit()
 
     var vName = name.innerHTML;
     var vRole = role.innerHTML;
-    
+
     var bCancel = document.createElement("button");
     bCancel.innerHTML=activeLanguage.cancel || "cancella";
     var bSubmit = document.createElement("button");
     bSubmit.innerHTML=activeLanguage.modify || "modifica";
     bSubmit.className="main";
-    
+
     name.innerHTML="<input type=\"text\" placeholder=\"name\" value=\""+vName+"\" data-id=\"name\" autofocus>";
     role.innerHTML="<select class=\"styleselect\" data-name=\"role\"><option value=\"0\">"+(activeLanguage.waiter||"Cameriere")+"</option><option value=\"1\">"+(activeLanguage.cook||"Cuoco")+"</option></select>";
     ele.appendChild(bCancel);
@@ -1336,7 +1356,7 @@ function userInit()
         return;
       }
     });
-    
+
     var cancel = function()
     {
       name.innerHTML=vName;
@@ -1345,7 +1365,7 @@ function userInit()
       bSubmit.remove();
       ele.appendChild(actions);
     };
-    
+
     var submit = function()
     {
       var nvName = name.querySelector("input").value;
@@ -1365,20 +1385,31 @@ function userInit()
         o.id=ele.getAttribute("data-id");
       }
       api.editUser(o,function(json){
-        var le = list.querySelector(".user[data-id=\""+json.id+"\"]");
-        if(!!le)ele.remove();
-        else loadDataIn(ele,json);    
+        ele.setAttribute("data-id",json.id);
+        loadDataIn(ele,json);
+        var le = list.querySelectorAll(".user[data-id=\""+json.id+"\"]");
+        if(le.length>1)
+        {
+          for(var i = le.length; --i>0;)
+          {
+            le[i].remove();
+          }
+        }
+        if(le.length==1)
+        {
+          loadDataIn(le[0],json);
+        }
       });
     };
-    
+
     bCancel.addEventListener("click",cancel);
     bSubmit.addEventListener("click",submit);
-    
+
     actions.remove();
     var i = name.querySelector("input");
     i.focus();try{i.select();}catch(e){}
     delete i;
-    
+
     Translation.applyTo(ele);
   }
 
@@ -1389,16 +1420,97 @@ function userInit()
     list.appendChild(li);
     editUser(li);
   };
-  
+
   //CONSTRUCTOR
   var addbtns = Array.from(root.querySelectorAll("[data-action=\"add\"]"));
   addbtns.forEach(function(b){
     b.addEventListener("click",addUser);
   });
-  
-  
+
+  ehandlers.addUser=function(data){
+    if("id" in data){
+      var l = list.querySelector("li[data-id=\""+data.id+"\"]");
+      if(!!l){
+        loadDataIn(l,data);
+        return;
+      }
+    }
+    removeRemovable();
+    var li = createUserElement();
+    loadDataIn(li,data);
+    list.appendChild(li);
+  };
+  ehandlers.editUser=function(data){
+    var e = list.querySelector("li[data-id=\""+data.id+"\"]");
+    if(!!e){
+      loadDataIn(e,data);
+    }
+  };
+  ehandlers.delUser=function(data){
+    var e = list.querySelector("li[data-id=\""+data+"\"]");
+    if(!!e){
+      e.remove();
+    }
+    checkIfEmpty();
+  };
+  ehandlers.usersUpdate=function(data){
+    var found = [], e;
+    data.forEach(function(d){
+      var id = d.id;
+      e = list.querySelector("li[data-id=\""+id+"\"]");
+      if(!!e)
+      {
+        loadDataIn(e,d);
+        found.push(e);
+      }
+      else if(!e)
+      {
+        var li = createUserElement();
+        loadDataIn(li,d);
+        list.appendChild(li);
+        found.push(li);
+      }
+    });
+    list.innerHTML="";
+    found.forEach(function(e){
+      list.appendChild(e);
+    });
+    checkIfEmpty();
+  };
 }
 
+
+//NOTE log init
+function logInit()
+{
+  var root = document.querySelector(".popups[data-action=\"logs\"]");
+  var list = document.getElementById("loglist");
+  
+  var format = function(dt)
+  {
+    dt = new Date(dt);
+    try{
+      return dt.getHours()+":"+dt.getMinutes();
+    }catch(e){
+      return format(new Date());
+    }
+  }
+  
+  var createElement = function(data){
+    var li = document.createElement("li");
+    li.className="log out";
+    li.innerHTML="<span class=\"time\">"+format(data.time)+"</span><span class=\"content\">"+data.message+"</span>";
+    setTimeout(function(){
+      li.className="log";
+    },64);
+    return li;
+  }
+  
+  ehandlers.addLog=function(data){
+    var li = createElement(data);
+    list.appendChild(li);
+  }
+}
 
 //NOTE initializer
 function init()
@@ -1430,7 +1542,7 @@ function init()
       e.setAttribute("data-active","true");
     });
   }
-  
+
   Array.apply(this,popups).forEach(function(a){
     window.popups[a.getAttribute("data-action")]=a;
   });
@@ -1439,6 +1551,7 @@ function init()
   extraInit();
   productInit();
   userInit();
+  logInit();
   api.info(function(data){
     (serverInfo=data);
     connect();
@@ -1462,9 +1575,9 @@ function init()
   });
   addEventListener("resize",rz.trigger);
   Translation.applyTo();
-  
+
   setTimeout(function(){
-    createPopup("<span data-translation=\"users\">Utenti</span>",window.popups.users).show();
+    createPopup("<span data-translation=\"logs\">Logs</span>",window.popups.logs).show();
   },0);
 }
 
