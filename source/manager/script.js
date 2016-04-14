@@ -540,7 +540,7 @@ function loadModule()
   eles.tablenumber.innerHTML=(activeLanguage.tables || "Tavoli")+": 0";
   eles.orders.innerHTML=(activeLanguage.orderTot || "Ordini totali")+": 0";
   eles.users.innerHTML=(activeLanguage.users || "Utenti")+": 0";
-  eles.logs.innerHTML=(activeLanguage.logs || "Cronologia")+": 0";
+  eles.logs.innerHTML=(activeLanguage.logs || "Cronologia");
   var t = "<div class=\"info\"><i class=\"icon rot loading\"></i> "+(activeLanguage.waitForData)+"</div>";
   eles.tables.innerHTML=t;
 
@@ -555,6 +555,7 @@ function loadModule()
     eles.extranumber.innerHTML=(activeLanguage.extra || "Extra")+": "+data.extras;
     eles.tablenumber.innerHTML=(activeLanguage.tables || "Tavoli")+": "+data.tables;
     eles.orders.innerHTML=(activeLanguage.orderTot || "Ordini totali")+": "+data.orders.total;
+    eles.users.innerHTML=(activeLanguage.users || "Utenti")+": "+data.users;
 
 
     eles.incoming.innerHTML=(activeLanguage.earned || "Guadagno")+": ~"+data.earned+"€";
@@ -1490,7 +1491,7 @@ function logInit()
   {
     dt = new Date(dt);
     try{
-      return dt.getHours()+":"+dt.getMinutes();
+      return dt.getHours()+":"+(dt.getMinutes() < 10 ? "0" : "")+dt.getMinutes();
     }catch(e){
       return format(new Date());
     }
@@ -1508,7 +1509,7 @@ function logInit()
   
   ehandlers.addLog=function(data){
     var li = createElement(data);
-    list.appendChild(li);
+    list.insertBefore(li,list.children[0]);
   }
 }
 

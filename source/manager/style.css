@@ -1180,3 +1180,47 @@ select.styleselect:active
   flex: 80% 2 1;
   margin: 2px 0;
 }
+
+/*Blockify*/
+.blockify, .blockify .blocky_row .sub_blockify{
+  background-color:rgba(0,0,0,0.05);
+  border: 1px rgba(0,0,0,0.05) solid;
+  margin: 2px 5px;
+  padding: 2px;
+  border-radius: 3px;
+}
+
+.blockify .blocky_row{
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flex;
+  display: -o-flex;
+  display: flex;
+}
+
+.blockify .blocky_row .blocky_key
+{
+  -webkit-flex: 100px 0.1 0;
+  -moz-flex: 100px 0.1 0;
+  -ms-flex: 100px 0.1 0;
+  -o-flex: 100px 0.1 0;
+  flex: 100px 0.1 0;
+  min-width: auto;
+  font-weight: normal;
+  font-style: italic;
+  text-align: center;
+}
+
+.blockify .blocky_row .blocky_value, .blockify .blocky_row .sub_blockify
+{
+  -webkit-flex: auto 2 0;
+  -moz-flex: auto 2 0;
+  -ms-flex: auto 2 0;
+  -o-flex: auto 2 0;
+  flex: auto 2 0;
+}
+
+.blockify .blocky_row .blocky_value.unknown
+{
+  opacity: 0.5;
+}

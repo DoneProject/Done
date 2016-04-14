@@ -11,12 +11,14 @@ var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({ port: 8181 });
 wss.on('connection', function connection(ws)
        {
+  wsaction.log("New connection");
   ws_array.push(ws);
   ws.on('message', function(message) {
     messageRecived(ws,message);
   });
   ws.on("ready",function(){
     ws.send(JSON.stringify(initInstance()));
+    wsaction.log("New WS instance");
   });
 });
 
@@ -94,17 +96,15 @@ var wsaction = {
     sendEvent("orderableUpdate",e);
   },
   "editUser":function(e){
-    wsaction.log("User edited"+Blockify(e));
+    wsaction.log("User edited "+Blockify(e));
     sendEvent("editUser",e);
   },
   "addUser":function(e){
-    wsaction.log("User added"+Blockify(e));
-    wsaction.statsUpdate();
+    wsaction.log("added user"+Blockify(e));
     sendEvent("addUser",e);
   },
   "delUser":function(id){
-    wsaction.log("User removed"+id);
-    wsaction.statsUpdate();
+    wsaction.log("Deleted user "+id);
     sendEvent("delUser",id);
   },
   "log":function(msg){
@@ -139,26 +139,26 @@ function errorJSON(st){return JSON.stringify({error:st});}
 
 function Blockify(e,sub)
 {
-  var t = "<div class=\""+(sub==true ? "sub_" : "")+"blockify\">";
-  for(var lol in e)
-  {
-    if(e[lol]===null || typeof e[lol]=="function")continue;
-    t+="<div class=\"blocky_row\"><strong class=\"blocky_key\">"+lol+"</strong>";
-    if(typeof e[lol] == "string" || typeof e[lol] =="number" || typeof e[lol] =="boolean")
-    {
-      t+="<span class=\"blocky_value\">"+e[lol]+"</span>";
-    }
-    else if(typeof e[lol] == "object")
-    {
-      t+=Blockify(e[lol],true);
-    }
-    else{
-      t+="<span class=\"blocky_value unknown\">unknown</span>";
-    }
-    t+="</div>";
-  }
-  t+="</div>";
-  return t;
+  return "BLOCKIFY";
+//  var t = "<div class=\""+(sub==true ? "sub_" : "")+"blockify\">";
+//  for(var lol in e)
+//  {
+//    t+="<div class=\"blocky_row\"><strong class=\"blocky_key\">"+lol+"</strong>";
+//    if(typeof e == "string" || typeof e =="number" || typeof e =="boolean")
+//    {
+//      t+="<span class=\"blocky_value\">"+e[lol]+"</span>";
+//    }
+//    else if(typeof e == "object")
+//    {
+//      t+=Blockify(e,true);
+//    }
+//    else{
+//      t+="<span class=\"blocky_value unknown\">unknown</span>";
+//    }
+//    t+="</div>";
+//  }
+//  t+="</div>";
+//  return t;
 }
 
 function parseFormData(data)
@@ -211,7 +211,6 @@ function getStats()
     products:orderable.length,
     extras:extras.length,
     tables:tables.length,
-    users:users.length,
     earned:earned,
     orders:{
       active:pending.length,
@@ -408,35 +407,34 @@ function enumTables()
 var api_handlers = {
   "tables":function()
   {
+    wsaction.log("Tables requested");
     return JSON.stringify(tables);
   },
   "orderable":function()
   {
+    wsaction.log("orderables requested");
     return JSON.stringify(orderable);
   },
   "extras":function()
   {
+    wsaction.log("Extras requested");
     return JSON.stringify(extras);
   },
   "orderid":function()
   {
+    wsaction.log("Order id generated");
     return JSON.stringify({"offer":getPendingId()})
   },
   "info":function(m,req,res){
     serverInfo(function(o){
+      wsaction.log("Server info broadcasted");
       res.end(JSON.stringify(o));
     });
     return false;
   },
   "queue":function(m,req,res){
-    if(m=="post")
-    {
-      postHandle(req,function(o){
-        req.end(errorJSON("Has to be implemented"));
-      });
-      return false;
-    }
-    else return JSON.stringify(pending);
+    wsaction.log("Pending list broadcasted");
+    return JSON.stringify(pending);
   },
   "addextra":function(m,req,res)
   {
@@ -628,6 +626,7 @@ var api_handlers = {
           }
           var table = enumTables();
           var t = {action:"settables",tables:tables,count:tables.length};
+          wsaction.log("New table count: "+table.length);
           sendEvent("updateTablecount",t);
           wsaction.statsUpdate();
           res.end(JSON.stringify(t));
@@ -652,9 +651,9 @@ var api_handlers = {
       else
       {
         password=o.password;
-      }
-      res.end(JSON.stringify({password:password,tables:tables}));
+      } res.end(JSON.stringify({password:password,tables:tables}));
       wsaction.statsUpdate();
+      wsaction.log("Ready to go");
       running=true;
     });
     return false;
@@ -725,6 +724,7 @@ function handleApiRequest(request,response)
   }
   else
   {
+    wsaction.log("Wrong api reuest (suspiscious)");
     response.end("API not found.");
   }
 };

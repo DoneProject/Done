@@ -53,6 +53,7 @@ const apikey = "api";
 var wsaction = {
   "statsUpdate":function()
   {
+    wsaction.log("updating Status");
     sendEvent("statsUpdate",getStats());
   },
   "delextra":function(id)
@@ -61,24 +62,24 @@ var wsaction = {
     sendEvent("delExtra",id);
   },
   "addextra":function(e){
-    wsaction.log("Added extra "+Blockify(e));
+    wsaction.log("Added extra "+JSON.stringify(e));
     sendEvent("addExtra",e);
   },
   "editextra":function(e){
-    wsaction.log("Edited extra "+Blockify(e));
+    wsaction.log("Edited extra "+JSON.stringify(e));
     sendEvent("editExtra",e);
   },
   "delproduct":function(id)
   {
-    wsaction.log("Deleted extra "+Blockify(e));
+    wsaction.log("Deleted extra "+JSON.stringify(e));
     sendEvent("delProduct",id);
   },
   "addproduct":function(e){
-    wsaction.log("Added product "+Blockify(e));
+    wsaction.log("Added product "+JSON.stringify(e));
     sendEvent("addProduct",e);
   },
   "editproduct":function(e){
-    wsaction.log("Edited product "+Blockify(e));
+    wsaction.log("Edited product "+JSON.stringify(e));
     sendEvent("editProduct",e);
   },
   "sendorderlist":function(e){
@@ -86,7 +87,7 @@ var wsaction = {
     sendEvent("updateOrderlist",e);
   },
   "addorderlist":function(e){
-    wsaction.log("new order added "+Blockify(e));
+    wsaction.log("new order added "+JSON.stringify(e));
     sendEvent("addOrderlist",e)
   },
   "orderable":function(e){
@@ -94,17 +95,12 @@ var wsaction = {
     sendEvent("orderableUpdate",e);
   },
   "editUser":function(e){
-    wsaction.log("User edited"+Blockify(e));
     sendEvent("editUser",e);
   },
   "addUser":function(e){
-    wsaction.log("User added"+Blockify(e));
-    wsaction.statsUpdate();
     sendEvent("addUser",e);
   },
   "delUser":function(id){
-    wsaction.log("User removed"+id);
-    wsaction.statsUpdate();
     sendEvent("delUser",id);
   },
   "log":function(msg){
@@ -136,30 +132,6 @@ function wsBroadcastObject(obj)
 }
 
 function errorJSON(st){return JSON.stringify({error:st});}
-
-function Blockify(e,sub)
-{
-  var t = "<div class=\""+(sub==true ? "sub_" : "")+"blockify\">";
-  for(var lol in e)
-  {
-    if(e[lol]===null || typeof e[lol]=="function")continue;
-    t+="<div class=\"blocky_row\"><strong class=\"blocky_key\">"+lol+"</strong>";
-    if(typeof e[lol] == "string" || typeof e[lol] =="number" || typeof e[lol] =="boolean")
-    {
-      t+="<span class=\"blocky_value\">"+e[lol]+"</span>";
-    }
-    else if(typeof e[lol] == "object")
-    {
-      t+=Blockify(e[lol],true);
-    }
-    else{
-      t+="<span class=\"blocky_value unknown\">unknown</span>";
-    }
-    t+="</div>";
-  }
-  t+="</div>";
-  return t;
-}
 
 function parseFormData(data)
 {
@@ -211,7 +183,6 @@ function getStats()
     products:orderable.length,
     extras:extras.length,
     tables:tables.length,
-    users:users.length,
     earned:earned,
     orders:{
       active:pending.length,
