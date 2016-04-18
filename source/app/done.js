@@ -28,8 +28,13 @@ var Done = (function(baseSocketURL) {
     // = Auth =
     // ========
     
-    self.auth = function (accessToken) {
+    self.auth = function (username, password) {
+      var accessToken = `${username}::${password}`
+      
       self.accessToken = accessToken
+      localStorage.setItem('auth', accessToken)
+      
+      document.getElementById('nav-view-settings').removeAttribute('dataset-notification')
     }
     
     // ==========
