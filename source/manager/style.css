@@ -1224,3 +1224,28 @@ select.styleselect:active
 {
   opacity: 0.5;
 }
+
+/*stats bullet*/
+.stat_bullet
+{
+  display: inline-block;
+  vertical-align: middle;
+  width: 10px;
+  height: 10px;
+  margin: 5px;
+  background-color: #000;
+  border-radius: 5px;
+}
+
+.stat_bullet.free
+{
+  background-color: #1fe31f;
+}
+.stat_bullet.occupied
+{
+  background-color: #e21f1f;
+}
+.stat_bullet.paying
+{
+  background-color: #1f90e3;
+}

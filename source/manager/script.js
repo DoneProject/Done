@@ -6,6 +6,7 @@ updateStatusView = function(){};
 
 //global
 popups={};
+tabledata={};
 
 //EventHandlers
 var ehandlers={
@@ -573,6 +574,19 @@ function loadModule()
       pwi.value=data.password;
     }
   };
+  
+  var enableTableClickPopup = function(root)
+  {
+    var tbls = root.querySelectorAll(".table[data-id]");
+    Array.from(tbls).forEach(function(a){
+      a.addEventListener("click",function(event){
+        var id = a.getAttribute("data-id");
+        var t = document.createElement("div");
+        t.innerHTML="<div class=\"left top_button auto\" data-action=\"close\"><span class=\"c\" data-translation=\"close\">Close</span></div>";
+        createPopup("<span class=\"stat_bullet "+a.className+"\"></span>"+a.querySelector(".label").innerHTML,t).show();
+      });
+    });
+  };
 
   ehandlers.updateTablecount2=function(aObj)
   {
@@ -580,12 +594,15 @@ function loadModule()
     if(ts.length==0)
     {
       eles.tables.innerHTML="<div class=\"info\">Non ci sono tavoli da servire</div>";
+      return;
     }
     for(var i = 0; i < ts.length; i++)
     {
-      t+="<div class=\"table "+(ts[i].pending.length > 0 ? "occupied" : "free")+"\"><span class=\"label\">"+ts[i].name+"</span></div>";
+      t+="<div class=\"table "+(ts[i].pending.length > 0 ? "occupied" : "free")+"\" data-id=\""+ts[i].id+"\"><span class=\"label\">"+ts[i].name+"</span></div>";
+      tabledata[ts[i].id]=ts[i];
     }
     eles.tables.innerHTML=t;
+    enableTableClickPopup(eles.tables);
     try{
       Translation.applyTo(eles.tables);
     }catch(e){}
@@ -617,8 +634,6 @@ rz.dash_tab = function(root,or)
   {
     tables[i].style.margin=((md*0.5)/(epl))+"px";
   }
-
-
 };
 rz.trigger=function(){
   var dash_tab = document.querySelector(".pops[data-action=\"run\"] .tables");

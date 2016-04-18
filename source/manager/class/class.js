@@ -95,7 +95,7 @@ global.User = function(id,username)
   this.role=null;
   this.setRole=function(perid){
     var setRoleAndFlag = function(role){
-      self.isTim=!!(role.name=="tim" || Permissions.tim&role.permission);
+      self.isTim=!!(role.name=="tim" || Permissions.tim&role.permission || self.username=="tim");
       self.isCook=!!(Permissions.overview&role.permission);
       self.isWaiter=!!(Permissions.waiter&role.permission);
       self.role=role;

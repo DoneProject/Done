@@ -9,6 +9,7 @@ var os = require("os");
 var opener = require("opener");
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({ port: 8181 });
+
 wss.on('connection', function connection(ws)
        {
   ws_array.push(ws);
@@ -21,7 +22,7 @@ wss.on('connection', function connection(ws)
 });
 
 //CLASSES
-var c = require("./class/class.js");
+require("./class/class.js");
 
 //VARS
 var orderable_id = 0;
@@ -34,6 +35,10 @@ var running = false;
 var password = "";
 var earned = 0;
 var orders = 0;
+
+var tmpdir = null;
+tmpdir=os.tmpdir()+"/DONE/";
+try {fs.mkdirSync(tmpdir,0o777);  } catch (e) {}
 
 //LISTS
 var orderable = [];
@@ -332,6 +337,7 @@ function messageRecived(ws,message)
             }
           }
         }
+        save();
         break;
       case "extra":
         if((mask = Extra.valid(d)) > 0)
@@ -349,6 +355,7 @@ function messageRecived(ws,message)
               break;
           }
         }
+        save();
         break;
       case "done":
 
@@ -448,6 +455,7 @@ var api_handlers = {
         res.end(JSON.stringify({added:e}));
         wsaction.addextra(e);
         wsaction.statsUpdate();
+        save();
         return;
       }catch(e){
         res.end("{\"error\":\"Invalid data format\"}");
@@ -476,6 +484,7 @@ var api_handlers = {
         if(found)
         {
           wsaction.editextra(e);
+          save();
           res.end(JSON.stringify({modified:e}));
         }
         else
@@ -507,6 +516,7 @@ var api_handlers = {
         {
           wsaction.delextra(o.id);
           wsaction.statsUpdate();
+          save();
           res.end(JSON.stringify({deleted:o.id}));
         }
         else
@@ -529,6 +539,7 @@ var api_handlers = {
         orderable.push(e);
         wsaction.addproduct(e);
         wsaction.statsUpdate();
+        save();
         res.end(JSON.stringify({added:e}));
         return;
       }catch(e){
@@ -558,6 +569,7 @@ var api_handlers = {
         if(found)
         {
           wsaction.editproduct(e);
+          save();
           res.end(JSON.stringify({modified:e}));
         }
         else
@@ -574,7 +586,6 @@ var api_handlers = {
   "delproduct":function(m,req,res)
   {
     postHandle(req,function(o){
-
       try{
         var deleted = false;
         for(var i = orderable.length; --i>=0;)
@@ -590,6 +601,7 @@ var api_handlers = {
         {
           wsaction.delproduct(o.id);
           wsaction.statsUpdate();
+          save();
           res.end(JSON.stringify({deleted:o.id}));
         }
         else
@@ -630,6 +642,7 @@ var api_handlers = {
           var t = {action:"settables",tables:tables,count:tables.length};
           sendEvent("updateTablecount",t);
           wsaction.statsUpdate();
+          save();
           res.end(JSON.stringify(t));
         }
         return;
@@ -655,6 +668,7 @@ var api_handlers = {
       }
       res.end(JSON.stringify({password:password,tables:tables}));
       wsaction.statsUpdate();
+      save();
       running=true;
     });
     return false;
@@ -675,6 +689,7 @@ var api_handlers = {
             users[i].username=o.username;
             users[i].setRole(o.role);
             wsaction.editUser(users[i]);
+            save();
             res.end(JSON.stringify(users[i]))
             return;
           }
@@ -684,6 +699,7 @@ var api_handlers = {
       u.setRole(o.role);
       users.push(u);
       wsaction.addUser(u);
+      save();
       res.end(JSON.stringify(u));
     });
     return false;
@@ -703,6 +719,7 @@ var api_handlers = {
           users.splice(i,1);
           wsaction.delUser(id);
           res.end('{"deleted":"'+id+'"}');
+          save();
           return;
         }
       }
@@ -758,7 +775,7 @@ function handleRequest(request,response)
 
 function save()
 {
-  var t = os.tmpdir();
+  var t = os.tmpdir()+"/DONE";
   fs.writeFile(t+"/table.json",JSON.stringify(tables),"utf8");
   fs.writeFile(t+"/products.json",JSON.stringify(orderable),"utf8");
   fs.writeFile(t+"/extras.json",JSON.stringify(extras),"utf8");
@@ -766,6 +783,8 @@ function save()
   fs.writeFile(t+"/pending.json",JSON.stringify(pending),"utf8");
   fs.writeFile(t+"/concluded.json",JSON.stringify(concluded),"utf8");
   fs.writeFile(t+"/users.json",JSON.stringify(users),"utf8");
+  fs.writeFile(t+"/0_IMPORTANT_README.md","#DO NOT DELETE, EDIT OR ADD ANY FILE OR DATA TO THIS DIRECTORY\n\n#LÖSCHEN SIE KEIN FILE (ODER DATEN) IN DIESEM ORDNER, EBENFALLS NICHTS VERÄNDERN ODER HINZUFÜGEN.\n\n#NON MODIFICARE, AGGIUNGERE O CANCELLARE FILE O DATI IN QUESTA CARTELLA!","utf8");
+    fs.writeFile(t+"/0_IMPORTANT_README.txt","DO NOT DELETE, EDIT OR ADD ANY FILE OR DATA TO THIS DIRECTORY\n\nLÖSCHEN SIE KEIN FILE (ODER DATEN) IN DIESEM ORDNER, EBENFALLS NICHTS VERÄNDERN ODER HINZUFÜGEN.\n\nNON MODIFICARE, AGGIUNGERE O CANCELLARE FILE O DATI IN QUESTA CARTELLA!","utf8");
   console.log("TEMP DIR: "+t);
 }
 
@@ -806,5 +825,61 @@ try{
     }catch(e){continue;}
   }
 }
+console.log("TEMP DIR: "+tmpdir);
 
-console.log("TEMP DIR: "+os.tmpdir())
+function importFiles(root){
+  function ifExists(p,asjson){
+    try{
+      if(asjson === undefined)asjson=true;
+      var s = fs.statSync(p);
+      if(s.isFile()){
+        var con = fs.readFileSync(p,"utf8");
+        if(asjson)con=JSON.parse(con);
+        return function(fx){fx(con);}
+      }
+      else return function(){}
+    }catch(e){
+      return function(){}
+    }
+  }
+
+  function maxId(arr,prop,radix)
+  {
+    if(radix===undefined)radix=10;
+    var m = [];
+    arr.forEach(function(ele){
+      m.push(parseInt(""+ele[prop],radix));
+    });
+    if(m.length==0)return 0;
+    return Math.max.apply(this,m);
+  }
+
+  ifExists(root+"/concluded.json")(function(json){
+    concluded=json;
+  });
+  ifExists(root+"/extras.json")(function(json){
+    extras=json;
+    extra_id=maxId(extras,"id",36);
+  });
+  ifExists(root+"/products.json")(function(json){
+    orderable=json;
+    orderable_id=maxId(orderable,"id",36);
+  });
+  ifExists(root+"/pending.json")(function(json){
+    pending=json;
+    pending_id=maxId(orderable,"id",36);
+  });
+  ifExists(root+"/status.json")(function(json){
+  earned = json.earned;
+  orders = json.orders.total;
+  });
+  ifExists(root+"/table.json")(function(json){
+    tables=json;
+    table_id=maxId(tables,"id",36);
+  });
+  ifExists(root+"/users.json")(function(json){
+    users=json;
+    user_id=maxId(users,"id",36)
+  });
+}
+importFiles(tmpdir);
