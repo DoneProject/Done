@@ -69,11 +69,38 @@
           <div class="f" data-bind="tablenumber"></div>
         </div>
         <div class="tables" data-bind="tables"></div> 
+        <div class="top bottom clickable">
+          <div class="f" data-bind="users" onclick="createPopup('<span data-translation=\'users\'>Utenti</span>',popups.users).show()"></div>
+          <div class="f" data-bind="logs" onclick="createPopup('<span data-translation=\'logs\'>Cronoologia</span>',popups.logs).show()"></div>
+        </div>
         <div class="top bottom">
           <div class="f" data-bind="incoming"></div>
           <div class="f" data-bind="orders"></div>
           <div class="f" data-bind="pending"></div>
         </div>
+      </div>
+      
+      
+      <div class="popups" data-action="users">
+        <div class="right top_button" data-action="add">
+          <span class="c"><i class="icon add"></i></span>
+        </div>
+        <div class="left top_button auto" data-action="close">
+          <span class="c" data-translation="close">Chiudi</span>
+        </div>
+        <ul class="list" id="userlist">
+          <div data-canremove="true" data-translation="helpUser" class="placeholder"></div>
+        </ul>
+      </div>
+      <div class="popups" data-action="logs">
+        <div class="left top_button auto" data-action="close">
+          <span class="c" data-translation="close">Chiudi</span>
+        </div>
+        <ul class="list" id="loglist">
+          <li>
+            <span class="content" data-translation="helpLog"></span>
+          </li>
+        </ul>
       </div>
     </div>
 

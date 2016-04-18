@@ -1,9 +1,12 @@
 serverInfo={};
 password="";
 ws = null;
-
 //PH
-updateStatusView = function(){}
+updateStatusView = function(){};
+
+//global
+popups={};
+tabledata={};
 
 //EventHandlers
 var ehandlers={
@@ -31,6 +34,19 @@ var ehandlers={
   updateTablecount2:function(){},
   statsUpdate:function(){
     console.log("statsUpdate not implemented");
+  },
+  orderableUpdate:function(asd){
+    console.log("orderableUpdate not implemented");
+  },
+  extrasUpdate:function()
+  {
+    console.log("extrasUpdate not implemented");
+  },
+  usersUpdate:function(){
+    console.log("usersUpdate not implemented");
+  },
+  addLog:function(){
+    console.log("addLog not implemented");
   }
 };
 
@@ -404,6 +420,26 @@ var api={
   },
   "addorderlist":function(o){
     sendEvent("updateOrderlist",o);
+  },
+  "editUser":function(o,cb){
+    postrequest("/api/edituser",o,function(json,error){
+      if(!!error)
+      {
+        na(error,true);
+        return;
+      }
+      !!cb && cb(json);
+    },true);
+  },
+  "delUser":function(id,cb){
+    postrequest("/api/deluser",{id:id},function(json,error){
+      if(!!error)
+      {
+        na(error,true);
+        return;
+      }
+      !!cb && cb(json);
+    },true);
   }
 };
 
@@ -475,7 +511,9 @@ function loadModule()
     orders:root.querySelector("[data-bind=\"orders\"]"),
     tables:root.querySelector("[data-bind=\"tables\"]"),
     incoming:root.querySelector("[data-bind=\"incoming\"]"),
-    pending:root.querySelector("[data-bind=\"pending\"]")
+    pending:root.querySelector("[data-bind=\"pending\"]"),
+    users:root.querySelector("[data-bind=\"users\"]"),
+    logs:root.querySelector("[data-bind=\"logs\"]"),
   }
 
   eles.ip.innerHTML=(serverInfo.address && serverInfo.webPort && "http://"+serverInfo.address+":"+serverInfo.webPort) || "no addr";
@@ -502,13 +540,15 @@ function loadModule()
   eles.extranumber.innerHTML=(activeLanguage.extra || "Extra")+": 0";
   eles.tablenumber.innerHTML=(activeLanguage.tables || "Tavoli")+": 0";
   eles.orders.innerHTML=(activeLanguage.orderTot || "Ordini totali")+": 0";
+  eles.users.innerHTML=(activeLanguage.users || "Utenti")+": 0";
+  eles.logs.innerHTML=(activeLanguage.logs || "Cronologia");
   var t = "<div class=\"info\"><i class=\"icon rot loading\"></i> "+(activeLanguage.waitForData)+"</div>";
   eles.tables.innerHTML=t;
 
   eles.incoming.innerHTML=(activeLanguage.earned || "Guadagno")+": ~0€";
   eles.pending.innerHTML=(activeLanguage.orderPending || "Ordini attivi")+": 0";
   rz.trigger();
-  
+
   ehandlers.statsUpdate=function(data){
     eles.password.innerHTML=(data.password===false || data.password.length==0) ? (activeLanguage.noPassword || "nessuna password") : data.password;
 
@@ -516,12 +556,13 @@ function loadModule()
     eles.extranumber.innerHTML=(activeLanguage.extra || "Extra")+": "+data.extras;
     eles.tablenumber.innerHTML=(activeLanguage.tables || "Tavoli")+": "+data.tables;
     eles.orders.innerHTML=(activeLanguage.orderTot || "Ordini totali")+": "+data.orders.total;
+    eles.users.innerHTML=(activeLanguage.users || "Utenti")+": "+data.users;
 
 
     eles.incoming.innerHTML=(activeLanguage.earned || "Guadagno")+": ~"+data.earned+"€";
     eles.pending.innerHTML=(activeLanguage.orderPending || "Ordini attivi")+": "+data.orders.active;
     rz.trigger();
-    
+
     var pwi = document.querySelector(".setting.list input[data-action=\"password\"]");
     if(!!pwi)
     {
@@ -534,23 +575,39 @@ function loadModule()
     }
   };
   
+  var enableTableClickPopup = function(root)
+  {
+    var tbls = root.querySelectorAll(".table[data-id]");
+    Array.from(tbls).forEach(function(a){
+      a.addEventListener("click",function(event){
+        var id = a.getAttribute("data-id");
+        var t = document.createElement("div");
+        t.innerHTML="<div class=\"left top_button auto\" data-action=\"close\"><span class=\"c\" data-translation=\"close\">Close</span></div>";
+        createPopup("<span class=\"stat_bullet "+a.className+"\"></span>"+a.querySelector(".label").innerHTML,t).show();
+      });
+    });
+  };
+
   ehandlers.updateTablecount2=function(aObj)
   {
     var ts = aObj.tables, t="";
     if(ts.length==0)
     {
       eles.tables.innerHTML="<div class=\"info\">Non ci sono tavoli da servire</div>";
+      return;
     }
     for(var i = 0; i < ts.length; i++)
     {
-      t+="<div class=\"table "+(ts[i].pending.length > 0 ? "occupied" : "free")+"\"><span class=\"label\">"+ts[i].name+"</span></div>";
+      t+="<div class=\"table "+(ts[i].pending.length > 0 ? "occupied" : "free")+"\" data-id=\""+ts[i].id+"\"><span class=\"label\">"+ts[i].name+"</span></div>";
+      tabledata[ts[i].id]=ts[i];
     }
     eles.tables.innerHTML=t;
+    enableTableClickPopup(eles.tables);
     try{
       Translation.applyTo(eles.tables);
     }catch(e){}
   }
-  
+
   ws.send('{"get":"stats"}');
   ws.send('{"get":"tables"}');
 };
@@ -577,8 +634,6 @@ rz.dash_tab = function(root,or)
   {
     tables[i].style.margin=((md*0.5)/(epl))+"px";
   }
-
-
 };
 rz.trigger=function(){
   var dash_tab = document.querySelector(".pops[data-action=\"run\"] .tables");
@@ -594,7 +649,7 @@ function extraInit()
     menus.products();
     highlight(2);
   })
-  
+
   var action_edit = function(li)
   {
     var done=function(){//DONE
@@ -739,7 +794,7 @@ function extraInit()
     if(event.keyCode==13)
     {
       event.preventDefault();
-      
+
       var gai = get_add_item();
       if(gai.name.length==0 || add_price.value.length==0)
       {
@@ -747,7 +802,7 @@ function extraInit()
         highlight(2);
         return;
       }
-      
+
       var li = simulate_addextra(gai);
       api.addextra(gai,function(data){
 
@@ -758,7 +813,7 @@ function extraInit()
           li.remove();
           return;
         }
-        
+
         fix_entry(li,data.added);
       });
       reset_add_item();
@@ -788,6 +843,14 @@ function extraInit()
     if(!ele)return;
     ele.remove();
   }
+  ehandlers.extrasUpdate=function(d)
+  {
+    extralist.innerHTML="";
+    d.forEach(function(a){
+      var li = simulate_addextra(a);
+      fix_entry(li,a);
+    });
+  };
 }
 
 function productInit()
@@ -885,6 +948,7 @@ function productInit()
     },true);
   };
 
+//TODO add action please
   var add_actions = function(li){
     var act = li.querySelector(".actions");
     var edit = act.querySelector(".edit");
@@ -951,7 +1015,7 @@ function productInit()
         highlight(3);
         return;
       }
-      
+
       var li = simulate_addextra(gai);
       api.addproduct(gai,function(data){
         var id = data.added.id;
@@ -968,7 +1032,7 @@ function productInit()
     }
   });
 
-  
+
   ehandlers.addProduct=function(p)
   {
     var id = p.id;
@@ -990,6 +1054,14 @@ function productInit()
     var ele = root.querySelector("#product"+p);
     if(!ele)return;
     ele.remove();
+  }
+  ehandlers.orderableUpdate=function(d)
+  {
+    productlist.innerHTML="";
+    d.forEach(function(a){
+      var li = simulate_addextra(a);
+      fix_entry(li,a);
+    });
   }
 }
 
@@ -1027,7 +1099,7 @@ function welcomeInit()
       passinput.focus();
     }
   });
-  
+
   ehandlers.updateTablecount=function(aObj)
   {
     tableinput.value=aObj.count;
@@ -1095,7 +1167,7 @@ function connect(con_problem)
   ws=new WebSocket("ws://"+serverInfo.address+":"+serverInfo.socketPort);
   ws.onmessage=handleWSMessage;
   ws.onopen=function()
-  { 
+  {
     if(con_problem)
     {
       na(activeLanguage.reCon || "Connessione ripristinata");
@@ -1115,25 +1187,361 @@ function getProductsAndExtras()
 {
   if(ws.readyState==ws.OPEN)
   {
-//    ws.send("{'get':'extras'}");
-//    ws.send("{'get':'ordarable'}");
+    ws.send('{"get":"extras"}');
+    ws.send('{"get":"orderable"}');
+    ws.send('{"get":"tables"}');
+    ws.send('{"get":"users"}');
     return;
   }
   setTimeout(getProductsAndExtras,100);
 }
 
+//NOTE popup manager
+function createPopup(title,element)
+{
+  var visible = false;
+  var d = document.createElement("div");
+  var handler = function(){}
+  d.className="popup_backdrop";
+  d.setAttribute("data-status","out");
+
+  var c = document.createElement("div");
+  c.className="popup_content";
+
+  c.innerHTML="<div class=\"popup_title\">"+title+"</div><div class=\"popup_main\"></div>";
+  var cp = c.querySelector(".popup_main");
+  if(!!element && !!cp)cp.appendChild(element);
+
+  d.appendChild(c);
+  document.body.appendChild(d);
+
+  var closebuttons = document.querySelectorAll("[data-action=\"close\"]");
+  Array.from(closebuttons).forEach(function(btn){
+    btn.addEventListener("click",function(){
+      o.visible=false;
+    });
+  });
+
+  var lShow = function()
+  {
+    d.setAttribute("data-status","in");
+    Translation.applyTo(d);
+    handler(o,c);
+  }
+  var lHide = function()
+  {
+    d.setAttribute("data-status","out2");
+    setTimeout(function(){
+      delete o;
+      document.body.removeChild(d);
+    },800);
+  }
+
+  var o={
+    set title(value){
+      title=value;
+      var t = c.querySelector(".popup_title");
+      t.innerHTML=title;
+      Translation.applyTo(t);
+    },
+    get title(){
+      return title;
+    },
+    show:function(tm)
+    {
+      setTimeout(function(){
+        o.visible=true;
+      },(!!tm && isFinite(tm)) || 0);
+      return o;
+    },
+    hide:function()
+    {
+      setTimeout(function(){
+        o.visible=false;
+      },(!!tm && isFinite(tm)) || 0);
+      return o;
+    },
+    set visible(bl){
+      if(bl===true && visible!==bl)
+      {
+        visible=true;
+        lShow();
+      }
+      else if(bl===false && visible!==bl)
+      {
+        visible=false;
+        lHide();
+      }
+    },
+    get visible(){return visible;},
+    set shown(fx){
+      handler=fx;
+      if(visible)fx(o);
+    },
+    get shown(){
+      return handler;
+    }
+  };
+  activePopup=o;
+  return o;
+}
+
+//NOTE User init
+function userInit()
+{
+  var addUser;
+  var root = document.querySelector(".hidden .popups[data-action=\"users\"]");
+  var list = root.querySelector("#userlist");
+
+  var createUserElement = function()
+  {
+    var li = document.createElement("li");
+    li.className="user";
+    li.innerHTML="<div class=\"name\">Username</div><div class=\"role\">Cook</div><div class=\"actions\"><i class=\"icon rot loading\"></i></div>";
+    return li;
+  };
+
+  var loadDataIn=function(li,data){
+    if("username" in data)
+    {
+      li.querySelector(".name").innerHTML=data.username;
+    }
+    if("role" in data)
+    {
+      li.querySelector(".role").innerHTML=data.role.html;
+    }
+    var actions = li.querySelector(".actions");
+    actions.innerHTML="<i class=\"icon edit\"></i><i class=\"icon delete\"></i>";
+    actions.querySelector(".icon.edit").addEventListener("click",function(){editUser(li);});
+    actions.querySelector(".icon.delete").addEventListener("click",function(){removeUser(li);});
+
+    if ("id" in data)
+    {
+      li.setAttribute("data-id",data.id);
+    }
+
+    Translation.applyTo(li);
+  };
+
+  var removeRemovable=function()
+  {
+    var rable = root.querySelectorAll("[data-canremove=\"true\"]");
+    Array.from(rable).forEach(function(a){a.remove();})
+  }
+
+  var checkIfEmpty=function(){
+    if(list.children.length==0){
+      list.insertAdjacentHTML("afterBegin","<div data-canremove=\"true\" data-translation=\"helpUser\" class=\"placeholder\">Drücken Sie auf das <i class=\"icon add\"></i> Icon, um ein Benutzer hinzuzufügen.<br><div class=\"desc\"><h4>Rollen</h4><strong>Kellner:</strong> Kann aufs app zugreifen.<br><strong>Koch:</strong> Kann auf der Overview zugreifen.</div></div>");
+    }
+  };
+
+  var removeUser = function(ele)
+  {
+    if(ele.hasAttribute("data-id"))
+    {
+      api.delUser(ele.getAttribute("data-id"));
+    }
+    ele.remove();
+    checkIfEmpty();
+  }
+
+  var editUser = function(ele)
+  {
+    var name = ele.querySelector(".name");
+    var role = ele.querySelector(".role");
+    var actions = ele.querySelector(".actions");
+
+    var vName = name.innerHTML;
+    var vRole = role.innerHTML;
+
+    var bCancel = document.createElement("button");
+    bCancel.innerHTML=activeLanguage.cancel || "cancella";
+    var bSubmit = document.createElement("button");
+    bSubmit.innerHTML=activeLanguage.modify || "modifica";
+    bSubmit.className="main";
+
+    name.innerHTML="<input type=\"text\" placeholder=\"name\" value=\""+vName+"\" data-id=\"name\" autofocus>";
+    role.innerHTML="<select class=\"styleselect\" data-name=\"role\"><option value=\"0\">"+(activeLanguage.waiter||"Cameriere")+"</option><option value=\"1\">"+(activeLanguage.cook||"Cuoco")+"</option></select>";
+    ele.appendChild(bCancel);
+    ele.appendChild(bSubmit);
+    name.querySelector("input").addEventListener("keydown",function(event){
+      if(event.keyCode==13){
+        event.stopPropagation();
+        event.preventDefault();
+        submit();
+        return;
+      }
+    });
+
+    var cancel = function()
+    {
+      name.innerHTML=vName;
+      role.innerHTML=vRole;
+      bCancel.remove();
+      bSubmit.remove();
+      ele.appendChild(actions);
+    };
+
+    var submit = function()
+    {
+      var nvName = name.querySelector("input").value;
+      var nvRole = role.querySelector("select");
+      var nrOption = nvRole.options[nvRole.selectedIndex].innerHTML;
+      nvRole=nvRole.value;
+      name.innerHTML=nvName;
+      role.innerHTML=nrOption;
+      cancel();
+      var o = {
+        username:nvName,
+        role:nvRole
+      };
+      var hasID = ele.hasAttribute("data-id");
+      if(hasID)
+      {
+        o.id=ele.getAttribute("data-id");
+      }
+      api.editUser(o,function(json){
+        ele.setAttribute("data-id",json.id);
+        loadDataIn(ele,json);
+        var le = list.querySelectorAll(".user[data-id=\""+json.id+"\"]");
+        if(le.length>1)
+        {
+          for(var i = le.length; --i>0;)
+          {
+            le[i].remove();
+          }
+        }
+        if(le.length==1)
+        {
+          loadDataIn(le[0],json);
+        }
+      });
+    };
+
+    bCancel.addEventListener("click",cancel);
+    bSubmit.addEventListener("click",submit);
+
+    actions.remove();
+    var i = name.querySelector("input");
+    i.focus();try{i.select();}catch(e){}
+    delete i;
+
+    Translation.applyTo(ele);
+  }
+
+  var addUser=function()
+  {
+    removeRemovable();
+    var li = createUserElement();
+    list.appendChild(li);
+    editUser(li);
+  };
+
+  //CONSTRUCTOR
+  var addbtns = Array.from(root.querySelectorAll("[data-action=\"add\"]"));
+  addbtns.forEach(function(b){
+    b.addEventListener("click",addUser);
+  });
+
+  ehandlers.addUser=function(data){
+    if("id" in data){
+      var l = list.querySelector("li[data-id=\""+data.id+"\"]");
+      if(!!l){
+        loadDataIn(l,data);
+        return;
+      }
+    }
+    removeRemovable();
+    var li = createUserElement();
+    loadDataIn(li,data);
+    list.appendChild(li);
+  };
+  ehandlers.editUser=function(data){
+    var e = list.querySelector("li[data-id=\""+data.id+"\"]");
+    if(!!e){
+      loadDataIn(e,data);
+    }
+  };
+  ehandlers.delUser=function(data){
+    var e = list.querySelector("li[data-id=\""+data+"\"]");
+    if(!!e){
+      e.remove();
+    }
+    checkIfEmpty();
+  };
+  ehandlers.usersUpdate=function(data){
+    var found = [], e;
+    data.forEach(function(d){
+      var id = d.id;
+      e = list.querySelector("li[data-id=\""+id+"\"]");
+      if(!!e)
+      {
+        loadDataIn(e,d);
+        found.push(e);
+      }
+      else if(!e)
+      {
+        var li = createUserElement();
+        loadDataIn(li,d);
+        list.appendChild(li);
+        found.push(li);
+      }
+    });
+    list.innerHTML="";
+    found.forEach(function(e){
+      list.appendChild(e);
+    });
+    checkIfEmpty();
+  };
+}
+
+
+//NOTE log init
+function logInit()
+{
+  var root = document.querySelector(".popups[data-action=\"logs\"]");
+  var list = document.getElementById("loglist");
+  
+  var format = function(dt)
+  {
+    dt = new Date(dt);
+    try{
+      return dt.getHours()+":"+(dt.getMinutes() < 10 ? "0" : "")+dt.getMinutes();
+    }catch(e){
+      return format(new Date());
+    }
+  }
+  
+  var createElement = function(data){
+    var li = document.createElement("li");
+    li.className="log out";
+    li.innerHTML="<span class=\"time\">"+format(data.time)+"</span><span class=\"content\">"+data.message+"</span>";
+    setTimeout(function(){
+      li.className="log";
+    },64);
+    return li;
+  }
+  
+  ehandlers.addLog=function(data){
+    var li = createElement(data);
+    list.insertBefore(li,list.children[0]);
+  }
+}
+
+//NOTE initializer
 function init()
 {
   var menuItems = document.querySelectorAll(".side div.more");
   var pops = document.querySelectorAll(".hidden .pops[data-action]");
+  var popups = document.querySelectorAll(".hidden .popups[data-action]");
 
+  //POPS
   var at = null;
   for(var i = pops.length; --i>=0;)
   {
     att=pops[i].getAttribute("data-action");
     attele[att]=pops[i];
   }
-
   for(var i = menuItems.length; --i>=0;)
   {
     menuItems[i].addEventListener("click",function(event){
@@ -1151,9 +1559,15 @@ function init()
     });
   }
 
+  Array.apply(this,popups).forEach(function(a){
+    window.popups[a.getAttribute("data-action")]=a;
+  });
+
   welcomeInit();
   extraInit();
   productInit();
+  userInit();
+  logInit();
   api.info(function(data){
     (serverInfo=data);
     connect();
@@ -1177,6 +1591,10 @@ function init()
   });
   addEventListener("resize",rz.trigger);
   Translation.applyTo();
+
+  setTimeout(function(){
+    createPopup("<span data-translation=\"logs\">Logs</span>",window.popups.logs).show();
+  },0);
 }
 
 //DEBUGGING

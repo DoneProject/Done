@@ -9,20 +9,21 @@ var os = require("os");
 var opener = require("opener");
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({ port: 8181 });
-
 wss.on('connection', function connection(ws)
        {
+  wsaction.log("New connection");
   ws_array.push(ws);
   ws.on('message', function(message) {
     messageRecived(ws,message);
   });
   ws.on("ready",function(){
     ws.send(JSON.stringify(initInstance()));
+    wsaction.log("New WS instance");
   });
 });
 
 //CLASSES
-require("./class/class.js");
+var c = require("./class/class.js");
 
 //VARS
 var orderable_id = 0;
@@ -35,10 +36,6 @@ var running = false;
 var password = "";
 var earned = 0;
 var orders = 0;
-
-var tmpdir = null;
-tmpdir=os.tmpdir()+"/DONE/";
-try {fs.mkdirSync(tmpdir,0o777);  } catch (e) {}
 
 //LISTS
 var orderable = [];
@@ -99,17 +96,15 @@ var wsaction = {
     sendEvent("orderableUpdate",e);
   },
   "editUser":function(e){
-    wsaction.log("User edited"+Blockify(e));
+    wsaction.log("User edited "+Blockify(e));
     sendEvent("editUser",e);
   },
   "addUser":function(e){
-    wsaction.log("User added"+Blockify(e));
-    wsaction.statsUpdate();
+    wsaction.log("added user"+Blockify(e));
     sendEvent("addUser",e);
   },
   "delUser":function(id){
-    wsaction.log("User removed"+id);
-    wsaction.statsUpdate();
+    wsaction.log("Deleted user "+id);
     sendEvent("delUser",id);
   },
   "log":function(msg){
@@ -144,26 +139,26 @@ function errorJSON(st){return JSON.stringify({error:st});}
 
 function Blockify(e,sub)
 {
-  var t = "<div class=\""+(sub==true ? "sub_" : "")+"blockify\">";
-  for(var lol in e)
-  {
-    if(e[lol]===null || typeof e[lol]=="function")continue;
-    t+="<div class=\"blocky_row\"><strong class=\"blocky_key\">"+lol+"</strong>";
-    if(typeof e[lol] == "string" || typeof e[lol] =="number" || typeof e[lol] =="boolean")
-    {
-      t+="<span class=\"blocky_value\">"+e[lol]+"</span>";
-    }
-    else if(typeof e[lol] == "object")
-    {
-      t+=Blockify(e[lol],true);
-    }
-    else{
-      t+="<span class=\"blocky_value unknown\">unknown</span>";
-    }
-    t+="</div>";
-  }
-  t+="</div>";
-  return t;
+  return "BLOCKIFY";
+//  var t = "<div class=\""+(sub==true ? "sub_" : "")+"blockify\">";
+//  for(var lol in e)
+//  {
+//    t+="<div class=\"blocky_row\"><strong class=\"blocky_key\">"+lol+"</strong>";
+//    if(typeof e == "string" || typeof e =="number" || typeof e =="boolean")
+//    {
+//      t+="<span class=\"blocky_value\">"+e[lol]+"</span>";
+//    }
+//    else if(typeof e == "object")
+//    {
+//      t+=Blockify(e,true);
+//    }
+//    else{
+//      t+="<span class=\"blocky_value unknown\">unknown</span>";
+//    }
+//    t+="</div>";
+//  }
+//  t+="</div>";
+//  return t;
 }
 
 function parseFormData(data)
@@ -216,7 +211,6 @@ function getStats()
     products:orderable.length,
     extras:extras.length,
     tables:tables.length,
-    users:users.length,
     earned:earned,
     orders:{
       active:pending.length,
@@ -337,7 +331,6 @@ function messageRecived(ws,message)
             }
           }
         }
-        save();
         break;
       case "extra":
         if((mask = Extra.valid(d)) > 0)
@@ -355,7 +348,6 @@ function messageRecived(ws,message)
               break;
           }
         }
-        save();
         break;
       case "done":
 
@@ -415,35 +407,34 @@ function enumTables()
 var api_handlers = {
   "tables":function()
   {
+    wsaction.log("Tables requested");
     return JSON.stringify(tables);
   },
   "orderable":function()
   {
+    wsaction.log("orderables requested");
     return JSON.stringify(orderable);
   },
   "extras":function()
   {
+    wsaction.log("Extras requested");
     return JSON.stringify(extras);
   },
   "orderid":function()
   {
+    wsaction.log("Order id generated");
     return JSON.stringify({"offer":getPendingId()})
   },
   "info":function(m,req,res){
     serverInfo(function(o){
+      wsaction.log("Server info broadcasted");
       res.end(JSON.stringify(o));
     });
     return false;
   },
   "queue":function(m,req,res){
-    if(m=="post")
-    {
-      postHandle(req,function(o){
-        req.end(errorJSON("Has to be implemented"));
-      });
-      return false;
-    }
-    else return JSON.stringify(pending);
+    wsaction.log("Pending list broadcasted");
+    return JSON.stringify(pending);
   },
   "addextra":function(m,req,res)
   {
@@ -455,7 +446,6 @@ var api_handlers = {
         res.end(JSON.stringify({added:e}));
         wsaction.addextra(e);
         wsaction.statsUpdate();
-        save();
         return;
       }catch(e){
         res.end("{\"error\":\"Invalid data format\"}");
@@ -484,7 +474,6 @@ var api_handlers = {
         if(found)
         {
           wsaction.editextra(e);
-          save();
           res.end(JSON.stringify({modified:e}));
         }
         else
@@ -516,7 +505,6 @@ var api_handlers = {
         {
           wsaction.delextra(o.id);
           wsaction.statsUpdate();
-          save();
           res.end(JSON.stringify({deleted:o.id}));
         }
         else
@@ -539,7 +527,6 @@ var api_handlers = {
         orderable.push(e);
         wsaction.addproduct(e);
         wsaction.statsUpdate();
-        save();
         res.end(JSON.stringify({added:e}));
         return;
       }catch(e){
@@ -569,7 +556,6 @@ var api_handlers = {
         if(found)
         {
           wsaction.editproduct(e);
-          save();
           res.end(JSON.stringify({modified:e}));
         }
         else
@@ -586,6 +572,7 @@ var api_handlers = {
   "delproduct":function(m,req,res)
   {
     postHandle(req,function(o){
+
       try{
         var deleted = false;
         for(var i = orderable.length; --i>=0;)
@@ -601,7 +588,6 @@ var api_handlers = {
         {
           wsaction.delproduct(o.id);
           wsaction.statsUpdate();
-          save();
           res.end(JSON.stringify({deleted:o.id}));
         }
         else
@@ -640,9 +626,9 @@ var api_handlers = {
           }
           var table = enumTables();
           var t = {action:"settables",tables:tables,count:tables.length};
+          wsaction.log("New table count: "+table.length);
           sendEvent("updateTablecount",t);
           wsaction.statsUpdate();
-          save();
           res.end(JSON.stringify(t));
         }
         return;
@@ -665,10 +651,9 @@ var api_handlers = {
       else
       {
         password=o.password;
-      }
-      res.end(JSON.stringify({password:password,tables:tables}));
+      } res.end(JSON.stringify({password:password,tables:tables}));
       wsaction.statsUpdate();
-      save();
+      wsaction.log("Ready to go");
       running=true;
     });
     return false;
@@ -689,7 +674,6 @@ var api_handlers = {
             users[i].username=o.username;
             users[i].setRole(o.role);
             wsaction.editUser(users[i]);
-            save();
             res.end(JSON.stringify(users[i]))
             return;
           }
@@ -699,7 +683,6 @@ var api_handlers = {
       u.setRole(o.role);
       users.push(u);
       wsaction.addUser(u);
-      save();
       res.end(JSON.stringify(u));
     });
     return false;
@@ -719,7 +702,6 @@ var api_handlers = {
           users.splice(i,1);
           wsaction.delUser(id);
           res.end('{"deleted":"'+id+'"}');
-          save();
           return;
         }
       }
@@ -742,6 +724,7 @@ function handleApiRequest(request,response)
   }
   else
   {
+    wsaction.log("Wrong api reuest (suspiscious)");
     response.end("API not found.");
   }
 };
@@ -775,7 +758,7 @@ function handleRequest(request,response)
 
 function save()
 {
-  var t = os.tmpdir()+"/DONE";
+  var t = os.tmpdir();
   fs.writeFile(t+"/table.json",JSON.stringify(tables),"utf8");
   fs.writeFile(t+"/products.json",JSON.stringify(orderable),"utf8");
   fs.writeFile(t+"/extras.json",JSON.stringify(extras),"utf8");
@@ -783,8 +766,6 @@ function save()
   fs.writeFile(t+"/pending.json",JSON.stringify(pending),"utf8");
   fs.writeFile(t+"/concluded.json",JSON.stringify(concluded),"utf8");
   fs.writeFile(t+"/users.json",JSON.stringify(users),"utf8");
-  fs.writeFile(t+"/0_IMPORTANT_README.md","#DO NOT DELETE, EDIT OR ADD ANY FILE OR DATA TO THIS DIRECTORY\n\n#LÖSCHEN SIE KEIN FILE (ODER DATEN) IN DIESEM ORDNER, EBENFALLS NICHTS VERÄNDERN ODER HINZUFÜGEN.\n\n#NON MODIFICARE, AGGIUNGERE O CANCELLARE FILE O DATI IN QUESTA CARTELLA!","utf8");
-    fs.writeFile(t+"/0_IMPORTANT_README.txt","DO NOT DELETE, EDIT OR ADD ANY FILE OR DATA TO THIS DIRECTORY\n\nLÖSCHEN SIE KEIN FILE (ODER DATEN) IN DIESEM ORDNER, EBENFALLS NICHTS VERÄNDERN ODER HINZUFÜGEN.\n\nNON MODIFICARE, AGGIUNGERE O CANCELLARE FILE O DATI IN QUESTA CARTELLA!","utf8");
   console.log("TEMP DIR: "+t);
 }
 
@@ -825,61 +806,5 @@ try{
     }catch(e){continue;}
   }
 }
-console.log("TEMP DIR: "+tmpdir);
 
-function importFiles(root){
-  function ifExists(p,asjson){
-    try{
-      if(asjson === undefined)asjson=true;
-      var s = fs.statSync(p);
-      if(s.isFile()){
-        var con = fs.readFileSync(p,"utf8");
-        if(asjson)con=JSON.parse(con);
-        return function(fx){fx(con);}
-      }
-      else return function(){}
-    }catch(e){
-      return function(){}
-    }
-  }
-
-  function maxId(arr,prop,radix)
-  {
-    if(radix===undefined)radix=10;
-    var m = [];
-    arr.forEach(function(ele){
-      m.push(parseInt(""+ele[prop],radix));
-    });
-    if(m.length==0)return 0;
-    return Math.max.apply(this,m);
-  }
-
-  ifExists(root+"/concluded.json")(function(json){
-    concluded=json;
-  });
-  ifExists(root+"/extras.json")(function(json){
-    extras=json;
-    extra_id=maxId(extras,"id",36);
-  });
-  ifExists(root+"/products.json")(function(json){
-    orderable=json;
-    orderable_id=maxId(orderable,"id",36);
-  });
-  ifExists(root+"/pending.json")(function(json){
-    pending=json;
-    pending_id=maxId(orderable,"id",36);
-  });
-  ifExists(root+"/status.json")(function(json){
-  earned = json.earned;
-  orders = json.orders.total;
-  });
-  ifExists(root+"/table.json")(function(json){
-    tables=json;
-    table_id=maxId(tables,"id",36);
-  });
-  ifExists(root+"/users.json")(function(json){
-    users=json;
-    user_id=maxId(users,"id",36)
-  });
-}
-importFiles(tmpdir);
+console.log("TEMP DIR: "+os.tmpdir())

@@ -1,0 +1,633 @@
+{
+  "exclude": [
+    "^(node_modules|bower_components|\\.imdone|target|build|dist|logs)[\\/\\\\]?|\\.(git|svn|hg|npmignore)|\\~$|\\.(jpg|png|gif|swp|ttf|otf)$"
+  ],
+  "watcher": true,
+  "keepEmptyPriority": false,
+  "code": {
+    "include_lists": [
+      "TODO",
+      "DOING",
+      "DONE",
+      "PLANNING",
+      "FIXME",
+      "ARCHIVE",
+      "HACK",
+      "CHANGED",
+      "XXX",
+      "IDEA",
+      "NOTE",
+      "REVIEW"
+    ]
+  },
+  "lists": [
+    {
+      "name": "objects",
+      "hidden": false
+    },
+    {
+      "name": "serverinfo",
+      "hidden": false
+    },
+    {
+      "name": "urlresolvable",
+      "hidden": false
+    },
+    {
+      "name": "ipresolvable",
+      "hidden": false
+    },
+    {
+      "name": "idresolvable",
+      "hidden": false
+    },
+    {
+      "name": "orderlistobject",
+      "hidden": false
+    },
+    {
+      "name": "passwordresolvable",
+      "hidden": false
+    },
+    {
+      "name": "extraobject",
+      "hidden": false
+    },
+    {
+      "name": "productobject",
+      "hidden": false
+    },
+    {
+      "name": "http",
+      "hidden": false
+    },
+    {
+      "name": "websocket",
+      "hidden": false
+    },
+    {
+      "name": "NOTE",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkname-fn--options",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkversion",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkdeepclonevalue",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkeachobject-callback-thisarg",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkextenddestination--source",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkfilterarray-callback-thisarg",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkforeacharray-callback-thisarg",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkformatnumbernumber",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkforownobject-callback-thisarg",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkhaskeyobject-key",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkindexofarray-value--fromindex0",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkinterpolatestring-object",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkinvokebenches-name--arg1-arg2-",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkjoinobject--separator1--separator2",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkmaparray-callback-thisarg",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkpluckarray-property",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkreducearray-callback-accumulator",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypeaborted",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypecompiled",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypecount",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypecycles",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypefn",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypehz",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototyperunning",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypesetup",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypeteardown",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypeabort",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypecloneoptions",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypecompareother",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypeemittype",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypelistenerstype",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypeofftype-listener",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypeontype-listener",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypereset",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototyperunoptions",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypetostring",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkoptions",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkoptionsasync",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkoptionsdefer",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkoptionsdelay",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkoptionsid",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkoptionsinitcount",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkoptionsmaxtime",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkoptionsminsamples",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkoptionsmintime",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkoptionsname",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkoptionsonabort",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkoptionsoncomplete",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkoptionsoncycle",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkoptionsonerror",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkoptionsonreset",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkoptionsonstart",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkplatform",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkplatformdescription",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkplatformlayout",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkplatformmanufacturer",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkplatformname",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkplatformos",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkplatformprerelease",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkplatformproduct",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkplatformversion",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkplatformtostring",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksupport",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksupportair",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksupportargumentsclass",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksupportbrowser",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksupportcharbyindex",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksupportcharbyownindex",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksupportdecompilation",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksupportdescriptors",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksupportgetallkeys",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksupportiteratesownfirst",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksupportjava",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksupportnodeclass",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksupporttimeout",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypeerror",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypestats",
+      "hidden": false
+    },
+    {
+      "name": "benchmark-statsdeviation",
+      "hidden": false
+    },
+    {
+      "name": "benchmark-statsmean",
+      "hidden": false
+    },
+    {
+      "name": "benchmark-statsmoe",
+      "hidden": false
+    },
+    {
+      "name": "benchmark-statsrme",
+      "hidden": false
+    },
+    {
+      "name": "benchmark-statssample",
+      "hidden": false
+    },
+    {
+      "name": "benchmark-statssem",
+      "hidden": false
+    },
+    {
+      "name": "benchmark-statsvariance",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkprototypetimes",
+      "hidden": false
+    },
+    {
+      "name": "benchmark-timescycle",
+      "hidden": false
+    },
+    {
+      "name": "benchmark-timeselapsed",
+      "hidden": false
+    },
+    {
+      "name": "benchmark-timesperiod",
+      "hidden": false
+    },
+    {
+      "name": "benchmark-timestimestamp",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkdeferredclone",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkdeferredprototypebenchmark",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkdeferredprototypecycles",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkdeferredprototypeelapsed",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkdeferredprototyperesolve",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkdeferredprototypetimestamp",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkeventtype",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkeventprototypeaborted",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkeventprototypecancelled",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkeventprototyperesult",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkeventprototypetimestamp",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkeventprototypetype",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkeventprototypecurrenttarget",
+      "hidden": false
+    },
+    {
+      "name": "benchmarkeventprototypetarget",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuitename--options",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypeaborted",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypelength",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototyperunning",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypeabort",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypeaddname-fn--options",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypecloneoptions",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypefiltercallback",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypeforeachcallback",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypeindexofvalue",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypeinvokename--arg1-arg2-",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypejoinseparator-",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypemapcallback",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypepluckproperty",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypepop",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypepush",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypereducecallback-accumulator",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypereset",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypereverse",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototyperunoptions",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypeshift",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypeslicestart-end",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypesortcomparefnnull",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypesplicestart-deletecount--val1-val2-",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteprototypeunshift",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteoptions",
+      "hidden": false
+    },
+    {
+      "name": "benchmarksuiteoptionsname",
+      "hidden": false
+    },
+    {
+      "name": "TODO",
+      "hidden": false
+    },
+    {
+      "name": "bindobj-fn",
+      "hidden": false
+    },
+    {
+      "name": "bindobj-fn-",
+      "hidden": false
+    },
+    {
+      "name": "bindobj-name",
+      "hidden": false
+    },
+    {
+      "name": "XXX",
+      "hidden": false
+    },
+    {
+      "name": "FIXME",
+      "hidden": false
+    },
+    {
+      "name": "ultronon",
+      "hidden": false
+    },
+    {
+      "name": "DONE",
+      "hidden": false
+    }
+  ],
+  "marked": {
+    "gfm": true,
+    "tables": true,
+    "breaks": false,
+    "pedantic": false,
+    "smartLists": true,
+    "langPrefix": "language-"
+  }
+}
