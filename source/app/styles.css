@@ -76,7 +76,7 @@ main {
 
 .view-footer {
   position: fixed;
-  display: flex;
+  text-align: right;
   width: 100vw;
   padding: 8px;
   background: linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
@@ -84,30 +84,95 @@ main {
   left: 0;
 }
 
+.left-handed-mode .view-footer {
+  text-align: left;
+}
+
 /* ====== */
 /* = UI = */
 /* ====== */
 
+fieldset {
+  padding: 12px;
+  border: 1px solid #e4e4e4;
+  background-color: rgba(0, 0, 0, 0.01);
+  margin-bottom: 1.5em;
+}
+
+legend {
+  font: inherit;
+  padding-right: 3px;
+  padding-left: 3px;
+}
+
 .button {
   -webkit-appearance: none;
-  display: block;
-  flex: auto 1 1;
   font-size: 13px;
   color: #fff;
-  padding: 8px;
+  padding: 8px 13px;
   background-color: #0A60FE;
   border: none;
   border-radius: 5px;
   cursor: pointer;
 }
 
-label {
-  display: block;
+.inactive .button {
+  opacity: 0;
 }
 
+label {
+  display: block;
+  text-transform: uppercase;
+  font-size: 13px;
+  padding-right: 8px;
+  padding-left: 8px;
+  margin-bottom: 0.2em;
+}
+
+input + label {
+  margin-top: 1em;
+}
+
+input[type=text],
+input[type=password],
 input[type=search] {
   -webkit-appearance: none;
+  display: block;
+  font-size: 13px;
+  width: 100%;
+  padding: 6px 8px;
   border: 1px solid #ccc;
+  border-radius: 2px;
+  margin-bottom: 0.5em;
+  outline: none;
+}
+
+input[type=text]:focus,
+input[type=password]:focus,
+input[type=search]:focus {
+  border-color: #777;
+}
+
+.suggestions-list ul {
+  white-space: nowrap;
+  list-style: none;
+  overflow-x: scroll;
+  padding-bottom: 0.2em;
+  margin-bottom: 1em;
+}
+
+.suggestions-list li {
+  display: inline-block;
+  line-height: 1;
+  color: #fff;
+  padding: 0.5em 0.7em;
+  background-color: #0A60FE;
+  border-radius: 5px;
+  margin-right: 0.2em;
+}
+
+[hidden] {
+  display: none !important;
 }
 
 /* ========== */
