@@ -34,10 +34,34 @@
           <input type="search" id="extras">
           <div class="suggestions-list"><ul id="extras-suggestions"></ul></div>
         </form>
+        
+        <footer class="view-footer">
+          <button id="add-to-orders-button" class="button" data-translation="Add to Orders">Add to Orders</button>
+        </footer>
       </section>
       
       <section id="view-settings" class="view" hidden>
-        Settings.
+        <form id="login-form">
+          <fieldset id="authentication">
+            <legend>Authentication</legend>
+            
+            <label for="username" data-translation="username">Username</label>
+            <input type="text" id="username">
+          
+            <label for="password" data-translation="password">Password</label>
+            <input type="password" id="password">
+            
+            <input type="submit" class="button" value="Login">
+          </fieldset>
+        </form>
+        
+        <form>
+          <fieldset id="accessibility">
+            <legend>Accessibility</legend>
+            
+            <button type="button" class="button" id="toggle-left-handed-mode-button">Toggle Left-Handed Mode</button>
+          </fieldset>
+        </form>
       </section>
     </main>
     
@@ -75,5 +99,6 @@
     <script src="velocity.min.js"></script>
     <script src="stdlib.js"></script>
     <script src="viewcontroller.js"></script>
+    <script src="logic.js"></script>
   </body>
 </html>
