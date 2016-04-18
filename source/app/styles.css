@@ -60,6 +60,14 @@ main {
   transition: background-color 300ms ease-out;
 }
 
+.empty {
+  font-weight: 300;
+  font-size: 2.5em;
+  color: rgba(0, 0, 0, 0.25);
+  text-align: center;
+  margin-top: 3em;
+}
+
 /* View Footer */
 
 .view.has-footer {
