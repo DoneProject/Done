@@ -1,4 +1,4 @@
-(function() {
+var vc = (function() {
   
   var self = {}
   
@@ -7,9 +7,30 @@
   self.title = document.getElementById('view-title')
   self.activeView = null
   self.activeTable = null
+  self.activeTableOrders = document.getElementById('active-table-orders')
   self.selectTabEvents = []
   self.buttons = {
     addOrder: document.getElementById('add-order-button')
+  }
+  self.inputs = {
+    order: document.getElementById('order'),
+    extras: document.getElementById('extras'),
+    username: document.getElementById('username'),
+    password: document.getElementById('password')
+  }
+  self.suggestions = {
+    order: document.getElementById('order-suggestions'),
+    extras: document.getElementById('extras-suggestions')
+  }
+  self.inLeftHandedMode = false
+  
+  // =========
+  // = Modes =
+  // =========
+  
+  if (localStorage.getItem('left-handed-mode') === '1') {
+    document.body.classList.add('left-handed-mode')
+    self.inLeftHandedMode = true
   }
   
   // ===============
@@ -26,12 +47,32 @@
     })
   }
   
-  self.selectTabEvents.push({ tabName: 'order', action: function () {
+  self.selectTabEvents.push({ tabName: 'table', action: function () {
     if (self.activeTable !== null) {
       self.title.innerHTML = self.activeTable.name
+      
+      self.activeTableOrders.innerHTML = ''
+      self.activeTable.orders.forEach(function (x) {
+        var order = document.createElement('li')
+        
+        self.activeTableOrders.appendChild(order)
+      })
     } else {
       self.title.innerHTML = 'Order'
+      self.activeTableOrders.innerHTML = '<li class="empty">No Orders</li>'
     }
+  }})
+  
+  self.selectTabEvents.push({ tabName: 'add-order', action: function () {
+    self.title.innerHTML = 'Add Order'
+    
+    setTimeout(function () {
+      self.inputs.order.focus()
+    }, 60 * 4)
+  }})
+  
+  self.selectTabEvents.push({ tabName: 'settings', action: function () {
+    self.title.innerHTML = 'Settings'
   }})
   
   // ========
@@ -54,44 +95,11 @@
     }
   })
   
-  // =========
-  // = Logic =
-  // =========
-  
-  Done.getTables('updateTablecount', function (action, type, data) {
-    self.view.innerHTML = ''
-    
-    data.tables.forEach(function (x) {
-      var element  = document.createElement('div')
-      var contents = document.createElement('div')
-      
-      element.id = `table-${x.id}`
-      element.dataset.id = x.id
-      element.classList.add('table')
-      contents.classList.add('table-contents')
-      
-      contents.innerHTML = x.name
-      
-      element.addEventListener('click', function () {
-        self.activeTable = new Table(parseInt(x.id, 36), x.name)
-        
-        openTabById('view-table', true)
-      })
-      
-      element.appendChild(contents)
-      self.view.appendChild(element)
-    })
-  })
-  
-  self.buttons.addOrder.addEventListener('click', function () {
-    openTabById('view-add-order', true)
-  })
-  
   // ==========
   // = Events =
   // ==========
   
-  function openTabById(id, animate) {
+  self.openTabById = function (id, animate) {
     animate = animate === true
     
     var oldView = self.activeView
@@ -110,8 +118,14 @@
     newView.removeAttribute('hidden')
     newView.style.display = 'block'
     
-    document.getElementById('nav-'+oldView.id).classList.remove('active')
-    document.getElementById('nav-'+newView.id).classList.add('active')
+    var newViewTab = document.getElementById('nav-'+newView.id)
+    
+    if (newViewTab) {
+      Array.from(document.getElementsByClassName('active')).forEach(function (x) {
+        x.classList.remove('active')
+      })
+      newViewTab.classList.add('active')
+    }
     
     self.title.innerHTML = 'Done'
     
@@ -123,7 +137,9 @@
   }
   
   window.addEventListener('hashchange', function () {
-    openTabById(location.hash.slice(1))
+    self.openTabById(location.hash.slice(1))
   })
+  
+  return self
   
 }())
