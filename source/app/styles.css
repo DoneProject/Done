@@ -11,7 +11,7 @@ body {
 }
 
 body {
-  font: 13px -apple-system, sans-serif;
+  font: 13px -webkit-system-font, -apple-system, sans-serif;
 }
 
 /* ========== */
