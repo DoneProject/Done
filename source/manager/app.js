@@ -62,7 +62,7 @@ var wsaction = {
   },
   "delextra":function(id)
   {
-    wsaction.log("Deleting extra "+id);
+    wsaction.log("Deleting extra <mark>"+id+"</mark>");
     sendEvent("delExtra",id);
   },
   "addextra":function(e){
@@ -73,9 +73,15 @@ var wsaction = {
     wsaction.log("Edited extra "+Blockify(e));
     sendEvent("editExtra",e);
   },
+  "changeextra":function(){
+    sendEvent("changeExtra",extras);
+  },
+  "changeorderable":function(){
+    sendEvent("changeOrderable",orderable);
+  },
   "delproduct":function(id)
   {
-    wsaction.log("Deleted extra "+Blockify(e));
+    wsaction.log("Deleted extra <mark>"+id+"</mark>");
     sendEvent("delProduct",id);
   },
   "addproduct":function(e){
@@ -108,7 +114,7 @@ var wsaction = {
     sendEvent("addUser",e);
   },
   "delUser":function(id){
-    wsaction.log("User removed"+id);
+    wsaction.log("User removed <mark>"+id+"</mark>");
     wsaction.statsUpdate();
     sendEvent("delUser",id);
   },
@@ -285,9 +291,11 @@ function messageRecived(ws,message)
         break;
       case "orderable":
         sendEventTo(ws,"orderableUpdate",orderable);
+        wsaction.changeorderable();
         break;
       case "extras":
         sendEventTo(ws,"extrasUpdate",extras);
+        wsaction.changeextra();
         break;
       case "queue":
         ws.send(JSON.stringify(pending));
@@ -455,6 +463,7 @@ var api_handlers = {
         res.end(JSON.stringify({added:e}));
         wsaction.addextra(e);
         wsaction.statsUpdate();
+        wsaction.changeextra();
         save();
         return;
       }catch(e){
@@ -484,6 +493,7 @@ var api_handlers = {
         if(found)
         {
           wsaction.editextra(e);
+          wsaction.changeextra();
           save();
           res.end(JSON.stringify({modified:e}));
         }
@@ -516,6 +526,7 @@ var api_handlers = {
         {
           wsaction.delextra(o.id);
           wsaction.statsUpdate();
+          wsaction.changeextra();
           save();
           res.end(JSON.stringify({deleted:o.id}));
         }
@@ -539,6 +550,7 @@ var api_handlers = {
         orderable.push(e);
         wsaction.addproduct(e);
         wsaction.statsUpdate();
+        wsaction.changeorderable();
         save();
         res.end(JSON.stringify({added:e}));
         return;
@@ -569,6 +581,7 @@ var api_handlers = {
         if(found)
         {
           wsaction.editproduct(e);
+          wsaction.changeorderable();
           save();
           res.end(JSON.stringify({modified:e}));
         }
@@ -601,6 +614,7 @@ var api_handlers = {
         {
           wsaction.delproduct(o.id);
           wsaction.statsUpdate();
+          wsaction.changeorderable();
           save();
           res.end(JSON.stringify({deleted:o.id}));
         }
@@ -870,16 +884,33 @@ function importFiles(root){
     pending_id=maxId(orderable,"id",36);
   });
   ifExists(root+"/status.json")(function(json){
-  earned = json.earned;
-  orders = json.orders.total;
+    earned = json.earned;
+    orders = json.orders.total;
   });
   ifExists(root+"/table.json")(function(json){
     tables=json;
     table_id=maxId(tables,"id",36);
+    tables=tables.map(function(t){
+      var nt = Table.from(t);
+      return nt;
+    });
   });
   ifExists(root+"/users.json")(function(json){
     users=json;
-    user_id=maxId(users,"id",36)
+    user_id=maxId(users,"id",36);
+    users=users.map(function(u){
+      var nu = User.from(u);
+      return nu;
+    });
   });
 }
 importFiles(tmpdir);
+
+/*function testingDev()
+{
+  if(tables.length==0 || orderable.length==0)return;
+  tables.forEach(function(t){
+    t.pending();
+  })
+}
+setTimeout(testingDev,2000);*/
