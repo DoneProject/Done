@@ -11,7 +11,6 @@ var Done = (function(baseSocketURL) {
     
     self.baseSocketURL = baseSocketURL
     self.connection = new WebSocket(self.baseSocketURL)
-    self.callback = function (event, success) { }
     
     var errorHandler = function () {
       try {
@@ -97,24 +96,12 @@ var Done = (function(baseSocketURL) {
       self.send({ get: message }, type, callback)
     }
     
-    self.getTables    = function (type, callback) { return self.get('tables', type, callback) }
-    self.getOrderable = function (type, callback) { return self.get('orderable', type, callback) }
-    self.getExtras    = function (type, callback) { return self.get('extras', type, callback) }
+    self.getTables    = function (callback) { return self.get('tables', 'updateTablecount', callback) }
+    self.getOrderable = function (callback) { return self.get('orderable', 'changeOrderable', callback) }
+    self.getExtras    = function (callback) { return self.get('extras', 'changeExtra', callback) }
     self.getQueue     = function (type, callback) { return self.get('queue', type, callback) }
-    
-    // ==================
-    // = Event Listener =
-    // ==================
-    
-    self.connection.addEventListener('message', function (event) {
-      return self.callback(event, true)
-    })
-    
-    self.connection.addEventListener('error', function (event) {
-      return self.callback(event, false)
-    })
   }
   
   return new Done(baseSocketURL)
   
-}('ws://mbp.local:8181'))
+}('ws://'+/*location.hostname*/'mbp.local'+':8181'))

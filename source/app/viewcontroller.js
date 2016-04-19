@@ -52,11 +52,6 @@ var vc = (function() {
       self.title.innerHTML = self.activeTable.name
       
       self.activeTableOrders.innerHTML = ''
-      self.activeTable.orders.forEach(function (x) {
-        var order = document.createElement('li')
-        
-        self.activeTableOrders.appendChild(order)
-      })
     } else {
       self.title.innerHTML = 'Order'
       self.activeTableOrders.innerHTML = '<li class="empty">No Orders</li>'

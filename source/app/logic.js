@@ -2,7 +2,7 @@
 // = Tables =
 // ==========
 
-Done.getTables('updateTablecount', function (action, type, data) {
+Done.getTables(function (action, type, data) {
   vc.view.innerHTML = ''
   
   data.tables.forEach(function (x) {
@@ -38,9 +38,6 @@ vc.buttons.addOrder.addEventListener('click', function () {
   vc.openTabById('view-add-order', true)
 })
 
-var orders = ['Apple', 'Banana', 'Cupcake', 'Fisch', 'Eis', 'Torte', 'Karpfen']
-var extras = ['Schokoladenstreusel', 'Wurst']
-
 var fuzzyMatch = function (hay, query) {
   hay = hay.toLowerCase()
   query = query.toLowerCase()
@@ -54,25 +51,7 @@ var fuzzyMatch = function (hay, query) {
   return true
 }
 
-var initFilter = function (input, listNode, datalist) {
-  datalist.forEach(function (x) {
-    var suggestion = document.createElement('li')
-  
-    suggestion.innerHTML = x
-    suggestion.dataset.value = x
-    suggestion.classList.add('suggestion')
-    
-    suggestion.addEventListener('click', function () {
-      input.value = suggestion.dataset.value
-      
-      setTimeout(function () {
-        input.select()
-      }, 10)
-    })
-    
-    listNode.appendChild(suggestion)
-  })
-  
+var initFilter = function (input, listNode) {
   input.addEventListener('input', function () {
     var query = this.value
     var suggestionNodes = listNode.getElementsByClassName('suggestion')
@@ -93,8 +72,38 @@ var initFilter = function (input, listNode, datalist) {
   })
 }
 
-initFilter(vc.inputs.order, vc.suggestions.order, orders)
-initFilter(vc.inputs.extras, vc.suggestions.extras, extras)
+var updateSuggestions = function (input, listNode, datalist) {
+  listNode.innerHTML = ''
+  
+  datalist.forEach(function (x) {
+    var suggestion = document.createElement('li')
+  
+    suggestion.innerHTML = x.name
+    suggestion.dataset.value = x.name
+    suggestion.classList.add('suggestion')
+    
+    suggestion.addEventListener('click', function () {
+      input.value = suggestion.dataset.value
+      
+      setTimeout(function () {
+        input.select()
+      }, 10)
+    })
+    
+    listNode.appendChild(suggestion)
+  })
+}
+
+initFilter(vc.inputs.order, vc.suggestions.order)
+initFilter(vc.inputs.extras, vc.suggestions.extras)
+
+Done.getOrderable(function (action, type, orders) {
+  updateSuggestions(vc.inputs.order, vc.suggestions.order, orders)
+})
+
+Done.getExtras(function (action, type, extras) {
+  updateSuggestions(vc.inputs.extras, vc.suggestions.extras, extras)
+})
 
 // ============
 // = Settings =
