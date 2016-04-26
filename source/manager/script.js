@@ -582,7 +582,35 @@ function loadModule()
       a.addEventListener("click",function(event){
         var id = a.getAttribute("data-id");
         var t = document.createElement("div");
+        t.setAttribute("data-table",id);
         t.innerHTML="<div class=\"left top_button auto\" data-action=\"close\"><span class=\"c\" data-translation=\"close\">Close</span></div>";
+        var d = tabledata[id];
+        var pending = d.pending;
+        var content = document.createElement("div");
+        content.className="table_content";
+        
+        var extraString = function(extraArr){
+          
+        };
+        
+        var calcPrice = function(order)
+        {
+          
+        };
+        
+        pending.forEach(function(d){
+          var ol = document.createElement("ol");
+          ol.className="t_ele orderlist";
+          
+          var o  = d.orders;
+          o.forEach(function(oi){
+            var li = document.createElement("li");
+            li.className="t_ele order";
+            li.setAttribute("data-id",oi.id);
+            li.innerHTML="<div class=\"left\"><div class=\"top\"><span class=\"name\">"+(oi.name)+"</span><span class=\"price\">"+calcPrice(oi)+"</span></div><div class=\"bottom\">"+extraString(oi)+"</div></div><div class=\"right\"><i class=\"icon delete\"></i><i class=\"icon done\"></i></div>";
+          })
+        });
+        
         createPopup("<span class=\"stat_bullet "+a.className+"\"></span>"+a.querySelector(".label").innerHTML,t).show();
       });
     });

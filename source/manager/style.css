@@ -1249,3 +1249,11 @@ select.styleselect:active
 {
   background-color: #1f90e3;
 }
+
+/*mark*/
+#loglist mark{
+  background-color: #fff;
+  padding: 2px 5px;
+  border: 1px #ddd solid;
+  border-radius: 3px;
+}

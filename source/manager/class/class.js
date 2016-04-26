@@ -30,10 +30,6 @@ global.Order = function Order(id,name,extra,price)
   this.price=price;
   this.stats="none";
   this.statusCode=0;
-  this.copy = function()
-  {
-    return new Order(self.id,self.prod_id,self.name,self.extra,self.price);
-  };
 }
 
 global.Extra = function Extra(id,name,price,action)
@@ -82,6 +78,18 @@ global.Table = function Table(id,name)
     return self;
   };
 }
+global.Table.from=function(data){
+  if(!("id" in data && "name" in data))return null;
+  var t = new Table(data.id,data.name);
+  for(var lol in t)
+  {
+    if(typeof t[lol] == "function")continue;
+    if(!(lol in data))continue;
+    if(typeof data[lol]=="undefined")continue;
+    t[lol]=data[lol];
+  }
+  return t;
+}
 
 global.User = function(id,username)
 {
@@ -111,6 +119,17 @@ global.User = function(id,username)
     }
   }
 }
+global.User.from=function(data){
+  var u = new User(data.id,data.username);
+  for(var lol in u)
+  {
+    if(typeof u[lol] == "function")continue;
+    if(!(lol in data))continue;
+    if(typeof data[lol]=="undefined")continue;
+    u[lol]=data[lol];
+  }
+  return u;
+};
 
 global.Permissions={
   server:1<<0,
@@ -136,5 +155,3 @@ global.Roles = [{
   html:"<span></span>",
   permission:0xF
 }];
-
-
