@@ -878,6 +878,10 @@ function importFiles(root){
   ifExists(root+"/products.json")(function(json){
     orderable=json;
     orderable_id=maxId(orderable,"id",36);
+    orderable=orderable.map(function(t){
+      var nt = Order.from(t);
+      return nt;
+    });
   });
   ifExists(root+"/pending.json")(function(json){
     pending=json;
@@ -902,15 +906,43 @@ function importFiles(root){
       var nu = User.from(u);
       return nu;
     });
-  });
+  }); 
 }
 importFiles(tmpdir);
 
-/*function testingDev()
+
+//DEV
+Order.prototype.add=function(extra){
+  console.log("THIS IS",this);
+//  this.extra.push(extra);
+  return this;
+}
+function getRandom(arr)
+{
+  console.log(arr.length);
+  var r=arr[Math.floor(Math.random()*arr.length)];;
+  console.log("RETURNS",r);
+  return r
+}
+
+function randomOrder()
+{
+  var ol = new OrderList(getPendingId());
+  var o = Order.from(getRandom(orderable)).add(getRandom(extras));
+  ol.orders.push(o);
+  return ol;
+}
+
+function testingDev()
 {
   if(tables.length==0 || orderable.length==0)return;
   tables.forEach(function(t){
-    t.pending();
+    var ro = randomOrder();
+    t.pending.push(ro);
+    save();
   })
 }
-setTimeout(testingDev,2000);*/
+//setTimeout(testingDev,2000);
+
+//COOL
+function sha1(r){var e,o,a,t,c,h,n,f,s,u=function(r,e){var o=r<<e|r>>>32-e;return o},C=function(r){var e,o,a="";for(e=7;e>=0;e--)o=r>>>4*e&15,a+=o.toString(16);return a},d=Array(80),A=1732584193,p=4023233417,i=2562383102,g=271733878,v=3285377520;r=unescape(encodeURIComponent(r));var b=r.length,k=[];for(o=0;b-3>o;o+=4)a=r.charCodeAt(o)<<24|r.charCodeAt(o+1)<<16|r.charCodeAt(o+2)<<8|r.charCodeAt(o+3),k.push(a);switch(b%4){case 0:o=2147483648;break;case 1:o=r.charCodeAt(b-1)<<24|8388608;break;case 2:o=r.charCodeAt(b-2)<<24|r.charCodeAt(b-1)<<16|32768;break;case 3:o=r.charCodeAt(b-3)<<24|r.charCodeAt(b-2)<<16|r.charCodeAt(b-1)<<8|128}for(k.push(o);k.length%16!=14;)k.push(0);for(k.push(b>>>29),k.push(b<<3&4294967295),e=0;e<k.length;e+=16){for(o=0;16>o;o++)d[o]=k[e+o];for(o=16;79>=o;o++)d[o]=u(d[o-3]^d[o-8]^d[o-14]^d[o-16],1);for(t=A,c=p,h=i,n=g,f=v,o=0;19>=o;o++)s=u(t,5)+(c&h|~c&n)+f+d[o]+1518500249&4294967295,f=n,n=h,h=u(c,30),c=t,t=s;for(o=20;39>=o;o++)s=u(t,5)+(c^h^n)+f+d[o]+1859775393&4294967295,f=n,n=h,h=u(c,30),c=t,t=s;for(o=40;59>=o;o++)s=u(t,5)+(c&h|c&n|h&n)+f+d[o]+2400959708&4294967295,f=n,n=h,h=u(c,30),c=t,t=s;for(o=60;79>=o;o++)s=u(t,5)+(c^h^n)+f+d[o]+3395469782&4294967295,f=n,n=h,h=u(c,30),c=t,t=s;A=A+t&4294967295,p=p+c&4294967295,i=i+h&4294967295,g=g+n&4294967295,v=v+f&4294967295}return s=C(A)+C(p)+C(i)+C(g)+C(v),s.toLowerCase()}

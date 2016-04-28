@@ -590,25 +590,36 @@ function loadModule()
         content.className="table_content";
         
         var extraString = function(extraArr){
-          
+          extraArr=extraArr.extra;
+          var t = extraArr.map(function(a){
+            return a.price+a.name+" ("+price(a.price)+")€";
+          });
+          return t.join(", ");
         };
         
         var calcPrice = function(order)
         {
-          
+          return price(order.price)+"€";
         };
         
         pending.forEach(function(d){
           var ol = document.createElement("ol");
           ol.className="t_ele orderlist";
           
+          var top = document.createElement("li");
+          top.className="t_ele toporder";
+          top.innerHTML="<span class=\"t_ele toporder_left\">"+activeLanguage.order+"</span><span class=\"t_ele toporder_right\"><button class=\"hl\">&#10003;</button></span>";
+          ol.appendChild(top);
+          
           var o  = d.orders;
           o.forEach(function(oi){
             var li = document.createElement("li");
             li.className="t_ele order";
             li.setAttribute("data-id",oi.id);
-            li.innerHTML="<div class=\"left\"><div class=\"top\"><span class=\"name\">"+(oi.name)+"</span><span class=\"price\">"+calcPrice(oi)+"</span></div><div class=\"bottom\">"+extraString(oi)+"</div></div><div class=\"right\"><i class=\"icon delete\"></i><i class=\"icon done\"></i></div>";
+            li.innerHTML="<div class=\"left\"><div class=\"top\"><span class=\"name\">"+(oi.name)+"</span><span class=\"price\">"+calcPrice(oi)+"</span></div><div class=\"bottom\">"+extraString(oi)+"</div></div><div class=\"right\"><i class=\"icon done\" style=\"color:#1ab71a\"></i><i class=\"icon delete\"></i></div>";
+            ol.appendChild(li);
           })
+          t.appendChild(ol);
         });
         
         createPopup("<span class=\"stat_bullet "+a.className+"\"></span>"+a.querySelector(".label").innerHTML,t).show();
@@ -1613,16 +1624,17 @@ function init()
     else if(event.keyCode==27)
     {
       var s = document.querySelector(".side [data-active=\"true\"]");
-      var b = document.querySelector(".sbtn[data-bind=\"stopbutton\"] button");
+      var b = d
+      ocument.querySelector(".sbtn[data-bind=\"stopbutton\"] button");
       if(!!b && !!s){event.preventDefault();b.click();}
     }
   });
   addEventListener("resize",rz.trigger);
   Translation.applyTo();
 
-  setTimeout(function(){
+  /*setTimeout(function(){
     createPopup("<span data-translation=\"logs\">Logs</span>",window.popups.logs).show();
-  },0);
+  },0);*/
 }
 
 //DEBUGGING
