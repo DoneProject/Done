@@ -28,7 +28,7 @@ var Done = (function(baseSocketURL) {
     // ========
     
     self.auth = function (username, password) {
-      var accessToken = `${username}::${password}`
+      var accessToken = Crypto.sha1(`${username}::${password}`)
       
       self.accessToken = accessToken
       localStorage.setItem('auth', accessToken)
