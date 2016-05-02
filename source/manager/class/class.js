@@ -24,13 +24,16 @@ global.OrderList.valid=function(obj)
 global.Order = function Order(id,name,extra,price)
 {
   var self = this;
-  this.id=id;
-  this.name=name;
-  this.extra=extra;
-  this.price=price;
+  this.id=id || -1;
+  this.name=name || "product";
+  this.extra=extra || [];
+  this.price=price || 0;
   this.stats="none";
   this.statusCode=0;
 }
+Order.from=function(t){
+  return new Order(t.id,t.name,t.extras,t.price);
+};
 
 global.Extra = function Extra(id,name,price,action)
 {

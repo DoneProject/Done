@@ -71,7 +71,26 @@ Object rappresenting an Product
 "price": 10.00,
 "status":"none",
 "statusCode":0,
-"copy":()=>{return self;}
+"copy":()=>{return new self;}
+}
+```
+
+###TableObject
+Object rappresenting an Product
+
+**Notice:**
+- *Status:* String that describes status (Done, Preparing)
+- *statusCode:* A statud id number
+- *copy:* Creates a copy of the instance (with other reference)
+
+```
+{
+"id":(IDResolvable),
+"name":"NameOfProduct",
+"nr":(NumberInt),
+"isFree":(Bool),
+"isPayed":(Bool),
+"isWaiting":(Bool)
 }
 ```
 
@@ -213,6 +232,8 @@ WebSocket
  - **Event** `Event<"addExtra",ExtraObject>`
  - **Event** `Event<"editExtra",ExtraObject>`
  - **Notice** If ID exists it will be modified
+- **Post** `{"post":"markFree","data":IDResolvable}`
+ - **Event** `Event<"tableUpdate",TableObject>`
 
 
 ###Events
@@ -226,3 +247,4 @@ WebSocket
 - **updateTablecount:** `(Event<"updateTablecount",AddTableActionObject>)`
 - **updateOrderlist:** `(Event<"updateOrderlist",[OrderListObject,OrderListObject,...]>)`
 - **addOrderlist:** `(Event<"addOrderlist",[OrderListObject,OrderListObject,...]>)`
+- **tableUpdate** `Event<"tableUpdate",TableObject>`
