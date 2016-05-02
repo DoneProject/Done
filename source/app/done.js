@@ -70,7 +70,9 @@ var Done = (function(baseSocketURL) {
       
       if (self.listener.hasOwnProperty(type)) {
         self.listener[type].forEach(function (f) {
-          f(action, type, data)
+          if (typeof f === 'function') {
+            f(action, type, data)
+          }
         })
       }
     }
