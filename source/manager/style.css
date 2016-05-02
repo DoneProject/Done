@@ -1257,7 +1257,7 @@ select.styleselect:active
 {
   background-color: #e21f1f;
 }
-.stat_bullet.paying
+.stat_bullet.paying,.stat_bullet.leaving
 {
   background-color: #1f90e3;
 }
