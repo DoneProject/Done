@@ -87,6 +87,7 @@ var Done = (function(baseSocketURL) {
     self.postOrderable = function (data, type, callback) { return self.post('orderable', data, type, callback) }
     self.postExtras    = function (data, type, callback) { return self.post('extras', data, type, callback) }
     self.postQueue     = function (data, type, callback) { return self.post('queue', data, type, callback) }
+    self.markFreeById  = function (id, callback) { return self.post('markFree', id, 'tableChange', callback) }
     
     // =======
     // = GET =
