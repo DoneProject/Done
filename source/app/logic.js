@@ -2,7 +2,7 @@
 // = Tables =
 // ==========
 
-Done.getTables(function (action, type, data) {
+var refreshTableHTML = function (action, type, data) {
   vc.view.innerHTML = ''
   
   data.tables.forEach(function (x) {
@@ -21,13 +21,25 @@ Done.getTables(function (action, type, data) {
     contents.innerHTML = x.name
     
     element.addEventListener('click', function () {
-      vc.activeTable = new Table(parseInt(x.id, 36), x.name)
+      vc.activeTable = new Table(x.id, x.name, x.pending, x.isFree, x.isPayed, x.isWaiting, x.nr)
       vc.openTabById('view-table', true)
+      
+      if (vc.activeTable.pending.length > 0) {
+        vc.buttons.markAsFree.setAttribute('hidden', 'hidden')
+      } else {
+        vc.buttons.markAsFree.removeAttribute('hidden')
+      }
     })
     
     element.appendChild(contents)
     vc.view.appendChild(element)
   })
+}
+
+Done.getTables(refreshTableHTML)
+
+vc.buttons.markAsFree.addEventListener('click', function () {
+  Done.markFreeById(vc.activeTable.id, refreshTableHTML)
 })
 
 // ===================
