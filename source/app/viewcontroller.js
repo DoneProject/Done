@@ -10,7 +10,8 @@ var vc = (function() {
   self.activeTableOrders = document.getElementById('active-table-orders')
   self.selectTabEvents = []
   self.buttons = {
-    addOrder: document.getElementById('add-order-button')
+    addOrder: document.getElementById('add-order-button'),
+    markAsFree: document.getElementById('mark-as-free-button')
   }
   self.inputs = {
     order: document.getElementById('order'),
@@ -103,7 +104,7 @@ var vc = (function() {
     newView.classList.remove('inactive')
     
     if (animate) {
-      Velocity(oldView, 'slideUp', { duration: 60 * 4, easing: 'ease-out' })
+      Velocity(oldView, 'slideUp', { duration: 300, easing: 'ease-out' })
       oldView.classList.add('inactive')
     } else {
       oldView.setAttribute('hidden', 'hidden')
