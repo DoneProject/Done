@@ -207,6 +207,7 @@ input[type=search]:focus {
   top: -7px;
   right: -7px;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.125);
+  pointer-events: none;
 }
 
 .table-free::after    { background-color: #1fe31f; }
@@ -271,6 +272,7 @@ input[type=search]:focus {
   padding: 1px 5px;
   border-radius: 1em;
   background-color: #d00;
+  pointer-events: none;
   top: 0;
   right: 0;
 }
