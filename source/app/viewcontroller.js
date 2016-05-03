@@ -49,13 +49,21 @@ var vc = (function() {
   }
   
   self.selectTabEvents.push({ tabName: 'table', action: function () {
-    if (self.activeTable !== null) {
-      self.title.innerHTML = self.activeTable.name
-      
-      self.activeTableOrders.innerHTML = ''
+    self.title.innerHTML = 'Order'
+    
+    if (self.activeTable === null) {
+      self.buttons.addOrder.setAttribute('hidden', 'hidden')
     } else {
-      self.title.innerHTML = 'Order'
+      self.buttons.addOrder.removeAttribute('hidden')
+    }
+    
+    if (self.activeTable === null) {
+      self.activeTableOrders.innerHTML = '<li class="empty">No Table</li>'
+    } else if (self.activeTable.pending.length <= 0) {
       self.activeTableOrders.innerHTML = '<li class="empty">No Orders</li>'
+    } else {
+      self.title.innerHTML = self.activeTable.name
+      self.activeTableOrders.innerHTML = ''
     }
   }})
   
@@ -64,7 +72,7 @@ var vc = (function() {
     
     setTimeout(function () {
       self.inputs.order.focus()
-    }, 60 * 4)
+    }, 300)
   }})
   
   self.selectTabEvents.push({ tabName: 'settings', action: function () {
