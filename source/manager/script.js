@@ -608,11 +608,38 @@ function loadModule()
 				
 				if(pending.length==0)
 				{
-					t.innerHTML="";
-					return;
-				}
+					t.innerHTML+="<div class=\"info\">"+activeLanguage.nopending+"</div>";
+					if(a.className.search(/(leaving|paying|payed)/i)!==-1)
+					{
+						var actions = document.createElement("div");
+						actions.className="info_actions";
+						
+						var btn = document.createElement("button");
+						btn.className="main";
+						btn.innerHTML="Mark as Free";
+						btn.setAttribute("data-action","close")
+						btn.addEventListener("click",function(){
+							var id = a.getAttribute("data-id");
+							ws.send(JSON.stringify({
+								post:"markFree",
+								data:id
+							}));
+						});
+						
+						
+						var btn2 = document.createElement("button");
+						btn2.innerHTML=activeLanguage.close;
+						btn2.setAttribute("data-action","close")
+						
 
-				pending.forEach(function(d){
+						actions.appendChild(btn2);
+						actions.appendChild(btn);
+						t.appendChild(actions);
+					}
+				}
+				else
+				{
+					pending.forEach(function(d){
 					var ol = document.createElement("ol");
 					ol.className="t_ele orderlist";
 
@@ -631,6 +658,7 @@ function loadModule()
 					})
 					t.appendChild(ol);
 				});
+				}
 
 				createPopup("<span class=\"stat_bullet "+a.className+"\"></span>"+a.querySelector(".label").innerHTML,t).show();
 			});
