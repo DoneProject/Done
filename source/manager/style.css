@@ -1044,6 +1044,11 @@ div.alertDiv i
   left: 0;
 }
 
+.popup_content .info_actions
+{
+	text-align: center;
+}
+
 /*userlist*/
 #userlist .user
 {
@@ -1435,3 +1440,4 @@ li.t_ele.toporder span.toporder_right button.hl
   color: #fff;
   border: none;
 }
+

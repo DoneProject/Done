@@ -309,7 +309,11 @@ function messageRecived(ws,message)
 		{
 			case "tables":
 				tables=checkTables(tables);
-				wsaction.tableChange();
+				sendEventTo(ws,"updateTablecount",{
+					action:"settables",
+					tables:tables,
+					count:tables.length
+				});
 				break;
 			case "orderable":
 				sendEventTo(ws,"orderableUpdate",orderable);
@@ -474,6 +478,7 @@ var api_handlers = {
 		return JSON.stringify({"offer":getPendingId()})
 	},
 	"info":function(m,req,res){
+		console.log("CIIA");
 		serverInfo(function(o){
 			res.end(JSON.stringify(o));
 		});
