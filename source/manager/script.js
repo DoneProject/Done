@@ -1709,3 +1709,31 @@ function debugme()
 	}
 	return gws;
 }
+
+
+function debugOrder()
+{
+	ws.send(JSON.stringify(
+		{
+		post:"orderListAdd",
+		data:{
+			table:"1",
+			order:[
+				{
+					name:"Pizza margherita",
+					extra:[
+						{
+							name:"funghi",
+							action:"+"
+						},
+						{
+							name:"prosciutto",
+							action:"+"
+						}
+					]
+				}
+			]
+		}
+	}
+	));
+}
