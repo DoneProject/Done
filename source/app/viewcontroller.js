@@ -59,11 +59,14 @@ var vc = (function() {
     
     if (self.activeTable === null) {
       self.activeTableOrders.innerHTML = '<li class="empty">No Table</li>'
-    } else if (self.activeTable.pending.length <= 0) {
-      self.activeTableOrders.innerHTML = '<li class="empty">No Orders</li>'
     } else {
       self.title.innerHTML = self.activeTable.name
-      self.activeTableOrders.innerHTML = ''
+      
+      if (self.activeTable.pending.length <= 0) {
+        self.activeTableOrders.innerHTML = '<li class="empty">No Orders</li>'
+      } else {
+        self.activeTableOrders.innerHTML = ''
+      }
     }
   }})
   
