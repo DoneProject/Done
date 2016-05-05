@@ -65,9 +65,10 @@ var fuzzyMatch = function (hay, query) {
 
 var initFilter = function (input, listNode) {
   input.addEventListener('input', function () {
-    var query = this.value
+    var query = this.value.replace(/[+-]/g, '').replace(/.*,\s*/, '')
     var suggestionNodes = listNode.getElementsByClassName('suggestion')
     var items = []
+    
     for (var i = suggestionNodes.length - 1; i >= 0; i -= 1) {
       items.push(suggestionNodes[i])
     }
@@ -84,7 +85,7 @@ var initFilter = function (input, listNode) {
   })
 }
 
-var updateSuggestions = function (input, listNode, datalist) {
+var updateSuggestions = function (input, listNode, datalist, callback) {
   listNode.innerHTML = ''
   
   datalist.forEach(function (x) {
@@ -95,11 +96,7 @@ var updateSuggestions = function (input, listNode, datalist) {
     suggestion.classList.add('suggestion')
     
     suggestion.addEventListener('click', function () {
-      input.value = suggestion.dataset.value
-      
-      setTimeout(function () {
-        input.select()
-      }, 10)
+      callback(input, suggestion)
     })
     
     listNode.appendChild(suggestion)
@@ -110,11 +107,29 @@ initFilter(vc.inputs.order, vc.suggestions.order)
 initFilter(vc.inputs.extras, vc.suggestions.extras)
 
 Done.getOrderable(function (action, type, orders) {
-  updateSuggestions(vc.inputs.order, vc.suggestions.order, orders)
+  updateSuggestions(vc.inputs.order, vc.suggestions.order, orders, function (input, suggestion) {
+    // [ Foo        ] -> [ Baz        ]
+    input.value = suggestion.dataset.value
+    setTimeout(function () { input.select() }, 10)
+  })
 })
 
 Done.getExtras(function (action, type, extras) {
-  updateSuggestions(vc.inputs.extras, vc.suggestions.extras, extras)
+  updateSuggestions(vc.inputs.extras, vc.suggestions.extras, extras, function (input, suggestion) {
+    // [ +Foo       ] -> [ +Foo, +Baz ]
+    var value = input.value.replace(/[^,]*$/, ' ')
+    var action = (function() {
+      var foo = /([+-])[^,]*$/.exec(input.value)
+      
+      if (foo !== null) {
+        return foo[1]
+      } else {
+        return confirm('OK: +, Cancel: -') ? '+' : '-'
+      }
+    }())
+    
+    input.value = value + action + suggestion.dataset.value + ', '
+  })
 })
 
 // ============
