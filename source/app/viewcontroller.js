@@ -11,7 +11,8 @@ var vc = (function() {
   self.selectTabEvents = []
   self.buttons = {
     addOrder: document.getElementById('add-order-button'),
-    markAsFree: document.getElementById('mark-as-free-button')
+    markAsFree: document.getElementById('mark-as-free-button'),
+    toggleLHM: document.getElementById('toggle-left-handed-mode-button')
   }
   self.inputs = {
     order: document.getElementById('order'),
