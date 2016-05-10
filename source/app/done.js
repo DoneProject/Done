@@ -8,11 +8,20 @@ var Done = (function(baseSocketURL) {
     // =============
     
     self.DONE_AUTH_HEADER = 'DoneAuth'
+    self.accessToken = (function() {
+      // check for access token
+      if (localStorage.getItem('auth')) {
+        return localStorage.getItem('auth')
+      } else {
+        return null
+      }
+    }())
     
     self.baseSocketURL = baseSocketURL
     self.connection = new WebSocket(self.baseSocketURL)
     
     var errorHandler = function () {
+      // retry to connect to the ws
       try {
         self.connection = new WebSocket(self.baseSocketURL)
         self.connection.onclose = errorHandler
@@ -28,12 +37,15 @@ var Done = (function(baseSocketURL) {
     // ========
     
     self.auth = function (username, password) {
+      // generate access token
       var accessToken = Crypto.sha1(`${username}::${password}`)
       
+      // set access token
       self.accessToken = accessToken
       localStorage.setItem('auth', accessToken)
       
-      document.getElementById('nav-view-settings').removeAttribute('dataset-notification')
+      // remove notification
+      document.getElementById('nav-view-settings').removeAttribute('data-notification')
     }
     
     // ==========
@@ -43,6 +55,7 @@ var Done = (function(baseSocketURL) {
     self.listener = {}
     
     var trySend = function (string) {
+      // try sending the message and retry if failed
       try {
         self.connection.send(string)
       } catch (variable) {
@@ -51,6 +64,10 @@ var Done = (function(baseSocketURL) {
     }
     
     self.send = function (object, type, callback) {
+      // add auth header
+      object[self.DONE_AUTH_HEADER] = self.accessToken
+      
+      // add callback function
       if (type && callback) {
         if (!self.listener.hasOwnProperty(type)) {
           self.listener[type] = []
@@ -63,12 +80,14 @@ var Done = (function(baseSocketURL) {
     }
     
     self.connection.onmessage = function (event) {
+      // handle events
       var rawEvent = JSON.parse(event.data)
       var action = rawEvent.action
       var type = rawEvent.event
       var data = rawEvent.data
       
       if (self.listener.hasOwnProperty(type)) {
+        // call all callbacks
         self.listener[type].forEach(function (f) {
           if (typeof f === 'function') {
             f(action, type, data)
