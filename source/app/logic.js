@@ -9,17 +9,20 @@ var refreshTableHTML = function (action, type, data) {
     var element  = document.createElement('div')
     var contents = document.createElement('div')
     
+    // create table object
     element.id = `table-${x.id}`
     element.dataset.id = x.id
     element.classList.add('table')
     contents.classList.add('table-contents')
     
+    // set states
     if (x.isFree)    { element.classList.add('table-free') }
     if (x.isPayed)   { element.classList.add('table-payed') }
     if (x.isWaiting) { element.classList.add('table-waiting') }
     
     contents.innerHTML = x.name
     
+    // handle table clicks
     element.addEventListener('click', function () {
       vc.activeTable = new Table(x.id, x.name, x.pending, x.isFree, x.isPayed, x.isWaiting, x.nr)
       vc.openTabById('view-table', true)
@@ -31,6 +34,7 @@ var refreshTableHTML = function (action, type, data) {
       }
     })
     
+    // add tables to the grid
     element.appendChild(contents)
     vc.view.appendChild(element)
   })
@@ -38,6 +42,7 @@ var refreshTableHTML = function (action, type, data) {
 
 Done.getTables(refreshTableHTML)
 
+// mark tables as free
 vc.buttons.markAsFree.addEventListener('click', function () {
   Done.markFreeById(vc.activeTable.id, refreshTableHTML)
 })
@@ -46,11 +51,13 @@ vc.buttons.markAsFree.addEventListener('click', function () {
 // = Order Interface =
 // ===================
 
+// open add order sheet
 vc.buttons.addOrder.addEventListener('click', function () {
   vc.openTabById('view-add-order', true)
 })
 
 var fuzzyMatch = function (hay, query) {
+  // fuzzy match strings
   hay = hay.toLowerCase()
   query = query.toLowerCase()
   
@@ -64,8 +71,12 @@ var fuzzyMatch = function (hay, query) {
 }
 
 var initFilter = function (input, listNode) {
+  // listen for input events and start filtering
   input.addEventListener('input', function () {
-    var query = this.value.replace(/[+-]/g, '').replace(/.*,\s*/, '')
+    // cut out query
+    var query = this.value
+      .replace(/[+-]/g, '')
+      .replace(/.*,\s*/, '')
     var suggestionNodes = listNode.getElementsByClassName('suggestion')
     var items = []
     
@@ -73,6 +84,7 @@ var initFilter = function (input, listNode) {
       items.push(suggestionNodes[i])
     }
     
+    // filter suggestions
     items.forEach(function (x) {
       var matches = fuzzyMatch(x.dataset.value, query)
       
@@ -88,13 +100,15 @@ var initFilter = function (input, listNode) {
 var updateSuggestions = function (input, listNode, datalist, callback) {
   listNode.innerHTML = ''
   
+  // list new suggestions
   datalist.forEach(function (x) {
     var suggestion = document.createElement('li')
-  
+    
     suggestion.innerHTML = x.name
     suggestion.dataset.value = x.name
     suggestion.classList.add('suggestion')
     
+    // invoke callback with decision handler
     suggestion.addEventListener('click', function () {
       callback(input, suggestion)
     })
