@@ -4,6 +4,7 @@ global.OrderList = function(id)
   this.state="pending"; //to serve, to pay, done
   this.orders=[];
   this.sender=null;
+	this.table=null;
 }
 global.OrderList.INVALID=0;
 global.OrderList.VALID_ID_MISSING=1;

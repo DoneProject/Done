@@ -132,11 +132,19 @@ var wsaction = {
 		if(gt.length>0)
 		{
 			sendEvent("tableUpdate",gt[0]);
+			wsaction.log("Table modified",Blockify(gt[0]));
 		}
 	},
 	"tableChange":function(id)
 	{
 		sendEvent("tableChange",{tables:tables});
+	},
+	"orderAdded":function(ol)
+	{
+		wsaction.addorderlist(ol);
+		checkTables(tables);
+		wsaction.tableChange();
+		wsaction.tableUpdate(ol.table);
 	}
 }
 
@@ -300,6 +308,56 @@ function checkTables(tbl)
 	});
 }
 
+function handleAddOrderList(data)
+{
+	var t = data.table;	
+	console.log("HANDLE ADD ORDER");
+	table=tables.find(function(a){
+		return (t==a.id);
+	});
+	if(t==null)
+	{
+		return;
+	}
+	console.log("TABLE FOUND");
+	var orders = [];
+	var o=data.order, to, ex;
+	o.forEach(function(b){
+		console.log("HANDLING ORDER");
+		to=orderable.find((a)=>{
+			if("id" in a && a.id==b.id)return true;
+			return a.name.toLowerCase()==b.name.toLowerCase();
+		});
+		if(!to)return;
+		console.log("ORDER FOUND");
+		
+		to = Order.from(to);
+		to.extras = [];
+		if("extra" in b)b.extras=b.extra;
+		if("extras" in b)
+		{
+			console.log("HANDLING EXTRA");
+			b.extras.forEach((c)=>{
+				ex = extras.find((x)=>{
+					if("id" in x && x.id==c.id)return true;
+					return x.name.toLowerCase()==c.name.toLowerCase();
+				});
+				console.log("EXTRA FOUND");
+				if(!!ex)to.extras.push(ex);
+			});
+		}
+		orders.push(to);
+	});
+	if(orders.length > 0)
+	{
+		var ol = new OrderList(getPendingId());
+		ol.orders=orders;
+		ol.table=table.id;
+		table.pending.push(ol);
+		wsaction.orderAdded(ol);
+	}
+}
+
 function messageRecived(ws,message)
 {
 	var j = JSON.parse(message);
@@ -392,7 +450,7 @@ function messageRecived(ws,message)
 				save();
 				break;
 			case "done":
-				
+
 				break;
 			case "markFree":
 				if(!!d)
@@ -406,6 +464,12 @@ function messageRecived(ws,message)
 							wsaction.tableChange();
 						}
 					});
+				}
+				break;
+			case "orderListAdd":
+				if(!!d)
+				{
+					handleAddOrderList(d);
 				}
 				break;
 		}
