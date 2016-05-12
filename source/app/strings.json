@@ -1,0 +1,33 @@
+[
+  {
+  	"en": "Mark as Free",
+  	"de": "Als frei markieren"
+  }, {
+  	"en": "Add Order",
+  	"de": "Bestellung hinzufügen"
+  }, {
+  	"en": "Order",
+  	"de": "Bestellung"
+  }, {
+  	"en": "Extras",
+  	"de": "Extras"
+  }, {
+  	"en": "Add to Orders",
+  	"de": "Zu Bestellungen hinzufügen"
+  }, {
+  	"en": "Authentication",
+  	"de": "Authentifizierung"
+  }, {
+  	"en": "Username",
+  	"de": "Benutzername"
+  }, {
+  	"en": "Password",
+  	"de": "Passwort"
+  }, {
+  	"en": "Accessibility",
+  	"de": "Bedienungshilfen"
+  }, {
+  	"en": "Toggle Left-Handed Mode",
+  	"de": "Linkshänder-Modus umschalten"
+  }
+]
