@@ -12,6 +12,10 @@ body {
 
 body {
   font: 13px -webkit-system-font, -apple-system, sans-serif;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 
 /* ========== */
@@ -30,7 +34,7 @@ body {
 }
 
 .app-header h1 {
-  font: 15px sans-serif;
+  font: 700 21px/1 Avenir Next, sans-serif;
   text-align: center;
   margin-top: 11px;
 }
@@ -52,13 +56,17 @@ main {
 
 .view {
   padding: 12px;
+  -webkit-transform: transformZ(0);
+          transform: transformZ(0);
 }
 
 .inactive {
-  opacity: 0.5;
-  background-color: rgba(0, 0, 0, 0.3);
-  transform: transformY(20px);
-  transition: opacity 300ms ease-out, transform 300ms ease-out, background-color 300ms ease-out;
+  -webkit-transform: transformY(20px) transformZ(0);
+          transform: transformY(20px) transformZ(0);
+  -webkit-transition: background-color 300ms ease-out, -webkit-transform 300ms ease-out;
+  transition: background-color 300ms ease-out, -webkit-transform 300ms ease-out;
+  transition: transform 300ms ease-out, background-color 300ms ease-out;
+  transition: transform 300ms ease-out, background-color 300ms ease-out, -webkit-transform 300ms ease-out;
 }
 
 .empty {
@@ -80,6 +88,7 @@ main {
   text-align: right;
   width: 100vw;
   padding: 8px;
+  background: -webkit-linear-gradient(bottom, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
   background: linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
   bottom: 50px; /* .app-footer height */
   left: 0;
@@ -123,6 +132,7 @@ legend {
   background-color: #555;
   border: none;
   border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
 }
 
@@ -173,15 +183,18 @@ input[type=search]:focus {
   overflow-x: scroll;
   padding-bottom: 0.2em;
   margin-bottom: 1em;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 
 .suggestions-list li {
   display: inline-block;
   line-height: 1;
-  color: #fff;
+  color: #111;
   padding: 0.5em 0.7em;
-  background-color: #0A60FE;
+  background-color: #ddd;
   border-radius: 5px;
   margin-right: 0.2em;
 }
@@ -206,8 +219,15 @@ input[type=search]:focus {
   border: 1px solid #e4e4e4;
   border-radius: 3px;
   float: left;
-  margin: 1.666666666%;
+  margin-right: 5%;
+  margin-bottom: 5%;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 2px 15px rgba(0, 0, 0, 0.05);
+  -webkit-transform: translateZ(0);
+          transform: translateZ(0);
+}
+
+.table:nth-child(3n) {
+  margin-right: 0;
 }
 
 .table::after {
@@ -233,7 +253,8 @@ input[type=search]:focus {
   white-space: nowrap;
   text-overflow: ellipsis;
   width: 100%;
-  transform: translateY(-50%) rotate(45deg);
+  -webkit-transform: translateY(-50%) rotate(45deg);
+          transform: translateY(-50%) rotate(45deg);
   overflow: hidden;
   top: 50%;
 }
@@ -255,12 +276,22 @@ input[type=search]:focus {
 }
 
 .app-footer ul {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
   height: 42px;
-  justify-content: center;
-  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
   list-style: none;
-  touch-action: none;
+  -ms-touch-action: none;
+      touch-action: none;
 }
 
 .app-footer li {
