@@ -150,7 +150,7 @@ Done.getExtras(function (action, type, extras) {
 // = Settings =
 // ============
 
-document.getElementById('toggle-left-handed-mode-button').addEventListener('click', function () {
+vc.buttons.toggleLHM.addEventListener('click', function () {
   vc.inLeftHandedMode = !vc.inLeftHandedMode
   
   localStorage.setItem('left-handed-mode', vc.inLeftHandedMode ? '1' : '0')
