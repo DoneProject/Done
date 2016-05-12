@@ -29,16 +29,15 @@ body {
   z-index: 100;
 }
 
-.ios .app-header {
-  background-color: rgba(250, 250, 250, 0.7);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-}
-
 .app-header h1 {
   font: 15px sans-serif;
   text-align: center;
   margin-top: 11px;
+}
+
+#done-logo {
+  height: 17px;
+  margin-top: 1px;
 }
 
 /* ========= */
@@ -90,31 +89,40 @@ main {
   text-align: left;
 }
 
+.lhmf {
+  direction: rtl;
+}
+
+.left-handed-mode .lhmf {
+  direction: ltr;
+}
+
 /* ====== */
 /* = UI = */
 /* ====== */
 
 fieldset {
-  padding: 12px;
-  border: 1px solid #e4e4e4;
-  background-color: rgba(0, 0, 0, 0.01);
+  padding: 1em 12px;
+  border: none;
   margin-bottom: 1.5em;
 }
 
 legend {
   font: inherit;
-  padding-right: 3px;
-  padding-left: 3px;
+  font-weight: 700;
+  paddign-bottom: 1px;
+  border-bottom: 1px solid #333;
+  margin-left: 8px;
 }
 
 .button {
   -webkit-appearance: none;
   font-size: 13px;
   color: #fff;
-  padding: 8px 13px;
-  background-color: #0A60FE;
+  padding: 7px 12px;
+  background-color: #555;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
 }
 
@@ -133,6 +141,10 @@ label {
 
 input + label {
   margin-top: 1em;
+}
+
+input + .button {
+  margin-top: 0.25em;
 }
 
 input[type=text],
@@ -161,6 +173,7 @@ input[type=search]:focus {
   overflow-x: scroll;
   padding-bottom: 0.2em;
   margin-bottom: 1em;
+  user-select: none;
 }
 
 .suggestions-list li {
@@ -233,7 +246,7 @@ input[type=search]:focus {
   position: fixed;
   font-size: 0.85em;
   width: 100%;
-  height: 50px;
+  height: 42px;
   background-color: #fafafa;
   border-top: 0.8px solid #ddd;
   bottom: 0;
@@ -241,15 +254,9 @@ input[type=search]:focus {
   z-index: 100;
 }
 
-.ios .app-footer {
-  background-color: rgba(250, 250, 250, 0.7);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-}
-
 .app-footer ul {
   display: flex;
-  height: 50px;
+  height: 42px;
   justify-content: center;
   align-items: center;
   list-style: none;
@@ -271,7 +278,7 @@ input[type=search]:focus {
   color: #fff;
   padding: 1px 5px;
   border-radius: 1em;
-  background-color: #d00;
+  background-color: #ed3131;
   pointer-events: none;
   top: 0;
   right: 0;
@@ -279,7 +286,7 @@ input[type=search]:focus {
 
 .app-footer a {
   display: block;
-  color: #444;
+  color: #222;
   text-decoration: none;
 }
 
@@ -298,23 +305,15 @@ input[type=search]:focus {
 }
 
 .app-footer svg * {
-  fill: #555;
-  stroke: #555;
-}
-
-.app-footer a span {
-  display: block;
-  text-align: center;
-  margin-right: auto;
-  margin-bottom: 3px;
-  margin-left: auto;
+  fill: #777;
+  stroke: #777;
 }
 
 .app-footer .active svg * {
-  fill: #0A60FE;
-  stroke: #0A60FE;
+  fill: #222;
+  stroke: #222;
 }
 
 .app-footer .active a {
-  color: #0A60FE;
+  color: #111;
 }
