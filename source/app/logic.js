@@ -27,7 +27,9 @@ var refreshTableHTML = function (action, type, data) {
       vc.activeTable = new Table(x.id, x.name, x.pending, x.isFree, x.isPayed, x.isWaiting, x.nr)
       vc.openTabById('view-table', true)
       
-      if (vc.activeTable.pending.length > 0) {
+      console.log(vc.activeTable)
+      
+      if (vc.activeTable.isFree) {
         vc.buttons.markAsFree.setAttribute('hidden', 'hidden')
       } else {
         vc.buttons.markAsFree.removeAttribute('hidden')
@@ -45,6 +47,7 @@ Done.getTables(refreshTableHTML)
 // mark tables as free
 vc.buttons.markAsFree.addEventListener('click', function () {
   Done.markFreeById(vc.activeTable.id, refreshTableHTML)
+  vc.buttons.markAsFree.setAttribute('hidden', 'hidden')
 })
 
 // ===================
@@ -131,7 +134,7 @@ Done.getOrderable(function (action, type, orders) {
 Done.getExtras(function (action, type, extras) {
   updateSuggestions(vc.inputs.extras, vc.suggestions.extras, extras, function (input, suggestion) {
     // [ +Foo       ] -> [ +Foo, +Baz ]
-    var value = input.value.replace(/[^,]*$/, ' ')
+    var value = input.value.replace(/[^,]*$/, ' ').replace(/^\s*/, '')
     var action = (function() {
       var foo = /([+-])[^,]*$/.exec(input.value)
       
@@ -144,6 +147,24 @@ Done.getExtras(function (action, type, extras) {
     
     input.value = value + action + suggestion.dataset.value + ', '
   })
+})
+
+// ===================
+// = Order Something =
+// ===================
+
+vc.buttons.addToOrders.addEventListener('click', function () {
+  var package = {}
+  var order = vc.inputs.order.value
+  var extras = vc.inputs.extras.value.split(',').map(function (x) {
+    return x.replace(/^\s*(.*?)\s*$/, '$1')
+  }).filter(function (x) {
+    return x !== ''
+  })
+  
+  console.log(order, extras)
+  
+  vc.openTabById('view-table')
 })
 
 // ============
