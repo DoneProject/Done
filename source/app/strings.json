@@ -24,6 +24,9 @@
   	"en": "Password",
   	"de": "Passwort"
   }, {
+    "en": "Authenticate",
+    "de": "Authentisieren"
+  }, {
   	"en": "Accessibility",
   	"de": "Bedienungshilfen"
   }, {
