@@ -126,4 +126,4 @@ var Done = (function(baseSocketURL) {
   
   return new Done(baseSocketURL)
   
-}('ws://'+/*location.hostname*/'mbp.local'+':8181'))
+}('ws://'+location.hostname/*'mbp.local'*/+':8181'))
