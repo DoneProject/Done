@@ -121,7 +121,8 @@ fieldset {
 legend {
   font: inherit;
   font-weight: 700;
-  paddign-bottom: 1px;
+  line-height: 1.8;
+  width: 100%;
   border-bottom: 1px solid #333;
   margin-left: 8px;
 }
