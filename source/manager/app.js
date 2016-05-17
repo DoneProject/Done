@@ -9,6 +9,7 @@ var os = require("os");
 var opener = require("opener");
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({ port: 8181 });
+var password = "";
 
 wss.on('connection', function connection(ws)
 	   {
@@ -253,14 +254,66 @@ function getStats()
 	}
 }
 
+function delOrderlist(id){
+	var tb = null;
+	
+	var forder = null;
+	tables.find((t)=>{
+		var p = t.pending;
+		var found = false;
+		var pi = p.findIndex((ol)=>{
+			return ol.id==id;
+		});
+		if(pi!==-1)
+		{
+			tb = t;
+			t.pending.splice(pi,1);
+			return true;
+		}
+		return false;
+	});
+	checkTables(tables);
+	wsaction.tableChange(tables);
+	wsaction.tableUpdate(tb.id);
+}
+function doneOrderlist(id){
+	var tb = null;
+	tables.find((t)=>{
+		var p = t.pending;
+		var found = false;
+		var pi = p.findIndex((ol)=>{
+			return ol.id==id;
+		});
+		if(pi!==-1)
+		{
+			tb=t;
+			var oli = t.pending.splice(pi,1)[0];
+			concluded.push(oli);
+			var sum = 0;
+			oli.orders.forEach((a)=>{
+				sum+=a.price;
+				(a.extras||a.extra).forEach((a)=>{
+					sum+=a.price;
+				});
+			});
+			earned+=sum;
+			return true;
+		}
+		return false;
+	});
+
+	checkTables(tables);
+	wsaction.statsUpdate();
+	wsaction.tableChange(tables);
+	wsaction.tableUpdate(tb.id);
+}
+
 function broadcast(msg)
 {
-	console.log("NUMBER OF CLIENTS: "+ws_array.length);
 	for(var i = ws_array.length; --i>=0;)
 	{
 		if(ws_array[i].readyState==ws_array[i].OPEN)
 		{
-			console.log("SEND TO CLIENT "+i);
 			try{
 				ws_array[i].send(msg);
 			}catch(e){}
@@ -302,7 +355,14 @@ function checkTables(tbl)
 	return tbl.map(function(t){
 		if(t.pending.length > 0){
 			t.isFree=false;
+			t.isPayed=false;
 			t.isWaiting=true;
+		}
+		else
+		{
+			t.isWaiting=false;
+			t.isPayed=true;
+			t.isFree=false;
 		}
 		return t;
 	});
@@ -358,9 +418,46 @@ function handleAddOrderList(data)
 	}
 }
 
+function checkHash(ws,hash)
+{
+	console.log("CHECK HASH");
+	var i = users.findIndex(u=>{
+		return hash==sha1(u.username+"::"+password);
+	});
+	console.log(`AUTHENTICATION INDEX ${i}`);
+	ws.send(""+(i!=-1));
+}
+
 function messageRecived(ws,message)
 {
-	var j = JSON.parse(message);
+	try{
+		var j = JSON.parse(message);
+	}catch(e)
+	{
+		console.log(w);
+		checkHash(ws,message);
+		return;
+	}
+	if("DoneAuth" in j)
+	{
+		console.log("PASS AND AUTH",j.DoneAuth,password);
+		var i = users.findIndex(u=>{
+			console.log(u.username,sha1(u.username+"::"+password));
+			return j.DoneAuth==sha1(u.username+"::"+password);
+		});
+		console.log(`AUTHENTICATION INDEX ${i}`);
+		if(i==-1)
+		{
+			sendEventTo(ws,"authenticationError");
+			return;
+		}
+	}
+	else if(password.length > 0)
+	{
+		sendEventTo(ws,"authenticationError");
+		return;
+	}
+
 	if("get" in j)
 	{
 		switch(j.get)
@@ -471,6 +568,12 @@ function messageRecived(ws,message)
 				{
 					handleAddOrderList(d);
 				}
+				break;
+			case "delOrderlist":
+				if(!!d)delOrderlist(d);
+				break;
+			case "doneOrderlist":
+				if(!!d)doneOrderlist(d);
 				break;
 		}
 	}
@@ -779,7 +882,7 @@ var api_handlers = {
 		postHandle(req,function(o){
 			if(o.password.length<=1 || o.password==undefined)
 			{
-				password=false;
+				password="";
 			}
 			else
 			{

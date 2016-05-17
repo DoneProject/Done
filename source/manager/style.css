@@ -1296,6 +1296,10 @@ ol.t_ele.orderlist li
   display: -o-flex;
   display: flex;
 }
+ol.t_ele.orderlist li[data-done="true"]
+{
+	background-color: #d6ffec;
+}
 ol.t_ele.orderlist li:first-of-type
 {
   border-top: none;
@@ -1336,11 +1340,11 @@ ol.t_ele.orderlist li .right
   -ms-flex-wrap: wrap;
   -o-flex-wrap: wrap;
   flex-wrap: wrap;
-  -webkit-flex-direction: column;
-  -moz-flex-direction: column;
-  -ms-flex-direction: column;
-  -o-flex-direction: column;
-  flex-direction: column;
+  -webkit-flex-direction: row;
+  -moz-flex-direction: row;
+  -ms-flex-direction: row;
+  -o-flex-direction: row;
+  flex-direction: row;
   -webkit-justify-content: center;
   -moz-justify-content: center;
   -ms-justify-content: center;
@@ -1429,9 +1433,11 @@ li.t_ele.toporder span.toporder_right
 
 li.t_ele.toporder span.toporder_right button
 {
-  height: auto;
+  height: 22px;
   padding-top: 3px;
   padding-bottom: 3px;
+	min-width: 30px;
+	font-weight: bold;
 }
 
 li.t_ele.toporder span.toporder_right button.hl
@@ -1439,5 +1445,11 @@ li.t_ele.toporder span.toporder_right button.hl
   background-color: #0a60fe;
   color: #fff;
   border: none;
+}
+li.t_ele.toporder span.toporder_right button.normal
+{
+	background-color: #ff416d;
+	color: #fff;
+	border: none;
 }
 

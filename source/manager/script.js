@@ -583,11 +583,27 @@ function loadModule()
 	{
 		var tbls = root.querySelectorAll(".table[data-id]");
 		Array.from(tbls).forEach(function(a){
-			a.addEventListener("click",function(event){
+			a.addEventListener("click",function nm(event,quick){
+				ehandlers.updateTablePopup = function(data){
+					if(data.id==a.getAttribute("data-id"))
+					{
+						nm(data,true);
+					}
+				}
+				
+				
 				var id = a.getAttribute("data-id");
 				var t = document.createElement("div");
 				t.setAttribute("data-table",id);
 				t.innerHTML="<div class=\"left top_button auto\" data-action=\"close\"><span class=\"c\" data-translation=\"close\">Close</span></div>";
+				var b = t.querySelector(".top_button.left");
+				
+				if(quick)
+				{
+					a = root.querySelector(".table[data-id=\""+id+"\"]");
+				}
+				if(!!b)b.addEventListener("click",function(){activePopup.hide()});
+
 				var d = tabledata[id];
 				var pending = d.pending;
 				var content = document.createElement("div");
@@ -605,19 +621,20 @@ function loadModule()
 				{
 					return price(order.price)+"€";
 				};
-				
+
 				if(pending.length==0)
 				{
-					t.innerHTML+="<div class=\"info\">"+activeLanguage.nopending+"</div>";
+					
+					t.insertAdjacentHTML("beforeEnd","<div class=\"info\">"+activeLanguage.nopending+"</div>");
 					if(a.className.search(/(leaving|paying|payed)/i)!==-1)
 					{
 						var actions = document.createElement("div");
 						actions.className="info_actions";
-						
+
 						var btn = document.createElement("button");
 						btn.className="main";
 						btn.innerHTML="Mark as Free";
-						btn.setAttribute("data-action","close")
+						btn.setAttribute("data-action","close");
 						btn.addEventListener("click",function(){
 							var id = a.getAttribute("data-id");
 							ws.send(JSON.stringify({
@@ -625,12 +642,12 @@ function loadModule()
 								data:id
 							}));
 						});
-						
-						
+
+
 						var btn2 = document.createElement("button");
 						btn2.innerHTML=activeLanguage.close;
-						btn2.setAttribute("data-action","close")
-						
+						btn2.setAttribute("data-action","close");
+
 
 						actions.appendChild(btn2);
 						actions.appendChild(btn);
@@ -640,33 +657,86 @@ function loadModule()
 				else
 				{
 					pending.forEach(function(d){
-					var ol = document.createElement("ol");
-					ol.className="t_ele orderlist";
+						var ol = document.createElement("ol");
+						ol.className="t_ele orderlist";
 
-					var top = document.createElement("li");
-					top.className="t_ele toporder";
-					top.innerHTML="<span class=\"t_ele toporder_left\">"+activeLanguage.order+"</span><span class=\"t_ele toporder_right\"><button class=\"hl\">&#10003;</button></span>";
-					ol.appendChild(top);
+						var top = document.createElement("li");
+						top.className="t_ele toporder";
+						top.innerHTML="<span class=\"t_ele toporder_left\">"+activeLanguage.order+"</span><span class=\"t_ele toporder_right\"><button class=\"normal\">&#10007;</button><button class=\"hl\">&#10003;</button></span>";
 
-					var o  = d.orders;
-					o.forEach(function(oi){
-						var li = document.createElement("li");
-						li.className="t_ele order";
-						li.setAttribute("data-id",oi.id);
-						li.innerHTML="<div class=\"left\"><div class=\"top\"><span class=\"name\">"+(oi.name)+"</span><span class=\"price\">"+calcPrice(oi)+"</span></div><div class=\"bottom\">"+extraString(oi)+"</div></div><div class=\"right\"><i class=\"icon done\" style=\"color:#1ab71a\"></i><i class=\"icon delete\"></i></div>";
-						ol.appendChild(li);
-					})
-					t.appendChild(ol);
-				});
+						var t_del = top.querySelector(".t_ele .normal");
+
+						var t_done = top.querySelector(".t_ele .hl");
+
+						t_del.addEventListener("click",function(){
+							ws.send(JSON.stringify({
+								"post":"delOrderlist",
+								"data":d.id
+							}));
+						});
+
+						t_done.addEventListener("click",function(){
+							ws.send(JSON.stringify({
+								"post":"doneOrderlist",
+								"data":d.id
+							}));
+						});
+
+						ol.appendChild(top);
+
+						var o  = d.orders;
+						o.forEach(function(oi){
+							var li = document.createElement("li");
+							li.className="t_ele order";
+							li.setAttribute("data-id",oi.id);
+							li.innerHTML="<div class=\"left\"><div class=\"top\"><span class=\"name\">"+(oi.name)+"</span><span class=\"price\">"+calcPrice(oi)+"</span></div><div class=\"bottom\">"+extraString(oi)+"</div></div><div class=\"right\"><i class=\"icon done\" style=\"color:#1ab71a\"></i><i class=\"icon delete\"></i></div>";
+
+							var dl_btn = li.querySelector(".icon.delete");
+							dl_btn.addEventListener("click",function(){
+								li.remove();
+							});
+
+							var dn_btn = li.querySelector(".icon.done");
+							dn_btn.addEventListener("click",function(){
+								if(li.hasAttribute("data-done") && li.getAttribute("data-done")=="true")
+								{
+									li.setAttribute("data-done","false");
+								}
+								else
+								{
+									li.setAttribute("data-done","true");
+								}
+							});
+
+							ol.appendChild(li);
+						})
+						t.appendChild(ol);
+					});
 				}
 
-				createPopup("<span class=\"stat_bullet "+a.className+"\"></span>"+a.querySelector(".label").innerHTML,t).show();
+				if(quick)
+				{
+					var p = document.querySelector(".popup_backdrop .popup_main");
+					var pt = document.querySelector(".popup_backdrop .popup_title");
+					p.innerHTML="";
+					p.appendChild(t);
+
+					a = root.querySelector(".table[data-id=\""+a.getAttribute("data-id")+"\"]");
+					pt.innerHTML="<span class=\"stat_bullet "+a.className+"\"></span>"+a.querySelector(".label").innerHTML;
+
+					Translation.applyTo(p);
+				}
+				else
+				{
+					createPopup("<span class=\"stat_bullet "+a.className+"\"></span>"+a.querySelector(".label").innerHTML,t).show();
+				}
 			});
 		});
 	};
 
 	ehandlers.updateTablecount2=function(aObj)
 	{
+		console.log("updateTable2",aObj);
 		var ts = aObj.tables, t="";
 		if(ts.length==0)
 		{
@@ -675,7 +745,6 @@ function loadModule()
 		}
 		for(var i = 0; i < ts.length; i++)
 		{
-			//ts[i].pending.length > 0 ? "occupied" : "free"
 			t+="<div class=\"table "+(ts[i].isFree ? "free" : ts[i].isWaiting ? "occupied" : "leaving")+"\" data-id=\""+ts[i].id+"\"><span class=\"label\">"+ts[i].name+"</span></div>";
 			tabledata[ts[i].id]=ts[i];
 		}
@@ -684,30 +753,17 @@ function loadModule()
 		try{
 			Translation.applyTo(eles.tables);
 		}catch(e){}
+		rz.trigger();
 	}
-	
+
 	ehandlers.tableUpdate=function(data)
 	{
-		var t = eles.tables.querySelector(".table[data-id=\""+data.id+"\"]");
-		if(!!t)
-		{
-			if(data.isFree)
-			{
-				t.className="table free";
-			}
-			else if(data.isPayed)
-			{
-				t.className="table leaving";
-			}
-			else if(data.isWaiting)
-			{
-				t.className="table occupied";
-			}
-			else
-			{
-				t.className="table";
-			}
-		}
+		try{ehandlers.updateTablePopup(data);}catch(e){}
+	};
+
+	ehandlers.tableChange=function(data)
+	{
+		ehandlers.updateTablecount2(data);
 	};
 
 	ws.send('{"get":"stats"}');
@@ -1356,7 +1412,7 @@ function createPopup(title,element)
 			},(!!tm && isFinite(tm)) || 0);
 			return o;
 		},
-		hide:function()
+		hide:function(tm)
 		{
 			setTimeout(function(){
 				o.visible=false;
@@ -1715,25 +1771,25 @@ function debugOrder()
 {
 	ws.send(JSON.stringify(
 		{
-		post:"orderListAdd",
-		data:{
-			table:"1",
-			order:[
-				{
-					name:"Pizza margherita",
-					extra:[
-						{
-							name:"funghi",
-							action:"+"
-						},
-						{
-							name:"prosciutto",
-							action:"+"
-						}
-					]
-				}
-			]
+			post:"orderListAdd",
+			data:{
+				table:"1",
+				order:[
+					{
+						name:"Pizza margherita",
+						extra:[
+							{
+								name:"funghi",
+								action:"+"
+							},
+							{
+								name:"prosciutto",
+								action:"+"
+							}
+						]
+					}
+				]
+			}
 		}
-	}
 	));
 }
