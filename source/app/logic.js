@@ -27,8 +27,6 @@ var refreshTableHTML = function (action, type, data) {
       vc.activeTable = new Table(x.id, x.name, x.pending, x.isFree, x.isPayed, x.isWaiting, x.nr)
       vc.openTabById('view-table', true)
       
-      console.log(vc.activeTable)
-      
       if (vc.activeTable.isFree) {
         vc.buttons.markAsFree.setAttribute('hidden', 'hidden')
       } else {
@@ -160,9 +158,17 @@ vc.buttons.addToOrders.addEventListener('click', function () {
     return x.replace(/^\s*(.*?)\s*$/, '$1')
   }).filter(function (x) {
     return x !== ''
+  }).filter(function (x) {
+    return /^([+-])(.+)$/.test(x)
+  }).map(function (x) {
+    var parts = /^([+-])(.+)$/.exec(x)
+    return { action: parts[1], name: parts[2] }
   })
   
-  console.log(order, extras)
+  Done.postOrder(vc.activeTable.id, [{
+    name: order,
+    extras: extras
+  }])
   
   vc.openTabById('view-table')
 })
