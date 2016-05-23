@@ -660,6 +660,7 @@ ul.list.setting li .tar
   border-top: none;
   border-right: none;
   padding: 5px 10px;
+	text-align: center;
 }
 .pops[data-action="run"] .top .f:first-child, .pops[data-action="run"] .bottom .f:first-child
 {
@@ -695,6 +696,7 @@ ul.list.setting li .tar
   flex: 1px 1 1;
   overflow: auto;
   overflow-x: hidden;
+	text-align: left;
 }
 
 .pops[data-action="run"] .tables .table
