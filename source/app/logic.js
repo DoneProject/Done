@@ -10,7 +10,7 @@ var refreshTableHTML = function (action, type, data) {
     var contents = document.createElement('div')
     
     // create table object
-    element.id = `table-${x.id}`
+    element.id = 'table-' + x.id
     element.dataset.id = x.id
     element.classList.add('table')
     contents.classList.add('table-contents')

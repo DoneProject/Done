@@ -26,7 +26,7 @@ function Extra(id, name, price, action) {
 function Table(id, name, pending, isFree, isPayed, isWaiting, nr) {
   this.id = id || -1
   this.nr = nr
-  this.name = name || `<span data-translation="tableName">Tavolo</span> ${id}`
+  this.name = name || '<span data-translation="tableName">Tavolo</span> ' + id
   this.pending = pending || []
   this.isFree = isFree
   this.isPayed = isPayed

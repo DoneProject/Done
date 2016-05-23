@@ -38,7 +38,7 @@ var Done = (function(baseSocketURL) {
     
     self.auth = function (username, password) {
       // generate access token
-      var accessToken = Crypto.sha1(`${username}::${password}`)
+      var accessToken = Crypto.sha1(username + '::' + password)
       
       // set access token
       self.accessToken = accessToken
