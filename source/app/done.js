@@ -43,9 +43,6 @@ var Done = (function(baseSocketURL) {
       // set access token
       self.accessToken = accessToken
       localStorage.setItem('auth', accessToken)
-      
-      // remove notification
-      document.getElementById('nav-view-settings').removeAttribute('data-notification')
     }
     
     // ==========
@@ -57,6 +54,7 @@ var Done = (function(baseSocketURL) {
     var trySend = function (string) {
       // try sending the message and retry if failed
       try {
+        console.log('SENDING', string)
         self.connection.send(string)
       } catch (variable) {
         setTimeout(function () { trySend(string) }, 100)
@@ -79,9 +77,7 @@ var Done = (function(baseSocketURL) {
       trySend(JSON.stringify(object))
     }
     
-    self.connection.onmessage = function (event) {
-      // handle events
-      var rawEvent = JSON.parse(event.data)
+    function sendMessage(rawEvent) {
       var action = rawEvent.action
       var type = rawEvent.event
       var data = rawEvent.data
@@ -93,6 +89,46 @@ var Done = (function(baseSocketURL) {
             f(action, type, data)
           }
         })
+      }
+    }
+    
+    var pendingRawEvents = []
+    
+    function flushRequests() {
+      pendingRawEvents.forEach(function (x) {
+        sendMessage(x)
+      })
+      
+      pendingRawEvents = []
+    }
+    
+    function tryFlush() {
+      var token = self.accessToken === null ? '' : self.accessToken
+      self.connection.send(self.accessToken)
+    }
+    
+    self.connection.onmessage = function (event) {
+      try {
+        // handle events
+        var rawEvent = JSON.parse(event.data)
+      } catch (error) {
+        if (event.data === 'true') {
+          flushRequests()
+        } else {
+          setTimeout(function () {
+            tryFlush()
+          }, 150)
+        }
+        return
+      }
+      
+      if (rawEvent.event === 'authenticationError') {
+        pendingRawEvents.push(rawEvent)
+        tryFlush()
+        
+        document.getElementById('nav-view-settings').dataset.notification = '1'
+      } else {
+        sendMessage(rawEvent)
       }
     }
     
@@ -109,6 +145,7 @@ var Done = (function(baseSocketURL) {
     self.postExtras    = function (data, type, callback) { return self.post('extras', data, type, callback) }
     self.postQueue     = function (data, type, callback) { return self.post('queue', data, type, callback) }
     self.markFreeById  = function (id, callback) { return self.post('markFree', id, 'tableChange', callback) }
+    self.postOrder     = function (tableId, order) { return self.post('orderListAdd', { table: tableId, order: order }, '') }
     
     // =======
     // = GET =
