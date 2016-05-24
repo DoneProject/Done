@@ -82,7 +82,7 @@ main {
 /* View Footer */
 
 .view.has-footer {
-  margin-bottom: 35px;
+  margin-bottom: 42px;
 }
 
 .view-footer {
@@ -90,9 +90,10 @@ main {
   text-align: right;
   width: 100vw;
   padding: 8px;
+  padding.top: 12px;
   background: -webkit-linear-gradient(bottom, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
   background: linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
-  bottom: 50px; /* .app-footer height */
+  bottom: 42px; /* .app-footer height */
   left: 0;
 }
 
@@ -350,4 +351,39 @@ input[type=search]:focus {
 
 .app-footer .active a {
   color: #111;
+}
+
+/* =============== */
+/* = Order Lists = */
+/* =============== */
+
+.order-item {
+  position: relative;
+  list-style: none;
+}
+
+.order-item + .order-item {
+  padding-top: 0.5em;
+  border-top: 1px solid #ddd;
+  margin-top: 0.5em;
+}
+
+.order-extras {
+  color: #999;
+  margin-top: 0.2em;
+}
+
+.delete-button {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMTYgMTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxwYXRoIGQ9Ik0wLjUsMC41bDE1LDE1IiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlPSIjZjAwIi8+PHBhdGggZD0iTTE1LjUsMC41bC0xNSwxNSIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZT0iI2YwMCIvPjwvc3ZnPg==) center center / 12px 12px no-repeat;
+  border: 1px solid #f00;
+  border-radius: 50%;
+  top: 5px;
+  right: 0;
+}
+
+.delete-button:active {
+  background-color: #fdd;
 }
