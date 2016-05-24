@@ -54,7 +54,6 @@ var Done = (function(baseSocketURL) {
     var trySend = function (string) {
       // try sending the message and retry if failed
       try {
-        console.log('SENDING', string)
         self.connection.send(string)
       } catch (variable) {
         setTimeout(function () { trySend(string) }, 100)
@@ -144,8 +143,9 @@ var Done = (function(baseSocketURL) {
     self.postOrderable = function (data, type, callback) { return self.post('orderable', data, type, callback) }
     self.postExtras    = function (data, type, callback) { return self.post('extras', data, type, callback) }
     self.postQueue     = function (data, type, callback) { return self.post('queue', data, type, callback) }
-    self.markFreeById  = function (id, callback) { return self.post('markFree', id, 'tableChange', callback) }
-    self.postOrder     = function (tableId, order) { return self.post('orderListAdd', { table: tableId, order: order }, '') }
+    self.markFreeById  = function (id, callback)         { return self.post('markFree', id, 'tableChange', callback) }
+    self.postOrder     = function (tableId, order)       { return self.post('orderListAdd', { table: tableId, order: order }) }
+    self.deleteOrder   = function (orderlistId)          { return self.post('delOrderlist', orderlistId ) }
     
     // =======
     // = GET =
@@ -155,6 +155,7 @@ var Done = (function(baseSocketURL) {
       self.send({ get: message }, type, callback)
     }
     
+    self.changeTable  = function (callback) { return self.get('tables', 'tableChange', callback) }
     self.getTables    = function (callback) { return self.get('tables', 'updateTablecount', callback) }
     self.getOrderable = function (callback) { return self.get('orderable', 'changeOrderable', callback) }
     self.getExtras    = function (callback) { return self.get('extras', 'changeExtra', callback) }
@@ -163,4 +164,4 @@ var Done = (function(baseSocketURL) {
   
   return new Done(baseSocketURL)
   
-}('ws://'+location.hostname/*'mbp.local'*/+':8181'))
+}('ws://'+/*location.hostname*/'flexlex-mbp.local'+':8181'))
