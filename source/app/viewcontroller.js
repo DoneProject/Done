@@ -17,6 +17,9 @@ var vc = (function() {
     markAsFree: document.getElementById('mark-as-free-button'),
     toggleLHM: document.getElementById('toggle-left-handed-mode-button')
   }
+  self.forms = {
+    addOrder: document.getElementById('add-order-form')
+  }
   self.inputs = {
     order: document.getElementById('order'),
     extras: document.getElementById('extras'),
