@@ -2,10 +2,33 @@
 // = Tables =
 // ==========
 
-var refreshTableHTML = function (action, type, data) {
-  vc.view.innerHTML = ''
+var listOrders = function (orders, id) {
+  orders.forEach(function (x) {
+    var item = document.createElement('li')
+    
+    item.className = 'order-item'
+    item.dataset.orderId = id
+    
+    item.innerHTML  = '<div class="order-name">'+ x.name + '</div>'
+    item.innerHTML += '<div class="order-extras">' + x.extras.map(function (extra) {
+      return extra.action + extra.name
+    }).join(', ') + '</div>'
+    item.innerHTML += '<button class="delete-button" onclick="deleteOrderById(\'' + id + '\')"></button>'
+    
+    vc.activeTableOrders.appendChild(item)
+  })
+}
+
+var refreshTableHTML = function (tables) {
+  if (!tables) { return }
   
-  data.tables.forEach(function (x) {
+  vc.view.innerHTML = ''  
+  
+  tables.forEach(function (x) {
+    if (vc.activeTable && vc.activeTable.id === x.id) {
+      vc.activeTable = x
+    }
+    
     var element  = document.createElement('div')
     var contents = document.createElement('div')
     
@@ -25,7 +48,12 @@ var refreshTableHTML = function (action, type, data) {
     // handle table clicks
     element.addEventListener('click', function () {
       vc.activeTable = new Table(x.id, x.name, x.pending, x.isFree, x.isPayed, x.isWaiting, x.nr)
+      
       vc.openTabById('view-table', true)
+      
+      vc.activeTable.pending.forEach(function (y) {
+        listOrders(y.orders, vc.activeTable.pending[0].id)
+      })
       
       if (vc.activeTable.isFree) {
         vc.buttons.markAsFree.setAttribute('hidden', 'hidden')
@@ -38,9 +66,32 @@ var refreshTableHTML = function (action, type, data) {
     element.appendChild(contents)
     vc.view.appendChild(element)
   })
+  
+  if (vc.activeTable && vc.activeTable.pending.length > 0) {
+    var orders = []
+    
+    vc.activeTable.pending.forEach(function (x) {
+      x.orders.forEach(function (y) {
+        orders.push(y)
+      })
+    })
+    
+    listOrders(orders, vc.activeTable.pending[0].id)
+  }
 }
 
-Done.getTables(refreshTableHTML)
+Done.getTables(function (action, type, data) {
+  refreshTableHTML(data.tables)
+})
+Done.changeTable(function (action, type, data) {
+  vc.activeTableOrders.innerHTML = ''
+  
+  refreshTableHTML(data.tables)
+})
+
+var deleteOrderById = function (id) {
+  Done.deleteOrder(id)
+}
 
 // mark tables as free
 vc.buttons.markAsFree.addEventListener('click', function () {
@@ -151,7 +202,7 @@ Done.getExtras(function (action, type, extras) {
 // = Order Something =
 // ===================
 
-vc.buttons.addToOrders.addEventListener('click', function () {
+var addToOrders = function () {
   var package = {}
   var order = vc.inputs.order.value
   var extras = vc.inputs.extras.value.split(',').map(function (x) {
@@ -171,6 +222,26 @@ vc.buttons.addToOrders.addEventListener('click', function () {
   }])
   
   vc.openTabById('view-table')
+  
+  vc.inputs.order.value = ''
+  vc.inputs.extras.value = ''
+  
+  var suggestionNodes = document.getElementsByClassName('suggestion')
+  var items = []
+  
+  for (var i = suggestionNodes.length - 1; i >= 0; i -= 1) {
+    items.push(suggestionNodes[i])
+  }
+  
+  items.forEach(function (x) {
+    x.removeAttribute('hidden')
+  })
+}
+
+vc.buttons.addToOrders.addEventListener('click', addToOrders)
+vc.forms.addOrder.addEventListener('submit', function (event) {
+  event.preventDefault()
+  addToOrders()
 })
 
 // ============
