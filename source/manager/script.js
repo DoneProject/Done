@@ -68,6 +68,11 @@ function sendEvent(name,element)
 	}
 }
 
+function getToken()
+{
+	return sha1("server::"+password);
+}
+
 function aniprox(dur, fx) {
 	if(!("requestAnimationFrame" in window)){
 		requestAnimationFrame = mozAnimationFrame || oRequestAnimationFrame || webkitRequestAnimationFrame || msRequestAnimationFrame || function(fx){setTimeout(fx,16);}
@@ -583,11 +588,27 @@ function loadModule()
 	{
 		var tbls = root.querySelectorAll(".table[data-id]");
 		Array.from(tbls).forEach(function(a){
-			a.addEventListener("click",function(event){
+			a.addEventListener("click",function nm(event,quick){
+				ehandlers.updateTablePopup = function(data){
+					if(data.id==a.getAttribute("data-id"))
+					{
+						nm(data,true);
+					}
+				}
+				
+				
 				var id = a.getAttribute("data-id");
 				var t = document.createElement("div");
 				t.setAttribute("data-table",id);
 				t.innerHTML="<div class=\"left top_button auto\" data-action=\"close\"><span class=\"c\" data-translation=\"close\">Close</span></div>";
+				var b = t.querySelector(".top_button.left");
+				
+				if(quick)
+				{
+					a = root.querySelector(".table[data-id=\""+id+"\"]");
+				}
+				if(!!b)b.addEventListener("click",function(){activePopup.hide()});
+
 				var d = tabledata[id];
 				var pending = d.pending;
 				var content = document.createElement("div");
@@ -605,32 +626,34 @@ function loadModule()
 				{
 					return price(order.price)+"€";
 				};
-				
+
 				if(pending.length==0)
 				{
-					t.innerHTML+="<div class=\"info\">"+activeLanguage.nopending+"</div>";
+					
+					t.insertAdjacentHTML("beforeEnd","<div class=\"info\">"+activeLanguage.nopending+"</div>");
 					if(a.className.search(/(leaving|paying|payed)/i)!==-1)
 					{
 						var actions = document.createElement("div");
 						actions.className="info_actions";
-						
+
 						var btn = document.createElement("button");
 						btn.className="main";
 						btn.innerHTML="Mark as Free";
-						btn.setAttribute("data-action","close")
+						btn.setAttribute("data-action","close");
 						btn.addEventListener("click",function(){
 							var id = a.getAttribute("data-id");
 							ws.send(JSON.stringify({
 								post:"markFree",
-								data:id
+								data:id,
+								DoneAuth:getToken()
 							}));
 						});
-						
-						
+
+
 						var btn2 = document.createElement("button");
 						btn2.innerHTML=activeLanguage.close;
-						btn2.setAttribute("data-action","close")
-						
+						btn2.setAttribute("data-action","close");
+
 
 						actions.appendChild(btn2);
 						actions.appendChild(btn);
@@ -640,33 +663,88 @@ function loadModule()
 				else
 				{
 					pending.forEach(function(d){
-					var ol = document.createElement("ol");
-					ol.className="t_ele orderlist";
+						var ol = document.createElement("ol");
+						ol.className="t_ele orderlist";
 
-					var top = document.createElement("li");
-					top.className="t_ele toporder";
-					top.innerHTML="<span class=\"t_ele toporder_left\">"+activeLanguage.order+"</span><span class=\"t_ele toporder_right\"><button class=\"hl\">&#10003;</button></span>";
-					ol.appendChild(top);
+						var top = document.createElement("li");
+						top.className="t_ele toporder";
+						top.innerHTML="<span class=\"t_ele toporder_left\">"+activeLanguage.order+"</span><span class=\"t_ele toporder_right\"><button class=\"normal\">&#10007;</button><button class=\"hl\">&#10003;</button></span>";
 
-					var o  = d.orders;
-					o.forEach(function(oi){
-						var li = document.createElement("li");
-						li.className="t_ele order";
-						li.setAttribute("data-id",oi.id);
-						li.innerHTML="<div class=\"left\"><div class=\"top\"><span class=\"name\">"+(oi.name)+"</span><span class=\"price\">"+calcPrice(oi)+"</span></div><div class=\"bottom\">"+extraString(oi)+"</div></div><div class=\"right\"><i class=\"icon done\" style=\"color:#1ab71a\"></i><i class=\"icon delete\"></i></div>";
-						ol.appendChild(li);
-					})
-					t.appendChild(ol);
-				});
+						var t_del = top.querySelector(".t_ele .normal");
+
+						var t_done = top.querySelector(".t_ele .hl");
+
+						t_del.addEventListener("click",function(){
+							ws.send(JSON.stringify({
+								"post":"delOrderlist",
+								"data":d.id,
+								DoneAuth:getToken()
+							}));
+						});
+
+						t_done.addEventListener("click",function(){
+							ws.send(JSON.stringify({
+								"post":"doneOrderlist",
+								"data":d.id,
+								DoneAuth:getToken()
+							}));
+						});
+
+						ol.appendChild(top);
+
+						var o  = d.orders;
+						o.forEach(function(oi){
+							var li = document.createElement("li");
+							li.className="t_ele order";
+							li.setAttribute("data-id",oi.id);
+							li.innerHTML="<div class=\"left\"><div class=\"top\"><span class=\"name\">"+(oi.name)+"</span><span class=\"price\">"+calcPrice(oi)+"</span></div><div class=\"bottom\">"+extraString(oi)+"</div></div><div class=\"right\"><i class=\"icon done\" style=\"color:#1ab71a\"></i><i class=\"icon delete\"></i></div>";
+
+							var dl_btn = li.querySelector(".icon.delete");
+							dl_btn.addEventListener("click",function(){
+								li.remove();
+							});
+
+							var dn_btn = li.querySelector(".icon.done");
+							dn_btn.addEventListener("click",function(){
+								if(li.hasAttribute("data-done") && li.getAttribute("data-done")=="true")
+								{
+									li.setAttribute("data-done","false");
+								}
+								else
+								{
+									li.setAttribute("data-done","true");
+								}
+							});
+
+							ol.appendChild(li);
+						})
+						t.appendChild(ol);
+					});
 				}
 
-				createPopup("<span class=\"stat_bullet "+a.className+"\"></span>"+a.querySelector(".label").innerHTML,t).show();
+				if(quick)
+				{
+					var p = document.querySelector(".popup_backdrop .popup_main");
+					var pt = document.querySelector(".popup_backdrop .popup_title");
+					p.innerHTML="";
+					p.appendChild(t);
+
+					a = root.querySelector(".table[data-id=\""+a.getAttribute("data-id")+"\"]");
+					pt.innerHTML="<span class=\"stat_bullet "+a.className+"\"></span>"+a.querySelector(".label").innerHTML;
+
+					Translation.applyTo(p);
+				}
+				else
+				{
+					createPopup("<span class=\"stat_bullet "+a.className+"\"></span>"+a.querySelector(".label").innerHTML,t).show();
+				}
 			});
 		});
 	};
 
 	ehandlers.updateTablecount2=function(aObj)
 	{
+		console.log("updateTable2",aObj);
 		var ts = aObj.tables, t="";
 		if(ts.length==0)
 		{
@@ -675,7 +753,6 @@ function loadModule()
 		}
 		for(var i = 0; i < ts.length; i++)
 		{
-			//ts[i].pending.length > 0 ? "occupied" : "free"
 			t+="<div class=\"table "+(ts[i].isFree ? "free" : ts[i].isWaiting ? "occupied" : "leaving")+"\" data-id=\""+ts[i].id+"\"><span class=\"label\">"+ts[i].name+"</span></div>";
 			tabledata[ts[i].id]=ts[i];
 		}
@@ -684,34 +761,21 @@ function loadModule()
 		try{
 			Translation.applyTo(eles.tables);
 		}catch(e){}
+		rz.trigger();
 	}
-	
+
 	ehandlers.tableUpdate=function(data)
 	{
-		var t = eles.tables.querySelector(".table[data-id=\""+data.id+"\"]");
-		if(!!t)
-		{
-			if(data.isFree)
-			{
-				t.className="table free";
-			}
-			else if(data.isPayed)
-			{
-				t.className="table leaving";
-			}
-			else if(data.isWaiting)
-			{
-				t.className="table occupied";
-			}
-			else
-			{
-				t.className="table";
-			}
-		}
+		try{ehandlers.updateTablePopup(data);}catch(e){}
 	};
 
-	ws.send('{"get":"stats"}');
-	ws.send('{"get":"tables"}');
+	ehandlers.tableChange=function(data)
+	{
+		ehandlers.updateTablecount2(data);
+	};
+
+	ws.send('{"get":"stats","DoneAuth":"'+getToken()+'"}');
+	ws.send('{"get":"tables","DoneAuth":"'+getToken()+'"}');
 };
 
 rz={};
@@ -1289,10 +1353,10 @@ function getProductsAndExtras()
 {
 	if(ws.readyState==ws.OPEN)
 	{
-		ws.send('{"get":"extras"}');
-		ws.send('{"get":"orderable"}');
-		ws.send('{"get":"tables"}');
-		ws.send('{"get":"users"}');
+		ws.send('{"get":"extras","DoneAuth":"'+getToken()+'"}');
+		ws.send('{"get":"orderable","DoneAuth":"'+getToken()+'"}');
+		ws.send('{"get":"tables","DoneAuth":"'+getToken()+'"}');
+		ws.send('{"get":"users","DoneAuth":"'+getToken()+'"}');
 		return;
 	}
 	setTimeout(getProductsAndExtras,100);
@@ -1356,7 +1420,7 @@ function createPopup(title,element)
 			},(!!tm && isFinite(tm)) || 0);
 			return o;
 		},
-		hide:function()
+		hide:function(tm)
 		{
 			setTimeout(function(){
 				o.visible=false;
@@ -1694,11 +1758,10 @@ function init()
 	});
 	addEventListener("resize",rz.trigger);
 	Translation.applyTo();
-
-	/*setTimeout(function(){
-    createPopup("<span data-translation=\"logs\">Logs</span>",window.popups.logs).show();
-  },0);*/
 }
+
+//Coding
+function sha1(r){var e,o,a,t,c,h,n,f,s,u=function(r,e){var o=r<<e|r>>>32-e;return o},C=function(r){var e,o,a="";for(e=7;e>=0;e--)o=r>>>4*e&15,a+=o.toString(16);return a},d=Array(80),A=1732584193,p=4023233417,i=2562383102,g=271733878,v=3285377520;r=unescape(encodeURIComponent(r));var b=r.length,k=[];for(o=0;b-3>o;o+=4)a=r.charCodeAt(o)<<24|r.charCodeAt(o+1)<<16|r.charCodeAt(o+2)<<8|r.charCodeAt(o+3),k.push(a);switch(b%4){case 0:o=2147483648;break;case 1:o=r.charCodeAt(b-1)<<24|8388608;break;case 2:o=r.charCodeAt(b-2)<<24|r.charCodeAt(b-1)<<16|32768;break;case 3:o=r.charCodeAt(b-3)<<24|r.charCodeAt(b-2)<<16|r.charCodeAt(b-1)<<8|128}for(k.push(o);k.length%16!=14;)k.push(0);for(k.push(b>>>29),k.push(b<<3&4294967295),e=0;e<k.length;e+=16){for(o=0;16>o;o++)d[o]=k[e+o];for(o=16;79>=o;o++)d[o]=u(d[o-3]^d[o-8]^d[o-14]^d[o-16],1);for(t=A,c=p,h=i,n=g,f=v,o=0;19>=o;o++)s=u(t,5)+(c&h|~c&n)+f+d[o]+1518500249&4294967295,f=n,n=h,h=u(c,30),c=t,t=s;for(o=20;39>=o;o++)s=u(t,5)+(c^h^n)+f+d[o]+1859775393&4294967295,f=n,n=h,h=u(c,30),c=t,t=s;for(o=40;59>=o;o++)s=u(t,5)+(c&h|c&n|h&n)+f+d[o]+2400959708&4294967295,f=n,n=h,h=u(c,30),c=t,t=s;for(o=60;79>=o;o++)s=u(t,5)+(c^h^n)+f+d[o]+3395469782&4294967295,f=n,n=h,h=u(c,30),c=t,t=s;A=A+t&4294967295,p=p+c&4294967295,i=i+h&4294967295,g=g+n&4294967295,v=v+f&4294967295}return s=C(A)+C(p)+C(i)+C(g)+C(v),s.toLowerCase()}
 
 //DEBUGGING
 function debugme()
@@ -1715,25 +1778,26 @@ function debugOrder()
 {
 	ws.send(JSON.stringify(
 		{
-		post:"orderListAdd",
-		data:{
-			table:"1",
-			order:[
-				{
-					name:"Pizza margherita",
-					extra:[
-						{
-							name:"funghi",
-							action:"+"
-						},
-						{
-							name:"prosciutto",
-							action:"+"
-						}
-					]
-				}
-			]
+			DoneAuth:getToken(),
+			post:"orderListAdd",
+			data:{
+				table:"1",
+				order:[
+					{
+						name:"Pizza margherita",
+						extra:[
+							{
+								name:"funghi",
+								action:"+"
+							},
+							{
+								name:"prosciutto",
+								action:"+"
+							}
+						]
+					}
+				]
+			}
 		}
-	}
 	));
 }
