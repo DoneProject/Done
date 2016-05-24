@@ -1325,11 +1325,11 @@ ol.t_ele.orderlist li .left
 
 ol.t_ele.orderlist li .right
 {
-  -webkit-flex: 40px 0 0;
-  -moz-flex: 40px 0 0;
-  -ms-flex: 40px 0 0;
-  -o-flex: 40px 0 0;
-  flex: 40px 0 0;
+  -webkit-flex: 60px 0 0;
+  -moz-flex: 60px 0 0;
+  -ms-flex: 60px 0 0;
+  -o-flex: 60px 0 0;
+  flex: 60px 0 0;
   border-left: 1px #ddd solid;
   text-align: center;
   display: -webkit-flex;
@@ -1352,16 +1352,26 @@ ol.t_ele.orderlist li .right
   -ms-justify-content: center;
   -o-justify-content: center;
   justify-content: center;
-  -webkit-align-content: center;
-  -moz-align-content: center;
-  -ms-align-content: center;
-  -o-align-content: center;
-  align-content: center;
+	-webkit-align-content: center;
+	-moz-align-content: center;
+	-ms-align-content: center;
+	-o-align-content: center;
+	align-content: center;
+	-ms-align-items: center;
+	align-items: center;
 }
 
 ol.t_ele.orderlist li .right > *
 {
-  margin: auto;
+  margin: 5px;
+	cursor: pointer;
+}
+
+ol.t_ele.orderlist li .right > *:hover
+{
+	background-color: #eee;
+	-webkit-box-shadow: 0 0 0 5px #eee;
+	box-shadow: 0 0 0 5px #eee;
 }
 
 ol.t_ele.orderlist li .top
@@ -1394,9 +1404,10 @@ ol.t_ele.orderlist li .top span.price
 
 ol.t_ele.orderlist li .bottom
 {
-  border-top: 1px #ddd solid;
+/*  border-top: 1px #eee solid;*/
   padding: 2px;
-  margin-top: 2px;
+	padding-top: 0;
+	color: #aaa;
 }
 ol.t_ele.orderlist li .bottom:empty
 {
@@ -1453,5 +1464,6 @@ li.t_ele.toporder span.toporder_right button.normal
 	background-color: #ff416d;
 	color: #fff;
 	border: none;
+	margin-right: 4px;
 }
 

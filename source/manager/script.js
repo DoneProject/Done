@@ -615,9 +615,9 @@ function loadModule()
 				content.className="table_content";
 
 				var extraString = function(extraArr){
-					extraArr=extraArr.extra;
+					extraArr=extraArr.extras;
 					var t = extraArr.map(function(a){
-						return a.price+a.name+" ("+price(a.price)+")€";
+						return a.action+a.name+" ("+price(a.price)+")€";
 					});
 					return t.join(", ");
 				};
@@ -665,7 +665,6 @@ function loadModule()
 					pending.forEach(function(d){
 						var ol = document.createElement("ol");
 						ol.className="t_ele orderlist";
-
 						var top = document.createElement("li");
 						top.className="t_ele toporder";
 						top.innerHTML="<span class=\"t_ele toporder_left\">"+activeLanguage.order+"</span><span class=\"t_ele toporder_right\"><button class=\"normal\">&#10007;</button><button class=\"hl\">&#10003;</button></span>";

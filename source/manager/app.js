@@ -284,7 +284,9 @@ function delOrderlist(id){
 	});
 	checkTables(tables);
 	wsaction.tableChange(tables);
-	wsaction.tableUpdate(tb.id);
+	if(!!tb && "id" in tb)
+		wsaction.tableUpdate(tb.id);
+	save();
 }
 
 //Order is done
@@ -318,6 +320,7 @@ function doneOrderlist(id){
 	wsaction.statsUpdate();
 	wsaction.tableChange(tables);
 	wsaction.tableUpdate(tb.id);
+	save();
 }
 
 //Send to all connected clients
@@ -337,6 +340,7 @@ function broadcast(msg)
 //Trigger an event on every connected client
 function sendEvent(eventName,data)
 {
+	console.log("SEND EVENT",eventName,data);
 	broadcast(JSON.stringify({
 		"action":"event",
 		"event":eventName,
@@ -346,6 +350,7 @@ function sendEvent(eventName,data)
 
 //Trigger an event on a client
 function sendEventTo(ws,eventName,data){
+	console.log("SEND EVENT TO",eventName,data);
 	ws.send(JSON.stringify({
 		action:"event",
 		"event":eventName,
@@ -508,6 +513,8 @@ function messageRecived(ws,message)
 			case "users":
 				sendEventTo(ws,"usersUpdate",users);
 				break;
+			case "":
+				break;
 			default:
 				ws.send(errorJSON("Wrong action"));
 				break;
@@ -570,6 +577,8 @@ function messageRecived(ws,message)
 						{
 							t.isFree=true;
 							t.isPayed=false;
+							t.isWaiting=false;
+							t.pending=[];
 							wsaction.tableUpdate(d);
 							wsaction.tableChange();
 						}
@@ -1034,17 +1043,17 @@ function hinit()
 		if(o.links.length>0)
 		{
 			console.log("URL: "+("http://"+o.links[0]+":"+o.webPort));
-			opener("http://"+o.links[0]+":"+o.webPort);
+//			opener("http://"+o.links[0]+":"+o.webPort);
 		}
 		else if(o.address.length>0)
 		{
 			console.log("URL: "+("http://"+o.address+":"+o.webPort));
-			opener("http://"+o.address+":"+o.webPort);
+//			opener("http://"+o.address+":"+o.webPort);
 		}
 		else
 		{
 			console.log("URL: "+("http://127.0.0.1:"+o.webPort));
-			opener("http://127.0.0.1:"+o.webPort);
+//			opener("http://127.0.0.1:"+o.webPort);
 		}
 		wsaction.log("Server is ready");
 	});
@@ -1130,7 +1139,7 @@ function importFiles(root){
 			var nu = User.from(u);
 			return nu;
 		});
-	}); 
+	});
 }
 importFiles(tmpdir);
 
