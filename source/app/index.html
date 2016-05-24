@@ -26,7 +26,7 @@
       </section>
       
       <section id="view-add-order" class="view" hidden>
-        <form>
+        <form id="add-order-form">
           <label for="order" data-translation="Order">Order</label>
           <input type="search" id="order">
           <div class="suggestions-list"><ul id="order-suggestions"></ul></div>
@@ -34,6 +34,8 @@
           <label for="extras" data-translation="Extras">Extras</label>
           <input type="search" placeholder="+extra1, -extra2, …" id="extras">
           <div class="suggestions-list"><ul id="extras-suggestions"></ul></div>
+          
+          <input type=submit hidden>
         </form>
         
         <footer class="view-footer">
