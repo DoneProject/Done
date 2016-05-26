@@ -9,7 +9,7 @@ var Done = (function(baseSocketURL) {
     
     self.DONE_AUTH_HEADER = 'DoneAuth'
     self.accessToken = (function() {
-      // check for access token
+      // Check for Access Token
       if (localStorage.getItem('auth')) {
         return localStorage.getItem('auth')
       } else {
@@ -21,7 +21,7 @@ var Done = (function(baseSocketURL) {
     self.connection = new WebSocket(self.baseSocketURL)
     
     var errorHandler = function () {
-      // retry to connect to the ws
+      // Retry to Connect to the WS
       try {
         self.connection = new WebSocket(self.baseSocketURL)
         self.connection.onclose = errorHandler
@@ -37,10 +37,10 @@ var Done = (function(baseSocketURL) {
     // ========
     
     self.auth = function (username, password) {
-      // generate access token
+      // Generate Access Token
       var accessToken = Crypto.sha1(username + '::' + password)
       
-      // set access token
+      // Set Access Token
       self.accessToken = accessToken
       localStorage.setItem('auth', accessToken)
     }
@@ -52,7 +52,7 @@ var Done = (function(baseSocketURL) {
     self.listener = {}
     
     var trySend = function (string) {
-      // try sending the message and retry if failed
+      // Try Sending the Message and Retry if Failed
       try {
         self.connection.send(string)
       } catch (variable) {
@@ -61,10 +61,10 @@ var Done = (function(baseSocketURL) {
     }
     
     self.send = function (object, type, callback) {
-      // add auth header
+      // Add Auth Header
       object[self.DONE_AUTH_HEADER] = self.accessToken
       
-      // add callback function
+      // Add Callback Function
       if (type && callback) {
         if (!self.listener.hasOwnProperty(type)) {
           self.listener[type] = []
@@ -82,7 +82,7 @@ var Done = (function(baseSocketURL) {
       var data = rawEvent.data
       
       if (self.listener.hasOwnProperty(type)) {
-        // call all callbacks
+        // Call all Callbacks
         self.listener[type].forEach(function (f) {
           if (typeof f === 'function') {
             f(action, type, data)
@@ -94,6 +94,7 @@ var Done = (function(baseSocketURL) {
     var pendingRawEvents = []
     
     function flushRequests() {
+      // Flush All Pending Events
       pendingRawEvents.forEach(function (x) {
         sendMessage(x)
       })
@@ -102,13 +103,14 @@ var Done = (function(baseSocketURL) {
     }
     
     function tryFlush() {
+      // Gain Access Token and Send It
       var token = self.accessToken === null ? '' : self.accessToken
       self.connection.send(self.accessToken)
     }
     
     self.connection.onmessage = function (event) {
       try {
-        // handle events
+        // Handle Events
         var rawEvent = JSON.parse(event.data)
       } catch (error) {
         if (event.data === 'true') {
@@ -122,6 +124,7 @@ var Done = (function(baseSocketURL) {
       }
       
       if (rawEvent.event === 'authenticationError') {
+        // Retry Flushing Events
         pendingRawEvents.push(rawEvent)
         tryFlush()
         
