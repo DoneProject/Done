@@ -31,6 +31,7 @@ global.Order = function Order(id,name,extra,price)
   this.price=price || 0;
   this.stats="none";
   this.statusCode=0;
+	this.date=new Date();
 }
 Order.from=function(t){
   return new Order(t.id,t.name,t.extras,t.price);

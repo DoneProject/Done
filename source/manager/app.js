@@ -414,6 +414,7 @@ function handleAddOrderList(data)
 		if(!to)return;
 		
 		to = Order.from(to);
+//		to.date=new Date();
 		to.extras = [];
 		if("extra" in b)b.extras=b.extra;
 		if("extras" in b)
@@ -1020,11 +1021,23 @@ function handleRequest(request,response)
 		return;
 	}
 
-	if(request.url=="/" || request.url.length==0)request.url="index.html";
 	if(request.url[0]=="/")request.url=request.url.replace("/","");
-
+	if(request.url=="/"||request.url.length==0)request.url="/index.html";
+	
+	var p = (__dirname+"/"+request.url).replace(/\/(\/)+/g,"/");
+	if(request.url.indexOf("overview")==0)
+	{
+		p=p.replace("/manager","/");
+	}
+	if(request.url.indexOf("app")==0)
+	{
+		p=p.replace("/manager","/");
+	}
+	if(p[p.length-1]=="/" || p=="/" || p=="")p+="/index.html";
+	
 	try{
-		var resp = fs.readFileSync(request.url);
+		console.log("REQUEST PATH",p);
+		var resp = fs.readFileSync(p);
 		if(request.url.search(/\.svg$/i)!==-1)
 		{
 			response.writeHead(200,{

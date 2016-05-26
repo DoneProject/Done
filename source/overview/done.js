@@ -30,7 +30,7 @@ var Done = (function(baseSocketURL) {
       }
     }
     
-    self.connection.onclose = errorHandler
+    self.connection.onclose = errorHandler;
     
     // ========
     // = Auth =
