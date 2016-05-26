@@ -1,6 +1,8 @@
 serverInfo={};
-password="";
+password=!!localStorage.password ? localStorage.password : "";
 ws = null;
+authenticationShown = false;
+
 //PH
 updateStatusView = function(){};
 
@@ -8,7 +10,7 @@ updateStatusView = function(){};
 popups={};
 tabledata={};
 
-//EventHandlers
+//EventHandlers - Handles events got from server
 var ehandlers={
 	addProduct:function(){
 		console.log("addProduct not implemented");
@@ -51,10 +53,14 @@ var ehandlers={
 	tableUpdate:function()
 	{
 		console.log("addLog not implemented");
+	},
+	authenticationError:function(){
+		console.log("authenticationError not implemented");
 	}
 };
 
 
+//Triggers a customEvent
 function sendEvent(name,element)
 {
 	element = element || document.body;
@@ -68,11 +74,13 @@ function sendEvent(name,element)
 	}
 }
 
+//Get authentication code
 function getToken()
 {
 	return sha1("server::"+password);
 }
 
+//Animation Proxy by Flexlex
 function aniprox(dur, fx) {
 	if(!("requestAnimationFrame" in window)){
 		requestAnimationFrame = mozAnimationFrame || oRequestAnimationFrame || webkitRequestAnimationFrame || msRequestAnimationFrame || function(fx){setTimeout(fx,16);}
@@ -197,9 +205,9 @@ Element.prototype.aniprox = function(dur,easing,concat){
 	return changeObjects;
 };
 Element.prototype.remove=function(){this.parentElement.removeChild(this);}
-
 var attele = {};
 
+//Float to String (filter)
 function price(flt)
 {
 	var t = ""+flt;
@@ -219,6 +227,7 @@ function price(flt)
 
 }
 
+//Nice alert
 function na(st,flash)
 {
 	var na = document.createElement("div");
@@ -251,6 +260,7 @@ function na(st,flash)
 	},50);
 };
 
+//Active the selected tab
 function highlight(nr)
 {
 	var opt = document.querySelectorAll(".side .more");
@@ -262,6 +272,7 @@ function highlight(nr)
 		opt[nr].setAttribute("data-active","true");
 }
 
+//Ajax with post
 function postrequest(url,data,cb,asjson)
 {
 	cb = cb || function(){};
@@ -271,6 +282,7 @@ function postrequest(url,data,cb,asjson)
 	{
 		fd.append(lol,data[lol]);
 	}
+	fd.append("DoneAuth",getToken());
 
 	var xml = new XMLHttpRequest;
 	xml.open("POST",url);
@@ -300,6 +312,7 @@ function postrequest(url,data,cb,asjson)
 		cb(e.message,true);
 	};
 }
+//Ajax with get
 function request(url,cb,asjson)
 {
 	cb = cb || function(){};
@@ -334,6 +347,7 @@ function request(url,cb,asjson)
 	};
 }
 
+//Got a beautifull WebSocket message
 function handleWSMessage(event)
 {
 	var d = event.data;
@@ -365,6 +379,7 @@ function handleWSMessage(event)
 	}
 }
 
+//convenient way to call REST apis
 var api={
 	"addextra":function(obj,cb){
 		if(obj == null)throw "Missing param";
@@ -452,6 +467,7 @@ var api={
 	}
 };
 
+//Fade in animation :O
 function fadeInMain()
 {
 	var m = document.querySelector(".main");
@@ -459,6 +475,7 @@ function fadeInMain()
 	m.aniprox(400).opacity=1;
 }
 
+//available Menus
 var menus={
 	"products":function(event)
 	{
@@ -506,6 +523,7 @@ var menus={
 	}
 };
 
+//Load dashboard with translation
 function loadModule()
 {
 	var root = document.querySelector(".pops[data-action=\"run\"]");
@@ -548,14 +566,14 @@ function loadModule()
 	eles.productsnumber.innerHTML=(activeLanguage.products || "Prodotti")+": 0";
 	eles.extranumber.innerHTML=(activeLanguage.extra || "Extra")+": 0";
 	eles.tablenumber.innerHTML=(activeLanguage.tables || "Tavoli")+": 0";
-	eles.orders.innerHTML=(activeLanguage.orderTot || "Ordini totali")+": 0";
+	//eles.orders.innerHTML=(activeLanguage.orderTot || "Ordini totali")+": 0";
 	eles.users.innerHTML=(activeLanguage.users || "Utenti")+": 0";
 	eles.logs.innerHTML=(activeLanguage.logs || "Cronologia");
 	var t = "<div class=\"info\"><i class=\"icon rot loading\"></i> "+(activeLanguage.waitForData)+"</div>";
 	eles.tables.innerHTML=t;
 
 	eles.incoming.innerHTML=(activeLanguage.earned || "Guadagno")+": ~0€";
-	eles.pending.innerHTML=(activeLanguage.orderPending || "Ordini attivi")+": 0";
+	//eles.pending.innerHTML=(activeLanguage.orderPending || "Ordini attivi")+": 0";
 	rz.trigger();
 
 	ehandlers.statsUpdate=function(data){
@@ -564,12 +582,12 @@ function loadModule()
 		eles.productsnumber.innerHTML=(activeLanguage.products || "Prodotti")+": "+data.products;
 		eles.extranumber.innerHTML=(activeLanguage.extra || "Extra")+": "+data.extras;
 		eles.tablenumber.innerHTML=(activeLanguage.tables || "Tavoli")+": "+data.tables;
-		eles.orders.innerHTML=(activeLanguage.orderTot || "Ordini totali")+": "+data.orders.total;
+		//eles.orders.innerHTML=(activeLanguage.orderTot || "Ordini totali")+": "+data.orders.total;
 		eles.users.innerHTML=(activeLanguage.users || "Utenti")+": "+data.users;
 
 
 		eles.incoming.innerHTML=(activeLanguage.earned || "Guadagno")+": ~"+data.earned+"€";
-		eles.pending.innerHTML=(activeLanguage.orderPending || "Ordini attivi")+": "+data.orders.active;
+		//eles.pending.innerHTML=(activeLanguage.orderPending || "Ordini attivi")+": "+data.orders.active;
 		rz.trigger();
 
 		var pwi = document.querySelector(".setting.list input[data-action=\"password\"]");
@@ -777,6 +795,7 @@ function loadModule()
 	ws.send('{"get":"tables","DoneAuth":"'+getToken()+'"}');
 };
 
+//Resizer
 rz={};
 rz.dash_tab = function(root,or)
 {
@@ -805,6 +824,7 @@ rz.trigger=function(){
 	!!dash_tab && rz.dash_tab(dash_tab);
 };
 
+//Extra Window
 function extraInit()
 {
 	var root = document.querySelector(".pops[data-action=\"extra\"]");
@@ -1018,6 +1038,7 @@ function extraInit()
 	};
 }
 
+//Product Window
 function productInit()
 {
 	var root = document.querySelector(".pops[data-action=\"products\"]");
@@ -1230,6 +1251,7 @@ function productInit()
 	}
 }
 
+//Welcome window (first window)
 function welcomeInit()
 {
 	var general = document.querySelector(".pops[data-action=\"general\"]");
@@ -1284,6 +1306,7 @@ function welcomeInit()
 var open_attempt=0;
 var c_lost = false;
 
+//Connection lost
 function handleConnectionLost()
 {
 	var alertDiv = document.querySelector(".alertDiv");
@@ -1299,7 +1322,7 @@ function handleConnectionLost()
 		});
 	}
 }
-
+//connection established
 function handleConnectionEstablished()
 {
 	var side = document.querySelector(".side");
@@ -1320,7 +1343,7 @@ function handleConnectionEstablished()
 		},400);
 	}
 }
-
+//Connect attempt
 function connect(con_problem)
 {
 	if((open_attempt>10 && !con_problem)){
@@ -1347,7 +1370,7 @@ function connect(con_problem)
 		setTimeout(connect,con_problem?5000:500);
 	};
 }
-
+//Get necessary data
 function getProductsAndExtras()
 {
 	if(ws.readyState==ws.OPEN)
@@ -1360,7 +1383,6 @@ function getProductsAndExtras()
 	}
 	setTimeout(getProductsAndExtras,100);
 }
-
 //NOTE popup manager
 function createPopup(title,element)
 {
@@ -1450,7 +1472,6 @@ function createPopup(title,element)
 	activePopup=o;
 	return o;
 }
-
 //NOTE User init
 function userInit()
 {
@@ -1660,6 +1681,29 @@ function userInit()
 	};
 }
 
+//NOTE authentication handler
+function authInit()
+{
+	ehandlers.authenticationError=function()
+	{
+		if(authenticationShown)return;
+		authenticationShown=true;
+		var e = document.createElement("div");
+		e.innerHTML="<div class=\"info\">"+activeLanguage.passwordPrompt+"<form onsubmit=\"event.preventDefault();return;\"><input type=\"password\" placeholder=\"password\" autofocus><button type=\"submit\" class=\"main\">Login</button></form></div>";
+		var f = e.querySelector("form");
+		var inp = e.querySelector("input");
+		f.addEventListener("submit",function(){
+			localStorage.password=inp.value;
+			location.reload();
+			authenticationShown=false;
+		})
+		var p = createPopup(activeLanguage.insertPassword,e);
+		p.show();
+		p.shown=function(){
+			inp.focus();
+		};
+	};
+}
 
 //NOTE log init
 function logInit()
@@ -1692,7 +1736,6 @@ function logInit()
 		list.insertBefore(li,list.children[0]);
 	}
 }
-
 //NOTE initializer
 function init()
 {
@@ -1733,13 +1776,14 @@ function init()
 	productInit();
 	userInit();
 	logInit();
+	authInit();
 	api.info(function(data){
 		(serverInfo=data);
 		connect();
 		getProductsAndExtras();
 	});
 	addEventListener("keydown",function(event){
-		if(event.keyCode==13)
+		if(event.keyCode==13 && authenticationShown==false)
 		{
 			var s = document.querySelector(".side [data-active=\"true\"]");
 			if(!s){
@@ -1759,7 +1803,7 @@ function init()
 	Translation.applyTo();
 }
 
-//Coding
+//Sha1 hash
 function sha1(r){var e,o,a,t,c,h,n,f,s,u=function(r,e){var o=r<<e|r>>>32-e;return o},C=function(r){var e,o,a="";for(e=7;e>=0;e--)o=r>>>4*e&15,a+=o.toString(16);return a},d=Array(80),A=1732584193,p=4023233417,i=2562383102,g=271733878,v=3285377520;r=unescape(encodeURIComponent(r));var b=r.length,k=[];for(o=0;b-3>o;o+=4)a=r.charCodeAt(o)<<24|r.charCodeAt(o+1)<<16|r.charCodeAt(o+2)<<8|r.charCodeAt(o+3),k.push(a);switch(b%4){case 0:o=2147483648;break;case 1:o=r.charCodeAt(b-1)<<24|8388608;break;case 2:o=r.charCodeAt(b-2)<<24|r.charCodeAt(b-1)<<16|32768;break;case 3:o=r.charCodeAt(b-3)<<24|r.charCodeAt(b-2)<<16|r.charCodeAt(b-1)<<8|128}for(k.push(o);k.length%16!=14;)k.push(0);for(k.push(b>>>29),k.push(b<<3&4294967295),e=0;e<k.length;e+=16){for(o=0;16>o;o++)d[o]=k[e+o];for(o=16;79>=o;o++)d[o]=u(d[o-3]^d[o-8]^d[o-14]^d[o-16],1);for(t=A,c=p,h=i,n=g,f=v,o=0;19>=o;o++)s=u(t,5)+(c&h|~c&n)+f+d[o]+1518500249&4294967295,f=n,n=h,h=u(c,30),c=t,t=s;for(o=20;39>=o;o++)s=u(t,5)+(c^h^n)+f+d[o]+1859775393&4294967295,f=n,n=h,h=u(c,30),c=t,t=s;for(o=40;59>=o;o++)s=u(t,5)+(c&h|c&n|h&n)+f+d[o]+2400959708&4294967295,f=n,n=h,h=u(c,30),c=t,t=s;for(o=60;79>=o;o++)s=u(t,5)+(c^h^n)+f+d[o]+3395469782&4294967295,f=n,n=h,h=u(c,30),c=t,t=s;A=A+t&4294967295,p=p+c&4294967295,i=i+h&4294967295,g=g+n&4294967295,v=v+f&4294967295}return s=C(A)+C(p)+C(i)+C(g)+C(v),s.toLowerCase()}
 
 //DEBUGGING
@@ -1771,8 +1815,6 @@ function debugme()
 	}
 	return gws;
 }
-
-
 function debugOrder()
 {
 	ws.send(JSON.stringify(

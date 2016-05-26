@@ -228,6 +228,12 @@ function parseFormData(data)
 			d[p]=t;
 		}
 	}
+	if(password.length > 0 && !checkHashOnly(d.DoneAuth))
+	 {
+		 return {
+			 "authenticationError":true
+		 };
+	 }
 	return d;
 }
 
@@ -382,8 +388,6 @@ function checkTables(tbl)
 		else
 		{
 			t.isWaiting=false;
-			t.isPayed=true;
-			t.isFree=false;
 		}
 		return t;
 	});
@@ -419,7 +423,11 @@ function handleAddOrderList(data)
 					if("id" in x && x.id==c.id)return true;
 					return x.name.toLowerCase()==c.name.toLowerCase();
 				});
-				if(!!ex)to.extras.push(ex);
+				if(!!ex)
+				{
+					ex.action=c.action;
+					to.extras.push(ex);
+				}
 			});
 		}
 		orders.push(to);
@@ -442,6 +450,14 @@ function checkHash(ws,hash)
 	});
 	if(mytoken==hash)i=1;
 	ws.send(""+(i!=-1));
+}
+function checkHashOnly(hash)
+{
+	var i = users.findIndex(u=>{
+		return hash==sha1(u.username+"::"+password);
+	});
+	if(mytoken==hash)i=1;
+	return i!=1;
 }
 
 //Handle WebSocket Messages
@@ -583,19 +599,23 @@ function messageRecived(ws,message)
 							wsaction.tableChange();
 						}
 					});
+					save();
 				}
 				break;
 			case "orderListAdd":
 				if(!!d)
 				{
 					handleAddOrderList(d);
+					save();
 				}
 				break;
 			case "delOrderlist":
 				if(!!d)delOrderlist(d);
+				save();
 				break;
 			case "doneOrderlist":
 				if(!!d)doneOrderlist(d);
+				save();
 				break;
 		}
 	}
@@ -902,7 +922,7 @@ var api_handlers = {
 	"startexecution":function(m,req,res)
 	{
 		postHandle(req,function(o){
-			if(o.password.length<=1 || o.password==undefined)
+			if(o.password==undefined || o.password.length==0)
 			{
 				password="";
 			}
