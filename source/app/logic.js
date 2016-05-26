@@ -6,46 +6,56 @@ var listOrders = function (orders, id) {
   orders.forEach(function (x) {
     var item = document.createElement('li')
     
+    // Set Attributes
     item.className = 'order-item'
     item.dataset.orderId = id
     
+    // Add Inner HTML
     item.innerHTML  = '<div class="order-name">'+ x.name + '</div>'
     item.innerHTML += '<div class="order-extras">' + x.extras.map(function (extra) {
       return extra.action + extra.name
     }).join(', ') + '</div>'
     item.innerHTML += '<button class="delete-button" onclick="deleteOrderById(\'' + id + '\')"></button>'
     
+    // List Item
     vc.activeTableOrders.appendChild(item)
   })
 }
 
+/**
+ * Refreshes all tables in the Done app.
+ * 
+ * @param tables An array of tables.
+ */
 var refreshTableHTML = function (tables) {
-  if (!tables) { return }
+  if (!tables || typeof tables.forEach !== 'function') { return }
   
+  // Clear Table View
   vc.view.innerHTML = ''  
   
+  // Rebuild Table View
   tables.forEach(function (x) {
     if (vc.activeTable && vc.activeTable.id === x.id) {
       vc.activeTable = x
     }
     
+    // Create Table DOM Object
     var element  = document.createElement('div')
     var contents = document.createElement('div')
     
-    // create table object
     element.id = 'table-' + x.id
     element.dataset.id = x.id
     element.classList.add('table')
     contents.classList.add('table-contents')
     
-    // set states
+    // Set States
     if (x.isFree)    { element.classList.add('table-free') }
     if (x.isPayed)   { element.classList.add('table-payed') }
     if (x.isWaiting) { element.classList.add('table-waiting') }
     
     contents.innerHTML = x.name
     
-    // handle table clicks
+    // Handle Table Clicks
     element.addEventListener('click', function () {
       vc.activeTable = new Table(x.id, x.name, x.pending, x.isFree, x.isPayed, x.isWaiting, x.nr)
       
@@ -55,6 +65,7 @@ var refreshTableHTML = function (tables) {
         listOrders(y.orders, vc.activeTable.pending[0].id)
       })
       
+      // Toggle Mark as Free Button
       if (vc.activeTable.isFree) {
         vc.buttons.markAsFree.setAttribute('hidden', 'hidden')
       } else {
@@ -62,11 +73,12 @@ var refreshTableHTML = function (tables) {
       }
     })
     
-    // add tables to the grid
+    // Add Tables to the Grid
     element.appendChild(contents)
     vc.view.appendChild(element)
   })
   
+  // Update Active Table View
   if (vc.activeTable && vc.activeTable.pending.length > 0) {
     var orders = []
     
@@ -80,30 +92,34 @@ var refreshTableHTML = function (tables) {
   }
 }
 
+// Mark Tables as Free
+vc.buttons.markAsFree.addEventListener('click', function () {
+  Done.markFreeById(vc.activeTable.id, refreshTableHTML)
+  vc.buttons.markAsFree.setAttribute('hidden', 'hidden')
+})
+
+// Delete Orders
+var deleteOrderById = function (id) {
+  Done.deleteOrder(id)
+}
+
+// =====================
+// = Listen For Tables =
+// =====================
+
 Done.getTables(function (action, type, data) {
   refreshTableHTML(data.tables)
 })
 Done.changeTable(function (action, type, data) {
   vc.activeTableOrders.innerHTML = ''
-  
   refreshTableHTML(data.tables)
-})
-
-var deleteOrderById = function (id) {
-  Done.deleteOrder(id)
-}
-
-// mark tables as free
-vc.buttons.markAsFree.addEventListener('click', function () {
-  Done.markFreeById(vc.activeTable.id, refreshTableHTML)
-  vc.buttons.markAsFree.setAttribute('hidden', 'hidden')
 })
 
 // ===================
 // = Order Interface =
 // ===================
 
-// open add order sheet
+// Open add Order Sheet
 vc.buttons.addOrder.addEventListener('click', function () {
   vc.openTabById('view-add-order', true)
 })
@@ -123,9 +139,9 @@ var fuzzyMatch = function (hay, query) {
 }
 
 var initFilter = function (input, listNode) {
-  // listen for input events and start filtering
+  // Listen for Input Events and Start Filtering
   input.addEventListener('input', function () {
-    // cut out query
+    // Cut out Query
     var query = this.value
       .replace(/[+-]/g, '')
       .replace(/.*,\s*/, '')
@@ -136,7 +152,7 @@ var initFilter = function (input, listNode) {
       items.push(suggestionNodes[i])
     }
     
-    // filter suggestions
+    // Filter Suggestions
     items.forEach(function (x) {
       var matches = fuzzyMatch(x.dataset.value, query)
       
@@ -152,7 +168,7 @@ var initFilter = function (input, listNode) {
 var updateSuggestions = function (input, listNode, datalist, callback) {
   listNode.innerHTML = ''
   
-  // list new suggestions
+  // List new Suggestions
   datalist.forEach(function (x) {
     var suggestion = document.createElement('li')
     
@@ -160,7 +176,7 @@ var updateSuggestions = function (input, listNode, datalist, callback) {
     suggestion.dataset.value = x.name
     suggestion.classList.add('suggestion')
     
-    // invoke callback with decision handler
+    // Invoke Callback With Decision Handler
     suggestion.addEventListener('click', function () {
       callback(input, suggestion)
     })
@@ -169,6 +185,7 @@ var updateSuggestions = function (input, listNode, datalist, callback) {
   })
 }
 
+// Register Filters
 initFilter(vc.inputs.order, vc.suggestions.order)
 initFilter(vc.inputs.extras, vc.suggestions.extras)
 
@@ -190,6 +207,7 @@ Done.getExtras(function (action, type, extras) {
       if (foo !== null) {
         return foo[1]
       } else {
+        // Ask for Confirm
         return confirm('OK: +, Cancel: -') ? '+' : '-'
       }
     }())
@@ -203,8 +221,11 @@ Done.getExtras(function (action, type, extras) {
 // ===================
 
 var addToOrders = function () {
+  // Create Package
   var package = {}
+  // Grap Order
   var order = vc.inputs.order.value
+  // Grap Extras With Action
   var extras = vc.inputs.extras.value.split(',').map(function (x) {
     return x.replace(/^\s*(.*?)\s*$/, '$1')
   }).filter(function (x) {
@@ -216,6 +237,7 @@ var addToOrders = function () {
     return { action: parts[1], name: parts[2] }
   })
   
+  // Send Order With Extras to Server
   Done.postOrder(vc.activeTable.id, [{
     name: order,
     extras: extras
@@ -223,6 +245,7 @@ var addToOrders = function () {
   
   vc.openTabById('view-table')
   
+  // Clear Input
   vc.inputs.order.value = ''
   vc.inputs.extras.value = ''
   
