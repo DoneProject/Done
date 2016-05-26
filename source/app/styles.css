@@ -123,8 +123,9 @@ legend {
   font: inherit;
   font-weight: 700;
   line-height: 1.8;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
   width: 100%;
-  border-bottom: 1px solid #333;
   margin-left: 8px;
 }
 
@@ -147,6 +148,7 @@ legend {
 label {
   display: block;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
   font-size: 13px;
   padding-right: 8px;
   padding-left: 8px;
@@ -360,6 +362,7 @@ input[type=search]:focus {
 .order-item {
   position: relative;
   list-style: none;
+  padding-top: 0.5em;
 }
 
 .order-item + .order-item {
@@ -380,7 +383,7 @@ input[type=search]:focus {
   background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMTYgMTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxwYXRoIGQ9Ik0wLjUsMC41bDE1LDE1IiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlPSIjZjAwIi8+PHBhdGggZD0iTTE1LjUsMC41bC0xNSwxNSIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZT0iI2YwMCIvPjwvc3ZnPg==) center center / 12px 12px no-repeat;
   border: 1px solid #f00;
   border-radius: 50%;
-  top: 5px;
+  top: 8px;
   right: 0;
 }
 
