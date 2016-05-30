@@ -20,8 +20,8 @@
         <ul id="active-table-orders"></ul>
         
         <footer class="view-footer">
-          <button id="mark-as-free-button" class="button" data-translation="Mark as Free" hidden="hidden">Mark as Free</button>
-          <button id="add-order-button" class="button" data-translation="Add Order">Add Order</button>
+          <button id="mark-as-free-button" class="button" data-translation="MarkasFree" hidden="hidden">Mark as Free</button>
+          <button id="add-order-button" class="button" data-translation="AddOrder">Add Order</button>
         </footer>
       </section>
       
@@ -39,7 +39,7 @@
         </form>
         
         <footer class="view-footer">
-          <button id="add-to-orders-button" class="button" data-translation="Add to Orders">Add to Orders</button>
+          <button id="add-to-orders-button" class="button" data-translation="AddtoOrders">Add to Orders</button>
         </footer>
       </section>
       
@@ -65,7 +65,7 @@
             <legend data-translation="Accessibility">Accessibility</legend>
             
             <div class="lhmf">
-              <button type="button" class="button" id="toggle-left-handed-mode-button" data-translation="Toggle Left-Handed Mode">Toggle Left-Handed Mode</button>
+              <button type="button" class="button" id="toggle-left-handed-mode-button" data-translation="ToggleLeftHandedMode">Toggle Left-Handed Mode</button>
             </div>
           </fieldset>
         </form>
@@ -94,12 +94,9 @@
       </nav>
     </footer>
     
-    <script>
-    if (navigator.userAgent.indexOf('iPhone') !== -1) {
-      document.body.classList.add('ios')
-    }
-    </script>
     <script src="crypto.js"></script>
+    <script src="dict.js"></script>
+    <script>Translation.applyTo()</script>
     <script src="done.js"></script>
     <script src="velocity.min.js"></script>
     <script src="stdlib.js"></script>
