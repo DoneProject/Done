@@ -61,7 +61,7 @@ var vc = (function() {
   
   // Register View Conterr
   self.selectTabEvents.push({ tabName: 'table', action: function () {
-    self.title.innerHTML = 'Order'
+    self.title.innerHTML = l('Order')
     
     if (self.activeTable === null) {
       self.buttons.addOrder.setAttribute('hidden', 'hidden')
@@ -70,12 +70,12 @@ var vc = (function() {
     }
     
     if (self.activeTable === null) {
-      self.activeTableOrders.innerHTML = '<li class="empty">No Table</li>'
+      self.activeTableOrders.innerHTML = '<li class="empty">'+l('NoTable')+'</li>'
     } else {
       self.title.innerHTML = self.activeTable.name
       
       if (self.activeTable.pending.length <= 0) {
-        self.activeTableOrders.innerHTML = '<li class="empty">No Orders</li>'
+        self.activeTableOrders.innerHTML = '<li class="empty">'+l('NoOrders')+'</li>'
       } else {
         self.activeTableOrders.innerHTML = ''
       }
@@ -84,7 +84,7 @@ var vc = (function() {
   
   // Register Active Table View
   self.selectTabEvents.push({ tabName: 'add-order', action: function () {
-    self.title.innerHTML = 'Add Order'
+    self.title.innerHTML = l('AddOrder')
     
     setTimeout(function () {
       self.inputs.order.focus()
@@ -93,7 +93,7 @@ var vc = (function() {
   
   // Register Settings View
   self.selectTabEvents.push({ tabName: 'settings', action: function () {
-    self.title.innerHTML = 'Settings'
+    self.title.innerHTML = l('Settings')
   }})
   
   // ========
@@ -163,6 +163,7 @@ var vc = (function() {
     self.activeView = newView
     
     history.pushState('', document.title, location.pathname)
+    Translation.applyTo()
   }
   
   window.addEventListener('hashchange', function () {
