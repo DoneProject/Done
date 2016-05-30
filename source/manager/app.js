@@ -228,6 +228,12 @@ function parseFormData(data)
 			d[p]=t;
 		}
 	}
+	if(password.length > 0 && !checkHashOnly(d.DoneAuth))
+	 {
+		 return {
+			 "authenticationError":true
+		 };
+	 }
 	return d;
 }
 
@@ -382,8 +388,6 @@ function checkTables(tbl)
 		else
 		{
 			t.isWaiting=false;
-			t.isPayed=true;
-			t.isFree=false;
 		}
 		return t;
 	});
@@ -410,6 +414,7 @@ function handleAddOrderList(data)
 		if(!to)return;
 		
 		to = Order.from(to);
+//		to.date=new Date();
 		to.extras = [];
 		if("extra" in b)b.extras=b.extra;
 		if("extras" in b)
@@ -419,7 +424,11 @@ function handleAddOrderList(data)
 					if("id" in x && x.id==c.id)return true;
 					return x.name.toLowerCase()==c.name.toLowerCase();
 				});
-				if(!!ex)to.extras.push(ex);
+				if(!!ex)
+				{
+					ex.action=c.action;
+					to.extras.push(ex);
+				}
 			});
 		}
 		orders.push(to);
@@ -442,6 +451,14 @@ function checkHash(ws,hash)
 	});
 	if(mytoken==hash)i=1;
 	ws.send(""+(i!=-1));
+}
+function checkHashOnly(hash)
+{
+	var i = users.findIndex(u=>{
+		return hash==sha1(u.username+"::"+password);
+	});
+	if(mytoken==hash)i=1;
+	return i!=1;
 }
 
 //Handle WebSocket Messages
@@ -583,19 +600,23 @@ function messageRecived(ws,message)
 							wsaction.tableChange();
 						}
 					});
+					save();
 				}
 				break;
 			case "orderListAdd":
 				if(!!d)
 				{
 					handleAddOrderList(d);
+					save();
 				}
 				break;
 			case "delOrderlist":
 				if(!!d)delOrderlist(d);
+				save();
 				break;
 			case "doneOrderlist":
 				if(!!d)doneOrderlist(d);
+				save();
 				break;
 		}
 	}
@@ -902,7 +923,7 @@ var api_handlers = {
 	"startexecution":function(m,req,res)
 	{
 		postHandle(req,function(o){
-			if(o.password.length<=1 || o.password==undefined)
+			if(o.password==undefined || o.password.length==0)
 			{
 				password="";
 			}
@@ -1000,11 +1021,23 @@ function handleRequest(request,response)
 		return;
 	}
 
-	if(request.url=="/" || request.url.length==0)request.url="index.html";
 	if(request.url[0]=="/")request.url=request.url.replace("/","");
-
+	if(request.url=="/"||request.url.length==0)request.url="/index.html";
+	
+	var p = (__dirname+"/"+request.url).replace(/\/(\/)+/g,"/");
+	if(request.url.indexOf("overview")==0)
+	{
+		p=p.replace("/manager","/");
+	}
+	if(request.url.indexOf("app")==0)
+	{
+		p=p.replace("/manager","/");
+	}
+	if(p[p.length-1]=="/" || p=="/" || p=="")p+="/index.html";
+	
 	try{
-		var resp = fs.readFileSync(request.url);
+		console.log("REQUEST PATH",p);
+		var resp = fs.readFileSync(p);
 		if(request.url.search(/\.svg$/i)!==-1)
 		{
 			response.writeHead(200,{
