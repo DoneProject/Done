@@ -208,7 +208,7 @@ Done.getExtras(function (action, type, extras) {
         return foo[1]
       } else {
         // Ask for Confirm
-        return confirm('OK: +, Cancel: -') ? '+' : '-'
+        return confirm('OK: +, '+l('Cancel')+': -') ? '+' : '-'
       }
     }())
     
