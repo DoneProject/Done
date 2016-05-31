@@ -585,12 +585,12 @@ function loadModule()
 		//eles.orders.innerHTML=(activeLanguage.orderTot || "Ordini totali")+": "+data.orders.total;
 		eles.users.innerHTML=(activeLanguage.users || "Utenti")+": "+data.users;
 
-
 		eles.incoming.innerHTML=(activeLanguage.earned || "Guadagno")+": ~"+data.earned+"€";
 		//eles.pending.innerHTML=(activeLanguage.orderPending || "Ordini attivi")+": "+data.orders.active;
 		rz.trigger();
 
 		var pwi = document.querySelector(".setting.list input[data-action=\"password\"]");
+		console.log("PWI",pwi,"DATA",data);
 		if(!!pwi)
 		{
 			if(data.password=="false" || data.password==false || data.password.indexOf("false")==0)
@@ -1290,7 +1290,6 @@ function welcomeInit()
 	ehandlers.updateTablecount=function(aObj)
 	{
 		tableinput.value=aObj.count;
-		console.log("TABLE OBJ",aObj);
 		ehandlers.updateTablecount2(aObj);
 	}
 	var btn = general.querySelector(".stepon button");
@@ -1342,6 +1341,10 @@ function handleConnectionEstablished()
 			alertDiv.remove();
 		},400);
 	}
+	ws.send(JSON.stringify({
+		get:"stats",
+		DoneAuth:getToken()
+	}));
 }
 //Connect attempt
 function connect(con_problem)
@@ -1801,6 +1804,20 @@ function init()
 	});
 	addEventListener("resize",rz.trigger);
 	Translation.applyTo();
+	
+	ehandlers.statsUpdate=function(data){
+		var pwi = document.querySelector(".setting.list input[data-action=\"password\"]");
+		console.log("PWI",pwi,"DATA",data);
+		if(!!pwi)
+		{
+			if(data.password=="false" || data.password==false || data.password.indexOf("false")==0)
+			{
+				pwi.value="";
+				return;
+			}
+			pwi.value=data.password;
+		}
+	};
 }
 
 //Sha1 hash

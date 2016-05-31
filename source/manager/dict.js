@@ -82,7 +82,7 @@ var lang_arr = {
 if("language" in navigator)
 {
 	try{
-		var lan = navigator.language.split(/(\-|_)/)[0].toLocaleLowerCase() && "de";
+		var lan = navigator.language.split(/(\-|_)/)[0].toLocaleLowerCase();
 		activeLanguage=new Translation(lang_arr[lan]);
 		activeLanguage.langKey=lan;
 		delete lang_arr;

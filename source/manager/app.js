@@ -346,7 +346,7 @@ function broadcast(msg)
 //Trigger an event on every connected client
 function sendEvent(eventName,data)
 {
-	console.log("SEND EVENT",eventName,data);
+	//console.log("SEND EVENT",eventName,data);
 	broadcast(JSON.stringify({
 		"action":"event",
 		"event":eventName,
@@ -356,7 +356,7 @@ function sendEvent(eventName,data)
 
 //Trigger an event on a client
 function sendEventTo(ws,eventName,data){
-	console.log("SEND EVENT TO",eventName,data);
+	//console.log("SEND EVENT TO",eventName,data);
 	ws.send(JSON.stringify({
 		action:"event",
 		"event":eventName,
@@ -468,14 +468,14 @@ function messageRecived(ws,message)
 		var j = JSON.parse(message);
 	}catch(e)
 	{
-		console.log(message);
+		//console.log(message);
 		checkHash(ws,message);
 		return;
 	}
 	if("DoneAuth" in j && password.length>0)
 	{
 		var i = users.findIndex(u=>{
-			console.log(u.username,sha1(u.username+"::"+password));
+			//console.log(u.username,sha1(u.username+"::"+password));
 			return j.DoneAuth==sha1(u.username+"::"+password);
 		});
 		if(i==-1)
@@ -688,7 +688,6 @@ var api_handlers = {
 		return JSON.stringify({"offer":getPendingId()})
 	},
 	"info":function(m,req,res){
-		console.log("CIIA");
 		serverInfo(function(o){
 			res.end(JSON.stringify(o));
 		});
@@ -898,10 +897,10 @@ var api_handlers = {
 						var dif = c-tables.length;
 						for(var i = dif; --i>=0;)
 						{
-							console.log("TABLE COUNT:"+i);
+//							console.log("TABLE COUNT:"+i);
 							tables.push(new Table(getTableId()));
 						}
-						console.log("END");
+//						console.log("END");
 					}
 					var table = enumTables();
 					var t = {action:"settables",tables:tables,count:tables.length};
@@ -913,7 +912,7 @@ var api_handlers = {
 				return;
 			}catch(e){
 				res.end("{\"error\":\"Invalid data format\"}");
-				console.log("ERROR:",e.message);
+//				console.log("ERROR:",e.message);
 				return;
 			};
 			res.end("Somthing strange happened");
@@ -943,6 +942,7 @@ var api_handlers = {
 	{
 		postHandle(req,function(o){
 			if(!("username" in o)){
+				console.log("NO USERNAME ERROR",o);
 				res.end(errorJSON("No username defined"));
 				return;
 			}
@@ -981,7 +981,6 @@ var api_handlers = {
 			{
 				if(users[i].id==id)
 				{
-					console.log("USER FOUND");
 					users.splice(i,1);
 					wsaction.delUser(id);
 					res.end('{"deleted":"'+id+'"}');
@@ -1036,7 +1035,7 @@ function handleRequest(request,response)
 	if(p[p.length-1]=="/" || p=="/" || p=="")p+="/index.html";
 	
 	try{
-		console.log("REQUEST PATH",p);
+//		console.log("REQUEST PATH",p);
 		var resp = fs.readFileSync(p);
 		if(request.url.search(/\.svg$/i)!==-1)
 		{
@@ -1072,21 +1071,21 @@ function save()
 function hinit()
 {
 	serverInfo(function(o){
-		console.log(o);
+//		console.log(o);
 		if(o.links.length>0)
 		{
 			console.log("URL: "+("http://"+o.links[0]+":"+o.webPort));
-//			opener("http://"+o.links[0]+":"+o.webPort);
+			opener("http://"+o.links[0]+":"+o.webPort);
 		}
 		else if(o.address.length>0)
 		{
 			console.log("URL: "+("http://"+o.address+":"+o.webPort));
-//			opener("http://"+o.address+":"+o.webPort);
+			opener("http://"+o.address+":"+o.webPort);
 		}
 		else
 		{
 			console.log("URL: "+("http://127.0.0.1:"+o.webPort));
-//			opener("http://127.0.0.1:"+o.webPort);
+			opener("http://127.0.0.1:"+o.webPort);
 		}
 		wsaction.log("Server is ready");
 	});
@@ -1156,6 +1155,7 @@ function importFiles(root){
 	ifExists(root+"/status.json")(function(json){
 		earned = json.earned;
 		orders = json.orders.total;
+		password = json.password;
 	});
 	ifExists(root+"/table.json")(function(json){
 		tables=json;
